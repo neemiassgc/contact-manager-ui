@@ -6,12 +6,14 @@ import SearchIcon from '@mui/icons-material/Search';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useState } from 'react';
+import { ContactView } from "./components"
+import { Contact, getData } from './net';
 
 export default function Home() {
   return (
     <>
       <Header/>
-      <main className="mt-36 w-full p-1">
+      <main className="mt-16 w-full p-1">
         <Box className="w-5/12 mx-auto">
           <ContactActionHeader/>
           <ContactBoard/>
@@ -43,6 +45,14 @@ function Header() {
 }
 
 function ContactActionHeader() {
+  const [open, setOpen] = useState(false);
+
+  const handleOpen: (value: boolean) => () => void = value => {
+    return () => {
+      setOpen(value);
+    }
+  }
+
   return (
     <Box className="w-full flex mb-3 justify-between">
       <OutlinedInput
@@ -55,7 +65,8 @@ function ContactActionHeader() {
           </InputAdornment>
         }
       />
-      <Button className="right-0" variant="contained" size="small" startIcon={<PersonAddIcon/>}>Add Contact</Button>
+      <Button onClick={handleOpen(true)} className="right-0" variant="contained" size="small" startIcon={<PersonAddIcon/>}>Add Contact</Button>
+      <ContactView open={open} handleClose={handleOpen(false)}/>
     </Box>
   )
 }
@@ -77,24 +88,24 @@ function ContactBoard() {
   return (
     <>
       <Box className="w-full bg-white rounded-lg border-2">
-        {generateList(getData(3, page), handleClick, indexSet)}
+        {generateList(getPaginatedData(3, page), handleClick, indexSet)}
       </Box>
       <Box className="p-2">
-        <Pagination className="w-fit mx-auto" count={4} page={page} onChange={handlePagination} size="large" />
+        <Pagination className="w-fit mx-auto" count={3} page={page} onChange={handlePagination} size="large" />
       </Box>
     </>
   )
 }
 
-function getData(size: number, page: number): string[] {
-  const names: string[] = ["Tom", "Jerry", "Mickey", "Rose", "Gary", "Tyrel", "Gulia", "Roger", "Anna", "Steven", "Bob", "Richard"];
+function getPaginatedData(size: number, page: number): Contact[] {
+  const contacts: Contact[] = getData();
   const viewStart: number = size * page - size;
-  return names.slice(viewStart === 0 ? 0 : viewStart, size * page);
+  return contacts.slice(viewStart === 0 ? 0 : viewStart, size * page);
 }
 
-function generateList(contactNames: string[], handleClick: (event: any) => void, indexSet: boolean[]) {
+function generateList(contacts: Contact[], handleClick: (event: any) => void, indexSet: boolean[]) {
   const elements = [];
-  for (let i = 0; i < contactNames.length; i++) {
+  for (let i = 0; i < contacts.length; i++) {
     elements.push(
       <ListItem secondaryAction={
         <Checkbox
@@ -106,11 +117,16 @@ function generateList(contactNames: string[], handleClick: (event: any) => void,
         <ListItemButton selected={indexSet[i]}>
           <ListItemAvatar>
             <Avatar>
-              {contactNames[i][0].toUpperCase()}
+              {contacts[i].name[0].toUpperCase()}
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary={contactNames[i]} secondary={
-              "+8187271092831"
+          <ListItemText primary={contacts[i].name} secondary={
+              (() => {
+                const phoneNumbers: string[] = [];
+                for (const key in contacts[i].phoneNumbers)
+                  phoneNumbers.push(`${key}: ${contacts[i].phoneNumbers[key]}`)
+                return phoneNumbers[0]
+              })()
             }/>
         </ListItemButton>
       </ListItem>
