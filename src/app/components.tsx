@@ -35,16 +35,19 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
             <PhoneIcon className="mr-2"/> Phone
           </AccordionSummary>
           <AccordionDetails>
-            <List dense>
+            <List dense className="border rounded-lg">
               {
-                toKeys(contact.phoneNumbers).map(item => {
-                  return <>
-                    <ListSubheader>{item}</ListSubheader>
-                    <ListItem divider secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
-                      {contact.phoneNumbers[item]}
-                    </ListItem>
-                  </>
-                })
+                (() => {
+                  const keys: string[] = toKeys(contact.phoneNumbers);
+                  return keys.map((item, index) => {
+                    return <>
+                      <ListSubheader>{item}</ListSubheader>
+                      <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
+                        {contact.phoneNumbers[item]}
+                      </ListItem>
+                    </>
+                  })
+                })()
               }
             </List>
           </AccordionDetails>
@@ -54,16 +57,19 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
             <EmailIcon className="mr-2"/> Email
           </AccordionSummary>
           <AccordionDetails>
-            <List dense>
+            <List dense className="border rounded-lg">
               {
-                toKeys(contact.emails).map(item => {
-                  return <>
-                    <ListSubheader>{item}</ListSubheader>
-                    <ListItem divider secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
-                      {contact.emails[item]}
-                    </ListItem>
-                  </>
-                })     
+                (() => {
+                  const keys: string[] = toKeys(contact.emails);
+                  return keys.map((item, index) => {
+                    return <>
+                      <ListSubheader>{item}</ListSubheader>
+                      <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
+                        {contact.emails[item]}
+                      </ListItem>
+                    </>
+                  })  
+                })()
               }
             </List>
           </AccordionDetails>
@@ -98,7 +104,7 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
   const addressKeys: string[] = toKeys(addresses);
 
   return (
-    <>
+    <Box className="w-full p-3 border rounded-lg">
       <Box className="w-fit mx-auto mb-3">
         <ToggleButtonGroup className="mx-auto" value={alignment} exclusive onChange={handleAlignment} size="small">
           {
@@ -109,7 +115,7 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
       <Box>
         {
           addressKeys.map((key, index) => {
-              return <Box key={index} className={"flex gap-2 flex-wrap w-full "+(index === alignment ? "block" : "hidden")}>
+              return <Box key={index} className={"flex gap-2 flex-wrap w-full justify-center "+(index === alignment ? "block" : "hidden")}>
                 {
                   toKeys(addresses[key]).map((prop, index) => {
                     return <TextField
@@ -132,7 +138,7 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
           })
         }
       </Box>
-    </>
+    </Box>
   )
 }
 
