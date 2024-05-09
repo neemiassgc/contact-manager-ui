@@ -103,15 +103,19 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
   const addressKeys: string[] = toKeys(addresses);
 
   return (
-    <Box className="w-full p-3 border rounded-lg justify-start">
-      <Box className="w-fit mx-auto mb-3">
+    <Box className="w-full p-3 border rounded-lg">
+      <Box className="w-full mb-5 flex">
         <ToggleButtonGroup className="mx-auto" value={alignment} exclusive onChange={handleAlignment} size="small">
           {
             addressKeys.map((item, index) => <ToggleButton key={index} value={index}>{item}</ToggleButton>)
           }
         </ToggleButtonGroup>
+        <Box>
+          <IconButton><DeleteIcon className="text-2xl"/></IconButton>
+          <IconButton><AddBoxRoundedIcon className="text-2xl"/></IconButton>
+        </Box>
       </Box>
-      <Box className="flex gap-2 flex-wrap">
+      <Box className="flex gap-2 flex-wrap justify-start">
         {
           addressKeys.map((key, index) => {
               return toKeys(addresses[key]).map(prop => {
