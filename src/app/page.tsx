@@ -45,14 +45,6 @@ function Header() {
 }
 
 function ContactActionHeader() {
-  const [open, setOpen] = useState(false);
-
-  const handleOpen: (value: boolean) => () => void = value => {
-    return () => {
-      setOpen(value);
-    }
-  }
-
   return (
     <Box className="w-full flex mb-3 justify-between">
       <OutlinedInput
@@ -65,72 +57,89 @@ function ContactActionHeader() {
           </InputAdornment>
         }
       />
-      <Button onClick={handleOpen(true)} className="right-0" variant="contained" size="small" startIcon={<PersonAddIcon/>}>Add Contact</Button>
-      <ContactView open={open} handleClose={handleOpen(false)}/>
+      <Button className="right-0" variant="contained" size="small" startIcon={<PersonAddIcon/>}>Add Contact</Button>
     </Box>
   )
 }
 
 function ContactBoard() {
-  const [indexSet, setIndexSet] = useState([false, false, false, false]);
   const [page, setPage] = useState(1);
 
   const handlePagination: (event: React.ChangeEvent<unknown>, value: number) => void = (_, value) => {
     setPage(value);
   }
 
-  const handleClick: (index: any) => void = index => {
-    const newSet = [...indexSet];
-    newSet[index] = !newSet[index];
-    setIndexSet(newSet);
-  }
+  const countPerPage: number = 3;
+  const contacts: Contact[] = getData();
+  const paginationCount: number = Math.floor(contacts.length / countPerPage);
 
   return (
     <>
-      <Box className="w-full bg-white rounded-lg border-2">
-        {generateList(getPaginatedData(3, page), handleClick, indexSet)}
-      </Box>
+      <ContentList data={getPaginatedData(countPerPage, page, contacts)}/>
       <Box className="p-2">
-        <Pagination className="w-fit mx-auto" count={3} page={page} onChange={handlePagination} size="large" />
+        <Pagination
+          className="w-fit mx-auto"
+          count={contacts.length % countPerPage === 0 ? paginationCount : paginationCount + 1}
+          page={page}
+          onChange={handlePagination}
+          size="large" />
       </Box>
     </>
   )
 }
 
-function getPaginatedData(size: number, page: number): Contact[] {
-  const contacts: Contact[] = getData();
+function getPaginatedData(size: number, page: number, contacts: Contact[]): Contact[] {
   const viewStart: number = size * page - size;
   return contacts.slice(viewStart === 0 ? 0 : viewStart, size * page);
 }
 
-function generateList(contacts: Contact[], handleClick: (event: any) => void, indexSet: boolean[]) {
-  const elements = [];
-  for (let i = 0; i < contacts.length; i++) {
-    elements.push(
-      <ListItem secondaryAction={
-        <Checkbox
-          edge="end"
-          onChange={handleClick.bind(null, i)}
-          checked={indexSet[i]}
-        />
-      }>
-        <ListItemButton selected={indexSet[i]}>
-          <ListItemAvatar>
-            <Avatar>
-              {contacts[i].name[0].toUpperCase()}
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText primary={contacts[i].name} secondary={
-              (() => {
-                const phoneNumbers: string[] = [];
-                for (const key in contacts[i].phoneNumbers)
-                  phoneNumbers.push(`${key}: ${contacts[i].phoneNumbers[key]}`)
-                return phoneNumbers[0]
-              })()
-            }/>
-        </ListItemButton>
-      </ListItem>
-    )
+function ContentList({ data }: { data: Contact[] }) {
+  const [indexSet, setIndexSet] = useState([false, false, false, false]);
+  const [open, setOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const handleOpen: (value: boolean) => () => void = value => () => setOpen(value);
+
+  const handleCheckBoxClick: (index: any) => () => void = index => {
+    return () => {
+      const newSet = [...indexSet];
+      newSet[index] = !newSet[index];
+      setIndexSet(newSet);
+    }
   }
-  return elements;
+
+  return (
+    <>
+      <Box className="w-full bg-white rounded-lg border-2">
+        {
+          data.map((contact, index) => {
+            return <ListItem key={index} secondaryAction={
+                <Checkbox
+                  edge="end"
+                  onChange={handleCheckBoxClick(index)}
+                  checked={indexSet[index]}
+                />
+              }>
+              <ListItemButton selected={indexSet[index]} onClick={() => {handleOpen(true)(); setSelectedIndex(index)}}>
+                <ListItemAvatar>
+                  <Avatar>
+                    {contact.name[0].toUpperCase()}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={contact.name} secondary={
+                    (() => {
+                      const phoneNumbers: string[] = [];
+                      for (const key in contact.phoneNumbers)
+                        phoneNumbers.push(`${key}: ${contact.phoneNumbers[key]}`)
+                      return phoneNumbers[0]
+                    })()
+                  }/>
+              </ListItemButton>
+            </ListItem>
+          })
+        }
+        <ContactView open={open} contact={data[selectedIndex]} handleClose={handleOpen(false)}/>
+      </Box>
+    </>
+  )
 }
