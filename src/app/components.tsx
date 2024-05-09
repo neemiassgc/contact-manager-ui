@@ -30,58 +30,7 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
         </Box>
       </DialogTitle>
       <DialogContent>
-        <Accordion>
-          <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
-            <PhoneIcon className="mr-2"/> Phone
-          </AccordionSummary>
-          <AccordionDetails>
-            <List dense className="border rounded-lg">
-              {
-                (() => {
-                  const keys: string[] = toKeys(contact.phoneNumbers);
-                  return keys.map((item, index) => {
-                    return <>
-                      <ListSubheader>{item}</ListSubheader>
-                      <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
-                        {contact.phoneNumbers[item]}
-                      </ListItem>
-                    </>
-                  })
-                })()
-              }
-            </List>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion>
-          <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
-            <EmailIcon className="mr-2"/> Email
-          </AccordionSummary>
-          <AccordionDetails>
-            <List dense className="border rounded-lg">
-              {
-                (() => {
-                  const keys: string[] = toKeys(contact.emails);
-                  return keys.map((item, index) => {
-                    return <>
-                      <ListSubheader>{item}</ListSubheader>
-                      <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
-                        {contact.emails[item]}
-                      </ListItem>
-                    </>
-                  })  
-                })()
-              }
-            </List>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion>
-          <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
-           <HomeIcon className="mr-2"/> Address
-          </AccordionSummary>
-          <AccordionDetails>
-            <AddressBoard addresses={contact.addresses}/>
-          </AccordionDetails>
-        </Accordion>
+        <DialogBody contact={contact}/>
       </DialogContent>
       <DialogActions>
       <Button
@@ -92,6 +41,63 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
       </DialogActions>
     </Dialog>
   )
+}
+
+function DialogBody({ contact }: {contact: Contact}) {
+  return <>
+    <Accordion>
+      <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
+        <PhoneIcon className="mr-2"/> Phone
+      </AccordionSummary>
+      <AccordionDetails>
+        <List dense className="border rounded-lg">
+          {
+            (() => {
+              const keys: string[] = toKeys(contact.phoneNumbers);
+              return keys.map((item, index) => {
+                return <>
+                  <ListSubheader>{item}</ListSubheader>
+                  <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
+                    {contact.phoneNumbers[item]}
+                  </ListItem>
+                </>
+              })
+            })()
+          }
+        </List>
+      </AccordionDetails>
+    </Accordion>
+    <Accordion>
+      <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
+        <EmailIcon className="mr-2"/> Email
+      </AccordionSummary>
+      <AccordionDetails>
+        <List dense className="border rounded-lg">
+          {
+            (() => {
+              const keys: string[] = toKeys(contact.emails);
+              return keys.map((item, index) => {
+                return <>
+                  <ListSubheader>{item}</ListSubheader>
+                  <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
+                    {contact.emails[item]}
+                  </ListItem>
+                </>
+              })  
+            })()
+          }
+        </List>
+      </AccordionDetails>
+    </Accordion>
+    <Accordion>
+      <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
+        <HomeIcon className="mr-2"/> Address
+      </AccordionSummary>
+      <AccordionDetails>
+        <AddressBoard addresses={contact.addresses}/>
+      </AccordionDetails>
+    </Accordion>
+  </>
 }
 
 function AddressBoard({ addresses }: { addresses: AddressType }) {
