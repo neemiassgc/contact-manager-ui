@@ -5,8 +5,7 @@ import {
   Avatar,
   Box,
   Button, Dialog, DialogActions, DialogContent,
-  DialogTitle, IconButton, InputAdornment, List, ListItem, ListSubheader,
-  TextField,
+  DialogTitle, IconButton,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
@@ -18,7 +17,6 @@ import HomeIcon from '@mui/icons-material/Home';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Contact, Address, AddressType } from "./net";
 import { useState } from "react";
-import EditNoteIcon from '@mui/icons-material/EditNote';
 
 export function ContactView({open, contact, handleClose}: {open: boolean, contact: Contact, handleClose: () => void}) {
   return (
@@ -58,21 +56,13 @@ function DialogBody({ contact }: {contact: Contact}) {
         <PhoneIcon className="mr-2"/> Phone
       </AccordionSummary>
       <AccordionDetails>
-        <List dense className="border rounded-lg">
-          {
-            (() => {
-              const keys: string[] = toKeys(contact.phoneNumbers);
-              return keys.map((item, index) => {
-                return <>
-                  <ListSubheader>{item}</ListSubheader>
-                  <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
-                    {contact.phoneNumbers[item]}
-                  </ListItem>
-                </>
-              })
-            })()
+        <Box className="w-full flex gap-2 flex-wrap">
+         {
+            toKeys(contact.phoneNumbers).map((prop, index) => {
+                return <ContentBox key={index} label={prop} content={contact.phoneNumbers[prop]}/>
+            })
           }
-        </List>
+        </Box>
       </AccordionDetails>
     </Accordion>
     <Accordion expanded={expanded === "panel2"} onChange={handleExpansion("panel2")}>
@@ -80,21 +70,13 @@ function DialogBody({ contact }: {contact: Contact}) {
         <EmailIcon className="mr-2"/> Email
       </AccordionSummary>
       <AccordionDetails>
-        <List dense className="border rounded-lg">
+        <Box className="w-full flex gap-2 flex-wrap">
           {
-            (() => {
-              const keys: string[] = toKeys(contact.emails);
-              return keys.map((item, index) => {
-                return <>
-                  <ListSubheader>{item}</ListSubheader>
-                  <ListItem divider={index !== keys.length - 1} secondaryAction={<IconButton edge="end"><DeleteIcon/></IconButton>}>
-                    {contact.emails[item]}
-                  </ListItem>
-                </>
-              })  
-            })()
+            toKeys(contact.emails).map((prop, index) => {
+                return <ContentBox key={index} label={prop} content={contact.emails[prop]}/>
+            })
           }
-        </List>
+        </Box>
       </AccordionDetails>
     </Accordion>
     <Accordion expanded={expanded === "panel3"} onChange={handleExpansion("panel3")}>
@@ -126,34 +108,31 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
           }
         </ToggleButtonGroup>
       </Box>
-      <Box>
+      <Box className="flex gap-2 flex-wrap">
         {
           addressKeys.map((key, index) => {
-              return <Box key={index} className={"flex gap-2 flex-wrap w-full justify-center "+(index === alignment ? "block" : "hidden")}>
-                {
-                  toKeys(addresses[key]).map((prop, index) => {
-                    return <TextField
-                      key={index}
-                      InputProps={{
-                        endAdornment: (
-                        <IconButton>
-                          <EditNoteIcon/>
-                        </IconButton>
-                        ),
-                        disableUnderline: true
-                      }}
-                      inputProps={{readOnly: true}}
-                      variant="filled"
-                      label={prop}
-                      value={addresses[key][prop]}/>
-                  })
-                }
-              </Box>
+              return toKeys(addresses[key]).map(prop => {
+                  return <ContentBox hidden={index !== alignment} key={index} label={prop} content={addresses[key][prop]}/>
+              })
           })
         }
       </Box>
     </Box>
   )
+}
+
+function ContentBox({ label, content, hidden = false }: {label: string, content: string, hidden?: boolean}) {
+  const classes: string[] = [
+    "w-fit", "flex", "flex-col", "gap-0", "justify-center",
+    "border", "rounded-lg", "p-2", "hover:shadow-lg", hidden ? "hidden" : "block"
+  ]
+  return <Box className={classes.join(" ")}>
+    <span className="text-start">{label}</span>
+    <Box className="flex gap-0">
+      <span className="text-center h-fit my-auto">{content}</span>
+      <IconButton size="small"><DeleteIcon/></IconButton>
+    </Box>
+  </Box>
 }
 
 function toKeys(input: object): string[] {
