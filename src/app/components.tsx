@@ -44,8 +44,16 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
 }
 
 function DialogBody({ contact }: {contact: Contact}) {
+  type Panel = "panel1" | "panel2" | "panel3" | null;
+
+  const [expanded, setExpanded] = useState<Panel>(null)
+
+  const handleExpansion = (value: Panel) => (_: any, expandable: boolean) => {
+    setExpanded(expandable ? value : null);
+  }
+
   return <>
-    <Accordion>
+    <Accordion expanded={expanded === "panel1"} onChange={handleExpansion("panel1")}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <PhoneIcon className="mr-2"/> Phone
       </AccordionSummary>
@@ -67,7 +75,7 @@ function DialogBody({ contact }: {contact: Contact}) {
         </List>
       </AccordionDetails>
     </Accordion>
-    <Accordion>
+    <Accordion expanded={expanded === "panel2"} onChange={handleExpansion("panel2")}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <EmailIcon className="mr-2"/> Email
       </AccordionSummary>
@@ -89,7 +97,7 @@ function DialogBody({ contact }: {contact: Contact}) {
         </List>
       </AccordionDetails>
     </Accordion>
-    <Accordion>
+    <Accordion expanded={expanded === "panel3"} onChange={handleExpansion("panel3")}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <HomeIcon className="mr-2"/> Address
       </AccordionSummary>
