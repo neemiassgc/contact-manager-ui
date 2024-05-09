@@ -15,6 +15,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import HomeIcon from '@mui/icons-material/Home';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import { Contact, Address, AddressType } from "./net";
 import { useState } from "react";
 
@@ -56,12 +57,13 @@ function DialogBody({ contact }: {contact: Contact}) {
         <PhoneIcon className="mr-2"/> Phone
       </AccordionSummary>
       <AccordionDetails>
-        <Box className="w-full flex gap-2 flex-wrap">
+        <Box className="w-full justify-start flex gap-2 flex-wrap">
          {
             toKeys(contact.phoneNumbers).map((prop, index) => {
-                return <ContentBox key={index} label={prop} content={contact.phoneNumbers[prop]}/>
+                return <ContentBox key={index} label={prop} content={contact.phoneNumbers[prop]} deleteHandle={() => null}/>
             })
           }
+          <CreationPlaceholder label="Add new phone"/>
         </Box>
       </AccordionDetails>
     </Accordion>
@@ -70,12 +72,13 @@ function DialogBody({ contact }: {contact: Contact}) {
         <EmailIcon className="mr-2"/> Email
       </AccordionSummary>
       <AccordionDetails>
-        <Box className="w-full flex gap-2 flex-wrap">
+        <Box className="w-full justify-start flex gap-2 flex-wrap">
           {
             toKeys(contact.emails).map((prop, index) => {
-                return <ContentBox key={index} label={prop} content={contact.emails[prop]}/>
+                return <ContentBox key={index} label={prop} content={contact.emails[prop]} deleteHandle={() => null}/>
             })
           }
+          <CreationPlaceholder label="Add new email"/>
         </Box>
       </AccordionDetails>
     </Accordion>
@@ -100,7 +103,7 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
   const addressKeys: string[] = toKeys(addresses);
 
   return (
-    <Box className="w-full p-3 border rounded-lg">
+    <Box className="w-full p-3 border rounded-lg justify-start">
       <Box className="w-fit mx-auto mb-3">
         <ToggleButtonGroup className="mx-auto" value={alignment} exclusive onChange={handleAlignment} size="small">
           {
@@ -121,17 +124,24 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
   )
 }
 
-function ContentBox({ label, content, hidden = false }: {label: string, content: string, hidden?: boolean}) {
+function ContentBox(props: {label: string, content: string, hidden?: boolean, deleteHandle?: () => void}) {
   const classes: string[] = [
     "w-fit", "flex", "flex-col", "gap-0", "justify-center",
-    "border", "rounded-lg", "p-2", "hover:shadow-lg", hidden ? "hidden" : "block"
+    "border", "rounded-lg", "p-2", "hover:shadow-lg", props.hidden ? "hidden" : "block"
   ]
   return <Box className={classes.join(" ")}>
-    <span className="text-start">{label}</span>
+    <span className="text-start text-sm">{props.label}</span>
     <Box className="flex gap-0">
-      <span className="text-center h-fit my-auto">{content}</span>
-      <IconButton size="small"><DeleteIcon/></IconButton>
+      <span className="text-center h-fit my-auto">{props.content}</span>
+      { props.deleteHandle && <IconButton onClick={props.deleteHandle} size="small"><DeleteIcon/></IconButton> }
     </Box>
+  </Box>
+}
+
+function CreationPlaceholder(props: {label: string}) {
+  return <Box className="p-5 border-4 border-dotted rounded-lg hover:cursor-pointer">
+      <AddBoxRoundedIcon className="mr-2 text-gray-400"/>
+      <span className="text-gray-600">{props.label.toLocaleLowerCase()}</span>
   </Box>
 }
 
