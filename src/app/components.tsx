@@ -6,6 +6,8 @@ import {
   Box,
   Button, Dialog, DialogActions, DialogContent,
   DialogTitle, IconButton,
+  InputAdornment,
+  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
@@ -18,6 +20,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Contact, Address, AddressType } from "./net";
 import { useState } from "react";
 
@@ -42,15 +45,34 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
 }
 
 function DialogHeader(props: {contactName: string}) {
+  const [editing, setEditing] = useState(false);
+
+  const handleEditing = (value: boolean) => () => setEditing(value);
+
   return <Box className="w-full flex flex-col justify-center items-center">
     <Avatar className="w-20 h-20 text-5xl">{props.contactName[0]}</Avatar>
     <Box>
-      <span>{props.contactName}</span>
-      <Tooltip title="Edit Contact Name" arrow>
-        <IconButton>
-          <EditNoteRoundedIcon fontSize="medium"/>
-        </IconButton>
-      </Tooltip>
+      {
+        editing ? 
+        <TextField
+          onBlur={handleEditing(false)}
+          className="mt-2"
+          variant="outlined" label="Contact name" size="small"
+          InputProps={{
+            endAdornment: <InputAdornment position="end">
+              <IconButton size="small" onClick={handleEditing(false)}><CheckCircleIcon/></IconButton>
+            </InputAdornment>
+          }}
+        /> :
+        <>
+          <span>{props.contactName}</span>
+          <Tooltip title="Edit Contact Name" arrow>
+            <IconButton onClick={handleEditing(true)}>
+              <EditNoteRoundedIcon fontSize="medium"/>
+            </IconButton>
+          </Tooltip>
+        </>
+      }
     </Box>
 </Box>
 }
