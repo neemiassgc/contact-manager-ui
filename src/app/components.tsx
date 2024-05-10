@@ -16,6 +16,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import HomeIcon from '@mui/icons-material/Home';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import { Contact, Address, AddressType } from "./net";
 import { useState } from "react";
 
@@ -25,7 +26,12 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
       <DialogTitle>
         <Box className="w-full flex flex-col justify-center items-center">
           <Avatar className="w-20 h-20 text-5xl">{contact.name[0]}</Avatar>
-          <span>{contact.name}</span>
+          <Box>
+            <span>{contact.name}</span>
+            <IconButton>
+              <EditNoteRoundedIcon fontSize="medium"/>
+            </IconButton>
+          </Box>
         </Box>
       </DialogTitle>
       <DialogContent>
