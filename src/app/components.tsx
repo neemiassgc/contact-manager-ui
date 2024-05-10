@@ -25,17 +25,7 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
   return (
     <Dialog open={open} fullWidth={true} maxWidth="md">
       <DialogTitle>
-        <Box className="w-full flex flex-col justify-center items-center">
-          <Avatar className="w-20 h-20 text-5xl">{contact.name[0]}</Avatar>
-          <Box>
-            <span>{contact.name}</span>
-            <Tooltip title="Edit Contact Name" arrow>
-              <IconButton>
-                <EditNoteRoundedIcon fontSize="medium"/>
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
+        <DialogHeader contactName={contact.name}/>
       </DialogTitle>
       <DialogContent>
         <DialogBody contact={contact}/>
@@ -49,6 +39,20 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
       </DialogActions>
     </Dialog>
   )
+}
+
+function DialogHeader(props: {contactName: string}) {
+  return <Box className="w-full flex flex-col justify-center items-center">
+    <Avatar className="w-20 h-20 text-5xl">{props.contactName[0]}</Avatar>
+    <Box>
+      <span>{props.contactName}</span>
+      <Tooltip title="Edit Contact Name" arrow>
+        <IconButton>
+          <EditNoteRoundedIcon fontSize="medium"/>
+        </IconButton>
+      </Tooltip>
+    </Box>
+</Box>
 }
 
 function DialogBody({ contact }: {contact: Contact}) {
