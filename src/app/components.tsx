@@ -8,6 +8,7 @@ import {
   DialogTitle, IconButton,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
 } from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -28,9 +29,11 @@ export function ContactView({open, contact, handleClose}: {open: boolean, contac
           <Avatar className="w-20 h-20 text-5xl">{contact.name[0]}</Avatar>
           <Box>
             <span>{contact.name}</span>
-            <IconButton>
-              <EditNoteRoundedIcon fontSize="medium"/>
-            </IconButton>
+            <Tooltip title="Edit Contact Name" arrow>
+              <IconButton>
+                <EditNoteRoundedIcon fontSize="medium"/>
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
       </DialogTitle>
@@ -117,8 +120,12 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
           }
         </ToggleButtonGroup>
         <Box>
-          <IconButton><DeleteIcon className="text-2xl"/></IconButton>
-          <IconButton><AddBoxRoundedIcon className="text-2xl"/></IconButton>
+          <Tooltip title="Delete Address">
+            <IconButton><DeleteIcon className="text-2xl"/></IconButton>
+          </Tooltip>
+          <Tooltip title="Create New Address">
+            <IconButton><AddBoxRoundedIcon className="text-2xl"/></IconButton>
+          </Tooltip>
         </Box>
       </Box>
       <Box className="flex gap-2 flex-wrap justify-start">
@@ -143,7 +150,12 @@ function ContentBox(props: {label: string, content: string, hidden?: boolean, de
     <span className="text-start text-sm">{props.label}</span>
     <Box className="flex gap-0">
       <span className="text-center h-fit my-auto">{props.content}</span>
-      { props.deleteHandle && <IconButton onClick={props.deleteHandle} size="small"><DeleteIcon/></IconButton> }
+      {
+      props.deleteHandle &&
+       <Tooltip title={"Delete "+props.label}>
+        <IconButton onClick={props.deleteHandle} size="small"><DeleteIcon/></IconButton> 
+       </Tooltip>
+      }
     </Box>
   </Box>
 }
