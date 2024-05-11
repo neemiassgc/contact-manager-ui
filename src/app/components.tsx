@@ -77,14 +77,45 @@ function DialogHeader(props: {contactName: string}) {
 </Box>
 }
 
+function CreationForm(props: {label: "phone" | "email", handleClose: () => void}) {
+  const [clicked, setClicked] = useState(false);
+
+  const actionButton = (clickAction: () => void) => {
+    return <InputAdornment position="end">
+        <IconButton onClick={clickAction}><CheckCircleIcon/></IconButton>
+    </InputAdornment>
+  }
+
+  return <Box className="w-fit h-fit my-auto">
+    {
+      clicked ?
+        <TextField focused color="secondary" size="small" placeholder={"type your "+props.label} variant="outlined" label={props.label}
+          InputProps={{
+            endAdornment: actionButton(props.handleClose)
+          }}
+        /> :
+        <TextField focused color="primary" size="small" variant="outlined" label="label" placeholder="label"
+          InputProps={{
+            endAdornment: actionButton(() => setClicked(true))
+          }}
+        />
+    }
+  </Box>
+}
+
 function DialogBody({ contact }: {contact: Contact}) {
   type Panel = "panel1" | "panel2" | "panel3" | null;
 
   const [expanded, setExpanded] = useState<Panel>(null)
+  const [creating, setCreating] = useState([false, false]);
 
   const handleExpansion = (value: Panel) => (_: any, expandable: boolean) => {
     setExpanded(expandable ? value : null);
   }
+
+  const handleCreatingPhone = (value: boolean) => () => setCreating(prev => [value, prev[1]])
+
+  const handleCreatingEmail = (value: boolean) => () => setCreating(prev => [prev[0], value])
 
   return <>
     <Accordion expanded={expanded === "panel1"} onChange={handleExpansion("panel1")}>
@@ -93,12 +124,16 @@ function DialogBody({ contact }: {contact: Contact}) {
       </AccordionSummary>
       <AccordionDetails>
         <Box className="w-full justify-start flex gap-2 flex-wrap">
-         {
+          {
             toKeys(contact.phoneNumbers).map((prop, index) => {
                 return <ContentBox key={index} label={prop} content={contact.phoneNumbers[prop]} deleteHandle={() => null}/>
             })
           }
-          <CreationPlaceholder label="Add new phone"/>
+          {
+            creating[0] ?
+              <CreationForm handleClose={handleCreatingPhone(false)} label="phone"/> :
+              <CreationPlaceholder onClick={handleCreatingPhone(true)} label="Add new phone"/>
+          }
         </Box>
       </AccordionDetails>
     </Accordion>
@@ -113,7 +148,11 @@ function DialogBody({ contact }: {contact: Contact}) {
                 return <ContentBox key={index} label={prop} content={contact.emails[prop]} deleteHandle={() => null}/>
             })
           }
-          <CreationPlaceholder label="Add new email"/>
+          {
+            creating[1] ?
+              <CreationForm handleClose={handleCreatingEmail(false)} label="email"/> :
+              <CreationPlaceholder onClick={handleCreatingEmail(true)} label="Add new email"/>
+          }
         </Box>
       </AccordionDetails>
     </Accordion>
@@ -186,8 +225,8 @@ function ContentBox(props: {label: string, content: string, hidden?: boolean, de
   </Box>
 }
 
-function CreationPlaceholder(props: {label: string}) {
-  return <Box className="p-5 border-4 border-dotted rounded-lg hover:cursor-pointer">
+function CreationPlaceholder(props: {label: string, onClick: () => void}) {
+  return <Box onClick={props.onClick} className="p-5 border-4 border-dotted rounded-lg hover:cursor-pointer">
       <AddBoxRoundedIcon className="mr-2 text-gray-400"/>
       <span className="text-gray-600">{props.label.toLocaleLowerCase()}</span>
   </Box>
