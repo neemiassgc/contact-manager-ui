@@ -21,6 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Contact, Address, AddressType } from "./net";
 import { useState } from "react";
 
@@ -107,15 +108,19 @@ function DialogBody({ contact }: {contact: Contact}) {
   type Panel = "panel1" | "panel2" | "panel3" | null;
 
   const [expanded, setExpanded] = useState<Panel>(null)
-  const [creating, setCreating] = useState([false, false]);
+  const [creating, setCreating] = useState([false, false, false]);
 
   const handleExpansion = (value: Panel) => (_: any, expandable: boolean) => {
     setExpanded(expandable ? value : null);
   }
 
-  const handleCreatingPhone = (value: boolean) => () => setCreating(prev => [value, prev[1]])
-
-  const handleCreatingEmail = (value: boolean) => () => setCreating(prev => [prev[0], value])
+  const handleCreating = (value: boolean, index: number) => () => {
+    setCreating(prev => {
+      const copy: boolean[] = [...prev];
+      copy[index] = value;
+      return copy
+    })
+  }
 
   return <>
     <Accordion expanded={expanded === "panel1"} onChange={handleExpansion("panel1")}>
@@ -131,8 +136,8 @@ function DialogBody({ contact }: {contact: Contact}) {
           }
           {
             creating[0] ?
-              <CreationForm handleClose={handleCreatingPhone(false)} label="phone"/> :
-              <CreationPlaceholder onClick={handleCreatingPhone(true)} label="Add new phone"/>
+              <CreationForm handleClose={handleCreating(false, 0)} label="phone"/> :
+              <CreationPlaceholder onClick={handleCreating(true, 0)} label="Add new phone"/>
           }
         </Box>
       </AccordionDetails>
@@ -150,8 +155,8 @@ function DialogBody({ contact }: {contact: Contact}) {
           }
           {
             creating[1] ?
-              <CreationForm handleClose={handleCreatingEmail(false)} label="email"/> :
-              <CreationPlaceholder onClick={handleCreatingEmail(true)} label="Add new email"/>
+              <CreationForm handleClose={handleCreating(false, 1)} label="email"/> :
+              <CreationPlaceholder onClick={handleCreating(true, 1)} label="Add new email"/>
           }
         </Box>
       </AccordionDetails>
@@ -161,20 +166,43 @@ function DialogBody({ contact }: {contact: Contact}) {
         <HomeIcon className="mr-2"/> Address
       </AccordionSummary>
       <AccordionDetails>
-        <AddressBoard addresses={contact.addresses}/>
+        {
+          creating[2] ?
+            <AddressCreationBoard addressFields={toKeys(contact.addresses[toKeys(contact.addresses)[0]])}/> :
+            <AddressBoard handleAddButton={handleCreating(true, 2)} addresses={contact.addresses}/>
+        }
       </AccordionDetails>
     </Accordion>
   </>
 }
 
-function AddressBoard({ addresses }: { addresses: AddressType }) {
+function AddressCreationBoard(props: {addressFields: string[]}) {
+  return <Box className="w-full">
+    <Box className="flex justify-center flex-wrap gap-2">
+      {
+        props.addressFields.map((field, index) => {
+          return <TextField key={index} size="small" className="w-fit"
+            placeholder={field} label={field}
+
+          />
+        })
+      }
+    </Box>
+    <Box className="flex justify-center">
+      <IconButton className="" size="medium"><ArrowBackIcon fontSize="large"/></IconButton>
+      <IconButton className="" size="medium"><CheckCircleIcon fontSize="large"/></IconButton>
+    </Box>
+  </Box>
+}
+
+function AddressBoard(props: { addresses: AddressType, handleAddButton: () => void}) {
   const [alignment, setAlignment] = useState(0);
 
   function handleAlignment(_: any, value: number): void {
     setAlignment(value);
   }
 
-  const addressKeys: string[] = toKeys(addresses);
+  const addressKeys: string[] = toKeys(props.addresses);
 
   return (
     <Box className="w-full p-3 border rounded-lg">
@@ -189,15 +217,15 @@ function AddressBoard({ addresses }: { addresses: AddressType }) {
             <IconButton><DeleteIcon className="text-2xl"/></IconButton>
           </Tooltip>
           <Tooltip title="Create New Address">
-            <IconButton><AddBoxRoundedIcon className="text-2xl"/></IconButton>
+            <IconButton onClick={props.handleAddButton}><AddBoxRoundedIcon className="text-2xl"/></IconButton>
           </Tooltip>
         </Box>
       </Box>
       <Box className="flex gap-2 flex-wrap justify-start">
         {
           addressKeys.map((key, index) => {
-              return toKeys(addresses[key]).map(prop => {
-                  return <ContentBox hidden={index !== alignment} key={index} label={prop} content={addresses[key][prop]}/>
+              return toKeys(props.addresses[key]).map(prop => {
+                  return <ContentBox hidden={index !== alignment} key={index} label={prop} content={props.addresses[key][prop]}/>
               })
           })
         }
