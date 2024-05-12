@@ -3,8 +3,6 @@ import { InputAdornment, Button, Box, Avatar, OutlinedInput, Checkbox, Paginatio
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
-import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
-import LogoutIcon from '@mui/icons-material/Logout';
 import { useState } from 'react';
 import { ContactView } from "./components"
 import { Contact, getData } from './net';
@@ -12,7 +10,6 @@ import { Contact, getData } from './net';
 export default function Home() {
   return (
     <>
-      <Header/>
       <main className="mt-16 w-full p-1">
         <Box className="w-5/12 mx-auto">
           <ContactActionHeader/>
@@ -21,27 +18,6 @@ export default function Home() {
       </main>
     </>
   );
-}
-
-function Header() {
-  return (
-    <header className="bg-white w-full text-right p-3 flex justify-between border-b-2">
-      <Box className="ml-5 border p-2 rounded-lg">
-        <ContactPhoneIcon className="text-4xl"/>
-        <span className="ml-2 align-middle text-lg">Contact Manager</span>
-      </Box>
-      <Box className="flex items-center mr-8 gap-x-6">
-        <Box className="align-center flex items-center gap-x-2">
-          <Avatar className="">R</Avatar>
-          <span className='align-middle'>Ronald</span>
-        </Box>
-        <Button
-          variant="outlined" size="small" color="secondary"
-          endIcon={<LogoutIcon/>}
-        >Log out</Button>
-      </Box>
-    </header>
-  )
 }
 
 function ContactActionHeader() {
