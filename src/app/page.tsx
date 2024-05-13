@@ -1,13 +1,12 @@
 "use client"
-import { InputAdornment, Button, Box, Avatar, OutlinedInput, Checkbox, Pagination } from '@mui/material';
+import { InputAdornment, Button, Box, Avatar, OutlinedInput, Pagination } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
-import { useState } from 'react';
-import { ContactView } from "./components"
 import { getLocalContacts } from './storage';
 import { Contact } from "./types"
 import { useRouter } from "next/navigation"
+import { useState } from 'react';
 
 export default function Home() {
   return (
@@ -72,52 +71,25 @@ function getPaginatedData(size: number, page: number, contacts: Contact[]): Cont
 }
 
 function ContentList({ data }: { data: Contact[] }) {
-  const [indexSet, setIndexSet] = useState([false, false, false, false]);
-  const [open, setOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
-
-  const handleOpen: (value: boolean) => () => void = value => () => setOpen(value);
-
-  const handleCheckBoxClick: (index: any) => () => void = index => {
-    return () => {
-      const newSet = [...indexSet];
-      newSet[index] = !newSet[index];
-      setIndexSet(newSet);
-    }
-  }
 
   return (
     <>
       <Box className="w-full bg-white rounded-lg border-2">
         {
           data.map((contact, index) => {
-            return <ListItem key={index} secondaryAction={
-                <Checkbox
-                  edge="end"
-                  onChange={handleCheckBoxClick(index)}
-                  checked={indexSet[index]}
-                />
-              }>
-              <ListItemButton selected={indexSet[index]} onClick={() => router.push("/profile")}>
+            return <ListItem key={index}>
+              <ListItemButton onClick={() => router.push("/profile")}>
                 <ListItemAvatar>
                   <Avatar>
                     {contact.name[0].toUpperCase()}
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={contact.name} secondary={
-                    (() => {
-                      const phoneNumbers: string[] = [];
-                      for (const key in contact.phoneNumbers)
-                        phoneNumbers.push(`${key}: ${contact.phoneNumbers[key]}`)
-                      return phoneNumbers[0]
-                    })()
-                  }/>
+                <ListItemText primary={contact.name}/>
               </ListItemButton>
             </ListItem>
           })
         }
-        <ContactView open={open} contact={data[selectedIndex]} handleClose={handleOpen(false)}/>
       </Box>
     </>
   )
