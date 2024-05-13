@@ -5,7 +5,9 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
 import { useState } from 'react';
 import { ContactView } from "./components"
-import { Contact, getData } from './net';
+import { getLocalContacts } from './storage';
+import { Contact } from "./types"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
   return (
@@ -46,7 +48,7 @@ function ContactBoard() {
   }
 
   const countPerPage: number = 3;
-  const contacts: Contact[] = getData();
+  const contacts: Contact[] = getLocalContacts();
   const paginationCount: number = Math.floor(contacts.length / countPerPage);
 
   return (
@@ -73,6 +75,7 @@ function ContentList({ data }: { data: Contact[] }) {
   const [indexSet, setIndexSet] = useState([false, false, false, false]);
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const router = useRouter();
 
   const handleOpen: (value: boolean) => () => void = value => () => setOpen(value);
 
@@ -96,7 +99,7 @@ function ContentList({ data }: { data: Contact[] }) {
                   checked={indexSet[index]}
                 />
               }>
-              <ListItemButton selected={indexSet[index]} onClick={() => {handleOpen(true)(); setSelectedIndex(index)}}>
+              <ListItemButton selected={indexSet[index]} onClick={() => router.push("/profile")}>
                 <ListItemAvatar>
                   <Avatar>
                     {contact.name[0].toUpperCase()}
