@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  Avatar, Box, InputAdornment, TextField, Tooltip, IconButton,
+  Avatar, Box, TextField, Tooltip, IconButton,
   Accordion, AccordionSummary, AccordionDetails, ToggleButtonGroup,
   ToggleButton,
   Breadcrumbs,
@@ -43,32 +43,22 @@ export default function Page() {
 function Header(props: {contactName: string}) {
   const [editing, setEditing] = useState(false);
 
-  const handleEditing = (value: boolean) => () => setEditing(value);
-
   return <Box className="w-full flex flex-col justify-center items-center">
-      <Avatar sx={{width: 100, height: 100, fontSize: 50}}>{props.contactName[0]}</Avatar>
-      <Box className="ml-5 mt-1">
-        {
-          editing ? 
-          <TextField
-            onBlur={handleEditing(false)}
-            variant="outlined" label="Contact name" size="small"
-            InputProps={{
-              endAdornment: <InputAdornment position="end">
-                <IconButton size="small" onClick={handleEditing(false)}><CheckCircleIcon/></IconButton>
-              </InputAdornment>
-            }}
-          /> :
-          <>
-            <span>{props.contactName}</span>
-            <Tooltip title="Edit Contact Name" arrow>
-              <IconButton onClick={handleEditing(true)}>
-                <EditNoteRoundedIcon fontSize="medium"/>
-              </IconButton>
-            </Tooltip>
-          </>
-        }
-      </Box>
+    <Avatar sx={{width: 100, height: 100, fontSize: 50}}>{props.contactName[0]}</Avatar>
+    <Box className="ml-5 mt-1">
+      <span>{props.contactName}</span>
+      <Tooltip title="Edit Contact Name" arrow>
+        <IconButton onClick={() => setEditing(true)}>
+          <EditNoteRoundedIcon fontSize="medium"/>
+        </IconButton>
+      </Tooltip>
+    </Box>
+    <PromptModal
+      open={editing}
+      title="Edit the name of the contact"
+      handleClose={() => setEditing(false)}
+      handleSave={()=>{}}
+    />
   </Box>
 }
 
