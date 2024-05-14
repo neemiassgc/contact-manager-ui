@@ -4,6 +4,8 @@ import {
   Avatar, Box, InputAdornment, TextField, Tooltip, IconButton,
   Accordion, AccordionSummary, AccordionDetails, ToggleButtonGroup,
   ToggleButton
+  Breadcrumbs,
+  Typography
 } from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EmailIcon from '@mui/icons-material/Email';
@@ -13,17 +15,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { toKeys } from "../utils";
 import { Contact, AddressType } from "../types";
 import { useState } from "react";
 import { getSelectedContact } from "../storage";
+import Link from "next/link";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact();
 
   return (
-    <Box className="w-1/2">
+    <Box className="w-1/2 mx-auto mt-10">
+      <Breadcrumbs>
+        <Link href="/">Home</Link>
+        <Typography>Profile</Typography>
+      </Breadcrumbs>
       <Header contactName={selectedContact.name}/>
       <Body contact={selectedContact}/>
     </Box>
