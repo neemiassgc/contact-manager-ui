@@ -3,9 +3,12 @@
 import {
   Avatar, Box, InputAdornment, TextField, Tooltip, IconButton,
   Accordion, AccordionSummary, AccordionDetails, ToggleButtonGroup,
-  ToggleButton
+  ToggleButton,
   Breadcrumbs,
-  Typography
+  Typography,
+  DialogContent,
+  DialogTitle,
+  Dialog
 } from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EmailIcon from '@mui/icons-material/Email';
@@ -15,6 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { toKeys } from "../utils";
 import { Contact, AddressType } from "../types";
 import { useState } from "react";
@@ -42,13 +46,12 @@ function Header(props: {contactName: string}) {
   const handleEditing = (value: boolean) => () => setEditing(value);
 
   return <Box className="w-full flex flex-col justify-center items-center">
-      <Avatar className="w-20 h-20 text-5xl">{props.contactName[0]}</Avatar>
-      <Box>
+      <Avatar sx={{width: 100, height: 100, fontSize: 50}}>{props.contactName[0]}</Avatar>
+      <Box className="ml-5 mt-1">
         {
           editing ? 
           <TextField
             onBlur={handleEditing(false)}
-            className="mt-2"
             variant="outlined" label="Contact name" size="small"
             InputProps={{
               endAdornment: <InputAdornment position="end">
@@ -70,25 +73,11 @@ function Header(props: {contactName: string}) {
 }
 
 function Body({ contact }: {contact: Contact}) {
-  type Panel = "panel1" | "panel2" | "panel3" | null;
-
-  const [expanded, setExpanded] = useState<Panel>(null)
-  const [creating, setCreating] = useState([false, false, false]);
-
-  const handleExpansion = (value: Panel) => (_: any, expandable: boolean) => {
-    setExpanded(expandable ? value : null);
-  }
-
-  const handleCreating = (value: boolean, index: number) => () => {
-    setCreating(prev => {
-      const copy: boolean[] = [...prev];
-      copy[index] = value;
-      return copy
-    })
-  }
+  const [creatingPhone, setCreatingPhone] = useState(false);
+  const [creatingEmail, setCreatingEmail] = useState(false);
 
   return <>
-    <Accordion expanded={expanded === "panel1"} onChange={handleExpansion("panel1")}>
+    <Accordion>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <PhoneIcon className="mr-2"/> Phone
       </AccordionSummary>
@@ -99,15 +88,11 @@ function Body({ contact }: {contact: Contact}) {
                 return <ContentBox key={index} label={prop} content={contact.phoneNumbers[prop]} deleteHandle={() => null}/>
             })
           }
-          {
-            creating[0] ?
-              <CreationForm handleClose={handleCreating(false, 0)} label="phone"/> :
-              <CreationPlaceholder onClick={handleCreating(true, 0)} label="Add new phone"/>
-          }
+          <CreationPlaceholder onClick={() => setCreatingPhone(true)} label="Add new phone"/>
         </Box>
       </AccordionDetails>
     </Accordion>
-    <Accordion expanded={expanded === "panel2"} onChange={handleExpansion("panel2")}>
+    <Accordion>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <EmailIcon className="mr-2"/> Email
       </AccordionSummary>
@@ -118,76 +103,26 @@ function Body({ contact }: {contact: Contact}) {
                 return <ContentBox key={index} label={prop} content={contact.emails[prop]} deleteHandle={() => null}/>
             })
           }
-          {
-            creating[1] ?
-              <CreationForm handleClose={handleCreating(false, 1)} label="email"/> :
-              <CreationPlaceholder onClick={handleCreating(true, 1)} label="Add new email"/>
-          }
+          <CreationPlaceholder onClick={() => setCreatingEmail(true)} label="Add new email"/>
         </Box>
       </AccordionDetails>
     </Accordion>
-    <Accordion expanded={expanded === "panel3"} onChange={handleExpansion("panel3")}>
+    <Accordion>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <HomeIcon className="mr-2"/> Address
       </AccordionSummary>
       <AccordionDetails>
-        {
-          creating[2] ?
-            <AddressCreationBoard addressFields={toKeys(contact.addresses[toKeys(contact.addresses)[0]])}/> :
-            <AddressBoard handleAddButton={handleCreating(true, 2)} addresses={contact.addresses}/>
-        }
+        <AddressBoard addresses={contact.addresses}/>
       </AccordionDetails>
     </Accordion>
+    <PromptModal open={creatingPhone} title="Create a new phone" handleClose={() => setCreatingPhone(false)} handleSave={()=>{}}/>
+    <PromptModal open={creatingEmail} title="Create a new email" handleClose={() => setCreatingEmail(false)} handleSave={()=>{}}/>
   </>
 }
 
-function AddressCreationBoard(props: {addressFields: string[]}) {
-  return <Box className="w-full">
-    <Box className="flex justify-center flex-wrap gap-2">
-      {
-        props.addressFields.map((field, index) => {
-          return <TextField key={index} size="small" className="w-fit"
-            placeholder={field} label={field}
-
-          />
-        })
-      }
-    </Box>
-    <Box className="flex justify-center">
-      <IconButton className="" size="medium"><ArrowBackIcon fontSize="large"/></IconButton>
-      <IconButton className="" size="medium"><CheckCircleIcon fontSize="large"/></IconButton>
-    </Box>
-  </Box>
-}
-
-function CreationForm(props: {label: "phone" | "email", handleClose: () => void}) {
-  const [clicked, setClicked] = useState(false);
-
-  const actionButton = (clickAction: () => void) => {
-    return <InputAdornment position="end">
-        <IconButton onClick={clickAction}><CheckCircleIcon/></IconButton>
-    </InputAdornment>
-  }
-
-  return <Box className="w-fit h-fit my-auto">
-    {
-      clicked ?
-        <TextField focused color="secondary" size="small" placeholder={"type your "+props.label} variant="outlined" label={props.label}
-          InputProps={{
-            endAdornment: actionButton(props.handleClose)
-          }}
-        /> :
-        <TextField focused color="primary" size="small" variant="outlined" label="label" placeholder="label"
-          InputProps={{
-            endAdornment: actionButton(() => setClicked(true))
-          }}
-        />
-    }
-  </Box>
-}
-
-function AddressBoard(props: { addresses: AddressType, handleAddButton: () => void}) {
+function AddressBoard(props: { addresses: AddressType}) {
   const [alignment, setAlignment] = useState(0);
+  const [creating, setCreating] = useState(false);
 
   function handleAlignment(_: any, value: number): void {
     setAlignment(value);
@@ -208,7 +143,7 @@ function AddressBoard(props: { addresses: AddressType, handleAddButton: () => vo
             <IconButton><DeleteIcon className="text-2xl"/></IconButton>
           </Tooltip>
           <Tooltip title="Create New Address">
-            <IconButton onClick={props.handleAddButton}><AddBoxRoundedIcon className="text-2xl"/></IconButton>
+            <IconButton onClick={() => setCreating(true)}><AddBoxRoundedIcon className="text-2xl"/></IconButton>
           </Tooltip>
         </Box>
       </Box>
@@ -221,6 +156,13 @@ function AddressBoard(props: { addresses: AddressType, handleAddButton: () => vo
           })
         }
       </Box>
+      <PromptModal
+        open={creating}
+        title="Create a new address"
+        fieldNames={toKeys(props.addresses[addressKeys[0]])}
+        handleClose={() => setCreating(false)}
+        handleSave={()=>{}}
+      />
     </Box>
   )
 }
@@ -249,4 +191,30 @@ function CreationPlaceholder(props: {label: string, onClick: () => void}) {
       <AddBoxRoundedIcon className="mr-2 text-gray-400"/>
       <span className="text-gray-600">{props.label.toLocaleLowerCase()}</span>
   </Box>
+}
+
+function PromptModal(props: {open: boolean, title: string, fieldNames?: string[], handleClose: () => void, handleSave: () => void}) {
+  return (
+    <Dialog open={props.open}>
+      <DialogTitle><Typography className="font-bold text-center">{props.title}</Typography></DialogTitle>
+      <DialogContent>
+        <Box className="flex flex-col gap-2 w-full p-1 h-full">
+          <TextField variant="outlined" size="small" label="label" placeholder="label"/>
+          {
+            !props.fieldNames ? <TextField variant="outlined" size="small" label="value" placeholder="value"/> :
+            <>
+              {
+                props.fieldNames.map((fieldName: string, index: number) =>
+                  <TextField key={index} variant="outlined" size="small" label={fieldName} placeholder="label"/>)
+              }
+            </>
+          }
+        </Box>
+        <Box className="w-full flex justify-center mt-2">
+          <IconButton onClick={props.handleSave} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+        </Box>
+      </DialogContent>
+    </Dialog>
+  )
 }
