@@ -3,7 +3,7 @@ import { InputAdornment, Button, Box, Avatar, OutlinedInput, Pagination } from '
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
-import { getLocalContacts } from './storage';
+import { getLocalContacts, setSelectedContact } from './storage';
 import { Contact } from "./types"
 import { useRouter } from "next/navigation"
 import { useState } from 'react';
@@ -79,7 +79,10 @@ function ContentList({ data }: { data: Contact[] }) {
         {
           data.map((contact, index) => {
             return <ListItem key={index}>
-              <ListItemButton onClick={() => router.push("/profile")}>
+              <ListItemButton onClick={() => {
+                setSelectedContact(contact);
+                router.push("/profile")
+              }}>
                 <ListItemAvatar>
                   <Avatar>
                     {contact.name[0].toUpperCase()}
