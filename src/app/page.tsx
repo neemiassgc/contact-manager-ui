@@ -1,5 +1,5 @@
 "use client"
-import { InputAdornment, Button, Box, Avatar, OutlinedInput, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions } from '@mui/material';
+import { InputAdornment, Button, Box, Avatar, OutlinedInput, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
@@ -25,20 +25,25 @@ export default function Home() {
 }
 
 function ContactActionHeader() {
+  const [openModal, setOpenModal] = useState(false);
+
   return (
-    <Box className="w-full flex mb-3 justify-between">
-      <OutlinedInput
-        size="small"
-        className="bg-white"
-        placeholder="search"
-        startAdornment={
-          <InputAdornment position="start">
-            <SearchIcon />
-          </InputAdornment>
-        }
-      />
-      <Button className="right-0" variant="contained" size="small" startIcon={<PersonAddIcon/>}>Add Contact</Button>
-    </Box>
+    <>
+      <Box className="w-full flex mb-3 justify-between">
+        <OutlinedInput
+          size="small"
+          className="bg-white"
+          placeholder="search"
+          startAdornment={
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          }
+        />
+        <Button onClick={() => setOpenModal(true)} variant="contained" size="small" startIcon={<PersonAddIcon/>}>Add Contact</Button>
+      </Box>
+      <CreationModal open={openModal} handleClose={() => setOpenModal(false)} handleYes={()=>{}}/>
+    </>
   )
 }
 
@@ -49,7 +54,7 @@ function ContactBoard() {
     setPage(value);
   }
 
-  const countPerPage: number = 3;
+  const countPerPage: number = 7;
   const contacts: Contact[] = getLocalContacts();
   const paginationCount: number = Math.floor(contacts.length / countPerPage);
 
@@ -115,6 +120,39 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
   return(
     <Dialog open={props.open}>
       <DialogTitle><Typography>Delete &apos;{props.contactName}&apos;?</Typography></DialogTitle>
+      <DialogActions>
+        <Box className="w-full flex justify-center gap-3">
+          <IconButton onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+function CreationModal(props: {open: boolean, handleClose: () => void, handleYes: () => void}) {
+  return (
+    <Dialog open={props.open}>
+      <DialogTitle><Typography className="text-center">Create a new contact</Typography></DialogTitle>
+      <DialogContent>
+        <Box className="w-full mb-2 pt-1">
+          <TextField
+            className="w-full"
+            label="contact name" placeholder="contact name"
+            size="small" variant="outlined"
+          />
+        </Box>
+        <Box className="w-full flex gap-2">
+          <TextField
+            label="phone label" placeholder="phone label"
+            size="small" variant="outlined"
+          />
+          <TextField
+            label="phone" placeholder="phone"
+            size="small" variant="outlined"
+          />
+        </Box>
+      </DialogContent>
       <DialogActions>
         <Box className="w-full flex justify-center gap-3">
           <IconButton onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
