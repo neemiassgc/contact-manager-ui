@@ -122,8 +122,7 @@ function AddressBoard(props: { addresses: AddressType}) {
   const [creating, setCreating] = useState(false);
 
   function handleAlignment(_: any, value: number): void {
-    if (!value) return;
-    setAlignment(value);
+    if (value !== null) setAlignment(value);
   }
 
   const addressKeys: string[] = toKeys(props.addresses);
@@ -145,15 +144,19 @@ function AddressBoard(props: { addresses: AddressType}) {
           </Tooltip>
         </Box>
       </Box>
-      <Box className="flex gap-2 flex-wrap justify-start">
         {
-          addressKeys.map((key, i) => {
-              return toKeys(props.addresses[key]).map((prop, j) => {
-                  return <ContentBox hidden={i !== alignment} key={i+""+j} label={prop} content={props.addresses[key][prop]}/>
-              })
+          addressKeys.map((label, i) => {
+            return (
+              <Box key={i} className={"flex gap-2 flex-wrap justify-start "+(alignment !== i ? "hidden" : "")}>
+                {
+                  toKeys(props.addresses[label]).map((prop, j) => {
+                    return <ContentBox key={j} label={prop} content={props.addresses[label][prop]}/>
+                  })
+                }
+              </Box>
+            )
           })
         }
-      </Box>
       <PromptModal
         open={creating}
         title="Create a new address"
@@ -165,10 +168,10 @@ function AddressBoard(props: { addresses: AddressType}) {
   )
 }
 
-function ContentBox(props: {label: string, content: string, hidden?: boolean, deleteHandle?: () => void}) {
+function ContentBox(props: {label: string, content: string, deleteHandle?: () => void}) {
   const classes: string[] = [
     "w-fit", "flex", "flex-col", "gap-0", "justify-center",
-    "border", "rounded-lg", "p-2", "hover:shadow-lg", props.hidden ? "hidden" : "block"
+    "border", "rounded-lg", "p-2", "hover:shadow-lg"
   ]
   return <Box className={classes.join(" ")}>
     <span className="text-start text-sm">{props.label}</span>
