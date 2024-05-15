@@ -65,9 +65,16 @@ function Header(props: {contactName: string}) {
 function Body({ contact }: {contact: Contact}) {
   const [creatingPhone, setCreatingPhone] = useState(false);
   const [creatingEmail, setCreatingEmail] = useState(false);
+  const [expanded, setExpanded] = useState([true, true, true])
+
+  const handleExpanded = (index: number) => (_:any, value: boolean) => {
+    const copy: boolean[] = [...expanded];
+    copy[index] = value;
+    setExpanded(copy);
+  }
 
   return <>
-    <Accordion>
+    <Accordion expanded={expanded[0]} onChange={handleExpanded(0)}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <PhoneIcon className="mr-2"/> Phone
       </AccordionSummary>
@@ -82,7 +89,7 @@ function Body({ contact }: {contact: Contact}) {
         </Box>
       </AccordionDetails>
     </Accordion>
-    <Accordion>
+    <Accordion expanded={expanded[1]} onChange={handleExpanded(1)}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <EmailIcon className="mr-2"/> Email
       </AccordionSummary>
@@ -97,7 +104,7 @@ function Body({ contact }: {contact: Contact}) {
         </Box>
       </AccordionDetails>
     </Accordion>
-    <Accordion>
+    <Accordion expanded={expanded[2]} onChange={handleExpanded(2)}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <HomeIcon className="mr-2"/> Address
       </AccordionSummary>
@@ -115,6 +122,7 @@ function AddressBoard(props: { addresses: AddressType}) {
   const [creating, setCreating] = useState(false);
 
   function handleAlignment(_: any, value: number): void {
+    if (!value) return;
     setAlignment(value);
   }
 
@@ -139,9 +147,9 @@ function AddressBoard(props: { addresses: AddressType}) {
       </Box>
       <Box className="flex gap-2 flex-wrap justify-start">
         {
-          addressKeys.map((key, index) => {
-              return toKeys(props.addresses[key]).map(prop => {
-                  return <ContentBox hidden={index !== alignment} key={index} label={prop} content={props.addresses[key][prop]}/>
+          addressKeys.map((key, i) => {
+              return toKeys(props.addresses[key]).map((prop, j) => {
+                  return <ContentBox hidden={i !== alignment} key={i+""+j} label={prop} content={props.addresses[key][prop]}/>
               })
           })
         }
