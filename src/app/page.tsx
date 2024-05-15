@@ -1,8 +1,11 @@
 "use client"
-import { InputAdornment, Button, Box, Avatar, OutlinedInput, Pagination } from '@mui/material';
+import { InputAdornment, Button, Box, Avatar, OutlinedInput, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { getLocalContacts, setSelectedContact } from './storage';
 import { Contact } from "./types"
 import { useRouter } from "next/navigation"
@@ -72,13 +75,22 @@ function getPaginatedData(size: number, page: number, contacts: Contact[]): Cont
 
 function ContentList({ data }: { data: Contact[] }) {
   const router = useRouter();
+  const [openModal, setOpenModal] = useState(false);
+  const [contactName, setContactName] = useState("");
 
   return (
     <>
       <Box className="w-full bg-white rounded-lg border-2">
         {
           data.map((contact, index) => {
-            return <ListItem key={index}>
+            return <ListItem key={index} secondaryAction={
+              <IconButton onClick={() => {
+                setOpenModal(true)
+                setContactName(contact.name);
+              }}>
+                <DeleteForeverIcon/>
+              </IconButton>
+            }>
               <ListItemButton onClick={() => {
                 setSelectedContact(contact);
                 router.push("/profile")
@@ -94,6 +106,21 @@ function ContentList({ data }: { data: Contact[] }) {
           })
         }
       </Box>
+      <ConsentModal open={openModal} contactName={contactName} handleClose={() => setOpenModal(false)} handleYes={()=>{}}/>
     </>
+  )
+}
+
+function ConsentModal(props: {open: boolean, contactName: string, handleClose: () => void, handleYes: () => void}) {
+  return(
+    <Dialog open={props.open}>
+      <DialogTitle><Typography>Delete &apos;{props.contactName}&apos;?</Typography></DialogTitle>
+      <DialogActions>
+        <Box className="w-full flex justify-center gap-3">
+          <IconButton onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+        </Box>
+      </DialogActions>
+    </Dialog>
   )
 }
