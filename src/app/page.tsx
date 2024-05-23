@@ -1,5 +1,5 @@
 "use client"
-import { InputAdornment, Button, Box, Avatar, OutlinedInput, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField } from '@mui/material';
+import { InputAdornment, Button, Box, Avatar, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
@@ -10,6 +10,7 @@ import { getLocalContacts, setSelectedContact } from './storage';
 import { Contact } from "./types"
 import { useRouter } from "next/navigation"
 import { useState } from 'react';
+import { paint, bg, border, text } from './colors';
 
 export default function Home() {
   return (
@@ -30,17 +31,43 @@ function ContactActionHeader() {
   return (
     <>
       <Box className="w-full flex mb-3 justify-between">
-        <OutlinedInput
+        <TextField
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              '& fieldset': {border: "none"},
+            },
+            ...paint(bg("tertiary"), text("on-tertiary")),
+            borderRadius: 2
+          }}
           size="small"
-          className="bg-white"
           placeholder="search"
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          }
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={paint(text("on-tertiary"))}/>
+              </InputAdornment>
+            ),
+          }}
+          inputProps={{
+            sx: {
+              "&::placeholder": {
+                ...paint(text("on-tertiary")),
+                opacity: 1
+              },
+              ...paint(text("on-tertiary"))
+            }
+          }}
         />
-        <Button onClick={() => setOpenModal(true)} variant="contained" size="small" startIcon={<PersonAddIcon/>}>Add Contact</Button>
+        <Button
+          onClick={() => setOpenModal(true)}
+          variant="contained"
+          size="small"
+          sx={{
+            ...paint(bg("primary"), text("on-primary")),
+            "&:hover": paint(bg("primary-container"), text("on-primary-container")),
+            borderRadius: 2
+          }}
+          startIcon={<PersonAddIcon/>}>Add Contact</Button>
       </Box>
       <CreationModal open={openModal} handleClose={() => setOpenModal(false)} handleYes={()=>{}}/>
     </>
@@ -54,7 +81,7 @@ function ContactBoard() {
     setPage(value);
   }
 
-  const countPerPage: number = 7;
+  const countPerPage: number = 6;
   const contacts: Contact[] = getLocalContacts();
   const paginationCount: number = Math.floor(contacts.length / countPerPage);
 
@@ -63,6 +90,12 @@ function ContactBoard() {
       <ContentList data={getPaginatedData(countPerPage, page, contacts)}/>
       <Box className="p-2">
         <Pagination
+          sx={{
+            "& .MuiPaginationItem-root.Mui-selected": paint(bg("primary"), text("on-primary")),
+            "& .MuiPaginationItem-root.Mui-selected:hover": paint(bg("primary-container"), text("on-primary-container")),
+            "& .MuiPaginationItem-root:hover": paint(bg("secondary-container"), text("on-secondary-container")),
+            "& .MuiPaginationItem-root": paint(text("on-surface"))
+          }}
           className="w-fit mx-auto"
           count={contacts.length % countPerPage === 0 ? paginationCount : paginationCount + 1}
           page={page}
@@ -85,7 +118,7 @@ function ContentList({ data }: { data: Contact[] }) {
 
   return (
     <>
-      <Box className="w-full bg-white rounded-lg border-2">
+      <Box className="w-full rounded-xl border" sx={paint(bg("secondary-container"), text("on-secondary-container"), border("outline-variant"))}>
         {
           data.map((contact, index) => {
             return <ListItem key={index} secondaryAction={
@@ -93,7 +126,7 @@ function ContentList({ data }: { data: Contact[] }) {
                 setOpenModal(true)
                 setContactName(contact.name);
               }}>
-                <DeleteForeverIcon/>
+                <DeleteForeverIcon sx={{color: "inherit"}}/>
               </IconButton>
             }>
               <ListItemButton onClick={() => {
@@ -101,7 +134,7 @@ function ContentList({ data }: { data: Contact[] }) {
                 router.push("/profile")
               }}>
                 <ListItemAvatar>
-                  <Avatar>
+                  <Avatar sx={paint(bg("secondary"), text("on-secondary"))}>
                     {contact.name[0].toUpperCase()}
                   </Avatar>
                 </ListItemAvatar>
@@ -119,11 +152,11 @@ function ContentList({ data }: { data: Contact[] }) {
 function ConsentModal(props: {open: boolean, contactName: string, handleClose: () => void, handleYes: () => void}) {
   return(
     <Dialog open={props.open}>
-      <DialogTitle><Typography>Delete &apos;{props.contactName}&apos;?</Typography></DialogTitle>
-      <DialogActions>
+      <DialogTitle sx={paint(bg("surface"), text("on-surface"))}><Typography>Delete &apos;{props.contactName}&apos;?</Typography></DialogTitle>
+      <DialogActions sx={paint(bg("surface"), text("on-surface"))}>
         <Box className="w-full flex justify-center gap-3">
-          <IconButton onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-          <IconButton onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+          <IconButton sx={paint(text("primary"))} onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
         </Box>
       </DialogActions>
     </Dialog>
@@ -131,12 +164,35 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
 }
 
 function CreationModal(props: {open: boolean, handleClose: () => void, handleYes: () => void}) {
+  const containerSx: object = paint(bg("surface"), text("on-surface"));
+  const textTertiary = paint(text("tertiary"));
+  const borderTertiary = paint(border("tertiary"));
+  const textFieldStyles: object = {
+    sx: {
+      "& label, label.Mui-focused": textTertiary,
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': borderTertiary,
+        '&:hover fieldset': borderTertiary,
+        '&.Mui-focused fieldset': borderTertiary,
+      },
+    },
+    inputProps: {
+      sx: {
+        "&::placeholder": textTertiary,
+        ...textTertiary
+      }
+    }
+  }
+
   return (
     <Dialog open={props.open}>
-      <DialogTitle><Typography className="text-center">Create a new contact</Typography></DialogTitle>
-      <DialogContent>
+      <DialogTitle sx={containerSx}>
+        <Typography sx={{color: "inherit"}} className="text-center">Create a new contact</Typography>
+      </DialogTitle>
+      <DialogContent sx={containerSx}>
         <Box className="w-full mb-2 pt-1">
           <TextField
+            {...textFieldStyles}
             className="w-full"
             label="contact name" placeholder="contact name"
             size="small" variant="outlined"
@@ -144,19 +200,21 @@ function CreationModal(props: {open: boolean, handleClose: () => void, handleYes
         </Box>
         <Box className="w-full flex gap-2">
           <TextField
+            {...textFieldStyles}
             label="phone label" placeholder="phone label"
             size="small" variant="outlined"
           />
           <TextField
+            {...textFieldStyles}
             label="phone" placeholder="phone"
             size="small" variant="outlined"
           />
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={containerSx}>
         <Box className="w-full flex justify-center gap-3">
-          <IconButton onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-          <IconButton onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+          <IconButton sx={paint(text("primary"))} onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
         </Box>
       </DialogActions>
     </Dialog>

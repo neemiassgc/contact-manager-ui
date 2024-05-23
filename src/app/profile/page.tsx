@@ -23,14 +23,15 @@ import { toKeys } from "../utils";
 import { Contact, AddressType } from "../types";
 import { useState } from "react";
 import { getSelectedContact } from "../storage";
+import { bg, text, paint, border} from "../colors";
 import Link from "next/link";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact();
 
   return (
-    <Box className="w-1/2 mx-auto mt-10">
-      <Breadcrumbs>
+    <Box className="w-1/2 mx-auto mt-10" sx={paint(bg("surface"))}>
+      <Breadcrumbs sx={paint(text("on-surface"))}>
         <Link href="/">Home</Link>
         <Typography>Profile</Typography>
       </Breadcrumbs>
@@ -44,12 +45,17 @@ function Header(props: {contactName: string}) {
   const [editing, setEditing] = useState(false);
 
   return <Box className="w-full flex flex-col justify-center items-center">
-    <Avatar sx={{width: 100, height: 100, fontSize: 50}}>{props.contactName[0]}</Avatar>
+    <Avatar
+      sx={{
+        width: 100, height: 100, fontSize: 50,
+        ...paint(bg("primary"), text("on-primary"))
+      }}
+    >{props.contactName[0]}</Avatar>
     <Box className="ml-5 mt-1">
-      <span>{props.contactName}</span>
+      <span style={paint(text("on-surface"))}>{props.contactName}</span>
       <Tooltip title="Edit Contact Name" arrow>
         <IconButton onClick={() => setEditing(true)}>
-          <EditNoteRoundedIcon fontSize="medium"/>
+          <EditNoteRoundedIcon sx={paint(text("on-surface"))} fontSize="medium"/>
         </IconButton>
       </Tooltip>
     </Box>
@@ -73,8 +79,14 @@ function Body({ contact }: {contact: Contact}) {
     setExpanded(copy);
   }
 
+  const sx: object = {
+    border: 1,
+    boxShadow: 0,
+    ...paint(bg("surface-container"), text("on-surface-variant"), border("outline-variant")),
+  };
+
   return <>
-    <Accordion expanded={expanded[0]} onChange={handleExpanded(0)}>
+    <Accordion sx={sx} expanded={expanded[0]} onChange={handleExpanded(0)}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <PhoneIcon className="mr-2"/> Phone
       </AccordionSummary>
@@ -89,7 +101,7 @@ function Body({ contact }: {contact: Contact}) {
         </Box>
       </AccordionDetails>
     </Accordion>
-    <Accordion expanded={expanded[1]} onChange={handleExpanded(1)}>
+    <Accordion sx={sx} expanded={expanded[1]} onChange={handleExpanded(1)}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <EmailIcon className="mr-2"/> Email
       </AccordionSummary>
@@ -104,7 +116,7 @@ function Body({ contact }: {contact: Contact}) {
         </Box>
       </AccordionDetails>
     </Accordion>
-    <Accordion expanded={expanded[2]} onChange={handleExpanded(2)}>
+    <Accordion sx={sx} expanded={expanded[2]} onChange={handleExpanded(2)}>
       <AccordionSummary expandIcon={<KeyboardArrowDownIcon/>}>
         <HomeIcon className="mr-2"/> Address
       </AccordionSummary>
@@ -128,19 +140,29 @@ function AddressBoard(props: { addresses: AddressType}) {
   const addressKeys: string[] = toKeys(props.addresses);
 
   return (
-    <Box className="w-full p-3 border rounded-lg">
+    <Box className="w-full p-3 border rounded-lg" sx={paint(border("outline-variant"))}>
       <Box className="w-full mb-5 flex">
-        <ToggleButtonGroup className="mx-auto" value={alignment} exclusive onChange={handleAlignment} size="small">
+        <ToggleButtonGroup
+          sx={{
+            ...paint(bg("tertiary-container"), text("on-tertiary-container")),
+            "& .MuiToggleButton-root.Mui-selected": {
+              ...paint(bg("tertiary"), text("on-tertiary"))
+            }
+          }}
+          className="mx-auto"
+          value={alignment} exclusive
+          onChange={handleAlignment} size="small"
+        >
           {
-            addressKeys.map((item, index) => <ToggleButton key={index} value={index}>{item}</ToggleButton>)
+            addressKeys.map((item, index) => <ToggleButton sx={{color: "inherit"}} key={index} value={index}>{item}</ToggleButton>)
           }
         </ToggleButtonGroup>
-        <Box>
+        <Box sx={paint(text("primary"))}>
           <Tooltip title="Delete Address">
-            <IconButton><DeleteIcon className="text-2xl"/></IconButton>
+            <IconButton sx={paint(text("secondary"))}><DeleteIcon className="text-2xl"/></IconButton>
           </Tooltip>
           <Tooltip title="Create New Address">
-            <IconButton onClick={() => setCreating(true)}><AddBoxRoundedIcon className="text-2xl"/></IconButton>
+            <IconButton sx={{color: "inherit"}} onClick={() => setCreating(true)}><AddBoxRoundedIcon className="text-2xl"/></IconButton>
           </Tooltip>
         </Box>
       </Box>
@@ -171,49 +193,77 @@ function AddressBoard(props: { addresses: AddressType}) {
 function ContentBox(props: {label: string, content: string, deleteHandle?: () => void}) {
   const classes: string[] = [
     "w-fit", "flex", "flex-col", "gap-0", "justify-center",
-    "border", "rounded-lg", "p-2", "hover:shadow-lg"
+    "border", "rounded-lg", "p-2", "hover:cursor-pointer"
   ]
-  return <Box className={classes.join(" ")}>
-    <span className="text-start text-sm">{props.label}</span>
+  return (
+  <Box className={classes.join(" ")}
+    sx={paint(bg("secondary-container"), text("on-secondary-container"))}
+  >
+    <span style={{color: "inherit"}} className="text-start text-sm">{props.label}</span>
     <Box className="flex gap-0">
-      <span className="text-center h-fit my-auto">{props.content}</span>
+      <span style={{color: "inherit"}} className="text-center h-fit my-auto">{props.content}</span>
       {
       props.deleteHandle &&
        <Tooltip title={"Delete "+props.label}>
-        <IconButton onClick={props.deleteHandle} size="small"><DeleteIcon/></IconButton> 
+        <IconButton sx={{color: "inherit"}} onClick={props.deleteHandle} size="small"><DeleteIcon/></IconButton> 
        </Tooltip>
       }
     </Box>
   </Box>
+  )
 }
 
 function CreationPlaceholder(props: {label: string, onClick: () => void}) {
-  return <Box onClick={props.onClick} className="p-5 border-4 border-dotted rounded-lg hover:cursor-pointer">
-      <AddBoxRoundedIcon className="mr-2 text-gray-400"/>
-      <span className="text-gray-600">{props.label.toLocaleLowerCase()}</span>
-  </Box>
+  return (
+    <Box
+      onClick={props.onClick}
+      className="p-5 border-4 border-dotted rounded-lg hover:cursor-pointer"
+      sx={paint(border("outline-variant"), text("on-secondary-container"))}
+    >
+      <AddBoxRoundedIcon sx={paint(text("tertiary"))} className="mr-2 text-gray-400"/>
+      <span style={{color: "inherit"}} className="text-gray-600">{props.label.toLocaleLowerCase()}</span>
+    </Box>
+  )
 }
 
 function PromptModal(props: {open: boolean, title: string, fieldNames?: string[], handleClose: () => void, handleSave: () => void}) {
+  const textTertiary = paint(text("tertiary"));
+  const borderTertiary = paint(border("tertiary"));
+  const textFieldStyles: object = {
+    sx: {
+      "& label, label.Mui-focused": textTertiary,
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': borderTertiary,
+        '&:hover fieldset': borderTertiary,
+        '&.Mui-focused fieldset': borderTertiary,
+      },
+    },
+    inputProps: {
+      sx: {
+        "&::placeholder": textTertiary,
+        ...textTertiary
+      }
+    }
+  }
   return (
     <Dialog open={props.open}>
-      <DialogTitle><Typography className="font-bold text-center">{props.title}</Typography></DialogTitle>
-      <DialogContent>
+      <DialogTitle sx={paint(bg("surface"), text("on-surface"))}><Typography className="font-bold text-center">{props.title}</Typography></DialogTitle>
+      <DialogContent sx={paint(bg("surface"), text("on-surface"))}>
         <Box className="flex flex-col gap-2 w-full p-1 h-full">
-          <TextField variant="outlined" size="small" label="label" placeholder="label"/>
+          <TextField {...textFieldStyles} variant="outlined" size="small" label="label" placeholder="label"/>
           {
-            !props.fieldNames ? <TextField variant="outlined" size="small" label="value" placeholder="value"/> :
+            !props.fieldNames ? <TextField {...textFieldStyles} variant="outlined" size="small" label="value" placeholder="value"/> :
             <>
               {
                 props.fieldNames.map((fieldName: string, index: number) =>
-                  <TextField key={index} variant="outlined" size="small" label={fieldName} placeholder="label"/>)
+                  <TextField {...textFieldStyles}  key={index} variant="outlined" size="small" label={fieldName} placeholder="label"/>)
               }
             </>
           }
         </Box>
         <Box className="w-full flex justify-center mt-2">
-          <IconButton onClick={props.handleSave} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-          <IconButton onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+          <IconButton sx={paint(text("primary"))} onClick={props.handleSave} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
         </Box>
       </DialogContent>
     </Dialog>
