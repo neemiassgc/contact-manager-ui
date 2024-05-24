@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Avatar, Box, Button, Chip, IconButton, Typography } from "@mui/material";
+import { Avatar, Box, Typography } from "@mui/material";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
-import LogoutIcon from '@mui/icons-material/Logout';
 import { paint, bg, border, text } from "./colors";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className} style={bg("surface")}>
+      <body className={inter.className} style={bg("surface-container-low")}>
         <Header/>
         {children}
       </body>
@@ -30,7 +29,7 @@ export default function RootLayout({
 
 function Header() {
   return (
-    <header className="w-full text-right p-3 flex justify-between items-center border"
+    <header className="w-full text-right p-3 flex justify-between items-center border-b"
       style={paint(bg("surface-container"), text("on-surface"), border("outline-variant"))}
     >
       <Box className="ml-5">

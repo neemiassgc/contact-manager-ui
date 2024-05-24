@@ -23,14 +23,14 @@ import { toKeys } from "../utils";
 import { Contact, AddressType } from "../types";
 import { useState } from "react";
 import { getSelectedContact } from "../storage";
-import { bg, text, paint, border} from "../colors";
+import { bg, text, paint, border, color} from "../colors";
 import Link from "next/link";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact();
 
   return (
-    <Box className="w-1/2 mx-auto mt-10" sx={paint(bg("surface"))}>
+    <Box className="w-1/2 mx-auto mt-10 mb-5">
       <Breadcrumbs sx={paint(text("on-surface"))}>
         <Link href="/">Home</Link>
         <Typography>Profile</Typography>
@@ -82,7 +82,9 @@ function Body({ contact }: {contact: Contact}) {
   const sx: object = {
     border: 1,
     boxShadow: 0,
-    ...paint(bg("surface-container"), text("on-surface-variant"), border("outline-variant")),
+    borderLeft: 3,
+    ...paint(bg("surface"), text("on-surface"), border("outline-variant")),
+    borderLeftColor: color("tertiary")
   };
 
   return <>
@@ -144,9 +146,9 @@ function AddressBoard(props: { addresses: AddressType}) {
       <Box className="w-full mb-5 flex">
         <ToggleButtonGroup
           sx={{
-            ...paint(bg("tertiary-container"), text("on-tertiary-container")),
+            ...paint(bg("secondary-container"), text("on-secondary-container")),
             "& .MuiToggleButton-root.Mui-selected": {
-              ...paint(bg("tertiary"), text("on-tertiary"))
+              ...paint(bg("secondary"), text("on-secondary"))
             }
           }}
           className="mx-auto"
@@ -197,7 +199,7 @@ function ContentBox(props: {label: string, content: string, deleteHandle?: () =>
   ]
   return (
   <Box className={classes.join(" ")}
-    sx={paint(bg("secondary-container"), text("on-secondary-container"))}
+    sx={paint(bg("secondary"), text("on-secondary"))}
   >
     <span style={{color: "inherit"}} className="text-start text-sm">{props.label}</span>
     <Box className="flex gap-0">
@@ -218,9 +220,9 @@ function CreationPlaceholder(props: {label: string, onClick: () => void}) {
     <Box
       onClick={props.onClick}
       className="p-5 border-4 border-dotted rounded-lg hover:cursor-pointer"
-      sx={paint(border("outline-variant"), text("on-secondary-container"))}
+      sx={paint(border("outline-variant"), text("on-surface"))}
     >
-      <AddBoxRoundedIcon sx={paint(text("tertiary"))} className="mr-2 text-gray-400"/>
+      <AddBoxRoundedIcon sx={paint(text("secondary"))} className="mr-2 text-gray-400"/>
       <span style={{color: "inherit"}} className="text-gray-600">{props.label.toLocaleLowerCase()}</span>
     </Box>
   )

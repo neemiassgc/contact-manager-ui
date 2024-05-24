@@ -80,7 +80,7 @@ function ContactBoard() {
   const handlePagination: (event: React.ChangeEvent<unknown>, value: number) => void = (_, value) => {
     setPage(value);
   }
-
+  
   const countPerPage: number = 6;
   const contacts: Contact[] = getLocalContacts();
   const paginationCount: number = Math.floor(contacts.length / countPerPage);
@@ -118,7 +118,7 @@ function ContentList({ data }: { data: Contact[] }) {
 
   return (
     <>
-      <Box className="w-full rounded-xl border" sx={paint(bg("secondary-container"), text("on-secondary-container"), border("outline-variant"))}>
+      <Box className="w-full rounded-xl border" sx={paint(bg("surface"), text("on-surface"), border("outline-variant"))}>
         {
           data.map((contact, index) => {
             return <ListItem key={index} secondaryAction={
@@ -126,7 +126,7 @@ function ContentList({ data }: { data: Contact[] }) {
                 setOpenModal(true)
                 setContactName(contact.name);
               }}>
-                <DeleteForeverIcon sx={{color: "inherit"}}/>
+                <DeleteForeverIcon sx={text("on-surface")}/>
               </IconButton>
             }>
               <ListItemButton onClick={() => {
@@ -138,7 +138,7 @@ function ContentList({ data }: { data: Contact[] }) {
                     {contact.name[0].toUpperCase()}
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={contact.name}/>
+                <ListItemText sx={text("on-surface")} primary={contact.name}/>
               </ListItemButton>
             </ListItem>
           })
