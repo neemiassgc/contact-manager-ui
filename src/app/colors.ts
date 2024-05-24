@@ -3,7 +3,8 @@ type ColorRole =
   "secondary" | "on-secondary" | "secondary-container" | "on-secondary-container" |
   "tertiary" | "on-tertiary" | "tertiary-container" | "on-tertiary-container" |
   "error" | "on-error" | "surface" | "on-surface" | "error-container" | "on-error-container" |
-  "surface-variant" | "on-surface-variant" | "outline" | "outline-variant" | "surface-container"
+  "surface-variant" | "on-surface-variant" | "outline" | "outline-variant" | "surface-container" |
+  "surface-container-low" | "surface-container-lowest" | "surface-container-high" | "surface-container-highest"
 
 const colorMap: {
   [propName: string]: string
@@ -30,7 +31,11 @@ const colorMap: {
   "on-surface-variant": "rgb(64 73 67)",
   outline: "rgb(112 121 114)",
   "outline-variant": "rgb(192 201 193)",
-  "surface-container": "rgb(234 239 233)"
+  "surface-container": "rgb(234 239 233)",
+  "surface-container-lowest": "rgb(255 255 255)",
+  "surface-container-low": "rgb(240 245 239)",
+  "surface-container-high": "rgb(228 234 227)",
+  "surface-container-highest": "rgb(222 228 222)"
 }
 
 type ColorFunc = (colorRole: ColorRole) => object;
@@ -40,6 +45,8 @@ export const text: ColorFunc = colorRole => ({color: colorMap[colorRole]})
 export const border: ColorFunc = colorRole => ({borderColor: colorMap[colorRole]})
 
 export const bg: ColorFunc = colorRole => ({backgroundColor: colorMap[colorRole]})
+
+export const color: (colorRole: ColorRole) => string = colorRole => colorMap[colorRole]
 
 export function paint(...cssProps: object[]): object {
   return cssProps.reduce((prev, curr) => ({...prev, ...curr}), {});
