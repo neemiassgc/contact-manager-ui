@@ -112,11 +112,6 @@ function PageableContactList() {
   )
 }
 
-function getPaginatedData(size: number, page: number, contacts: Contact[]): Contact[] {
-  const viewStart: number = size * page - size;
-  return contacts.slice(viewStart === 0 ? 0 : viewStart, size * page);
-}
-
 function ContactList({ data }: { data: Contact[] }) {
   const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
