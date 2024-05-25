@@ -99,7 +99,7 @@ function Body({ contact }: {contact: Contact}) {
                 return <ContentBox key={index} label={prop} content={contact.phoneNumbers[prop]} deleteHandle={() => null}/>
             })
           }
-          <CreationPlaceholder onClick={() => setCreatingPhone(true)} label="Add new phone"/>
+          <CreationPlaceholder onClick={() => setCreatingPhone(true)}/>
         </Box>
       </AccordionDetails>
     </Accordion>
@@ -114,7 +114,7 @@ function Body({ contact }: {contact: Contact}) {
                 return <ContentBox key={index} label={prop} content={contact.emails[prop]} deleteHandle={() => null}/>
             })
           }
-          <CreationPlaceholder onClick={() => setCreatingEmail(true)} label="Add new email"/>
+          <CreationPlaceholder onClick={() => setCreatingEmail(true)}/>
         </Box>
       </AccordionDetails>
     </Accordion>
@@ -215,15 +215,14 @@ function ContentBox(props: {label: string, content: string, deleteHandle?: () =>
   )
 }
 
-function CreationPlaceholder(props: {label: string, onClick: () => void}) {
+function CreationPlaceholder(props: {onClick: () => void}) {
   return (
     <Box
       onClick={props.onClick}
-      className="p-5 border-4 border-dotted rounded-lg hover:cursor-pointer"
+      className="border-4 border-dotted rounded-lg hover:cursor-pointer flex flex-col justify-center p-3"
       sx={paint(border("outline-variant"), text("on-surface"))}
     >
-      <AddBoxRoundedIcon sx={paint(text("secondary"))} className="mr-2 text-gray-400"/>
-      <span style={{color: "inherit"}} className="text-gray-600">{props.label.toLocaleLowerCase()}</span>
+      <AddBoxRoundedIcon fontSize="large" sx={paint(text("secondary"))}/>
     </Box>
   )
 }
