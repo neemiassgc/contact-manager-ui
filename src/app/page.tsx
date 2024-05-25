@@ -105,20 +105,23 @@ function PageableContactList({ contacts }: { contacts: Contact[] }) {
   return (
     <>
       <ContactList data={getPaginatedData(countPerPage, page, contacts)}/>
-      <Box className="p-2">
-        <Pagination
-          sx={{
-            "& .MuiPaginationItem-root.Mui-selected": paint(bg("primary"), text("on-primary")),
-            "& .MuiPaginationItem-root.Mui-selected:hover": paint(bg("primary-container"), text("on-primary-container")),
-            "& .MuiPaginationItem-root:hover": paint(bg("secondary-container"), text("on-secondary-container")),
-            "& .MuiPaginationItem-root": paint(text("on-surface"))
-          }}
-          className="w-fit mx-auto"
-          count={contacts.length % countPerPage === 0 ? paginationCount : paginationCount + 1}
-          page={page}
-          onChange={handlePagination}
-          size="large" />
-      </Box>
+      {
+        contacts.length > countPerPage &&
+        <Box className="p-2">
+          <Pagination
+            sx={{
+              "& .MuiPaginationItem-root.Mui-selected": paint(bg("primary"), text("on-primary")),
+              "& .MuiPaginationItem-root.Mui-selected:hover": paint(bg("primary-container"), text("on-primary-container")),
+              "& .MuiPaginationItem-root:hover": paint(bg("secondary-container"), text("on-secondary-container")),
+              "& .MuiPaginationItem-root": paint(text("on-surface"))
+            }}
+            className="w-fit mx-auto"
+            count={contacts.length % countPerPage === 0 ? paginationCount : paginationCount + 1}
+            page={page}
+            onChange={handlePagination}
+            size="large" />
+        </Box>
+      }
     </>
   )
 }
