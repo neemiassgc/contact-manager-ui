@@ -16,16 +16,22 @@ export default function Home() {
   return (
     <>
       <main className="mt-16 w-full p-1">
-        <Box className="w-5/12 mx-auto">
-          <ContactActionHeader/>
-          <ContactBoard/>
-        </Box>
+        <ContactListBoard/>
       </main>
     </>
   );
 }
 
-function ContactActionHeader() {
+function ContactListBoard() {
+  return (
+    <Box className="w-5/12 mx-auto">
+      <ContactListHeader/>
+      <PageableContactList/>
+    </Box>
+  )
+}
+
+function ContactListHeader() {
   const [openModal, setOpenModal] = useState(false);
 
   return (
@@ -74,7 +80,7 @@ function ContactActionHeader() {
   )
 }
 
-function ContactBoard() {
+function PageableContactList() {
   const [page, setPage] = useState(1);
 
   const handlePagination: (event: React.ChangeEvent<unknown>, value: number) => void = (_, value) => {
@@ -87,7 +93,7 @@ function ContactBoard() {
 
   return (
     <>
-      <ContentList data={getPaginatedData(countPerPage, page, contacts)}/>
+      <ContactList data={getPaginatedData(countPerPage, page, contacts)}/>
       <Box className="p-2">
         <Pagination
           sx={{
@@ -111,7 +117,7 @@ function getPaginatedData(size: number, page: number, contacts: Contact[]): Cont
   return contacts.slice(viewStart === 0 ? 0 : viewStart, size * page);
 }
 
-function ContentList({ data }: { data: Contact[] }) {
+function ContactList({ data }: { data: Contact[] }) {
   const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
   const [contactName, setContactName] = useState("");
