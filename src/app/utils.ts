@@ -10,3 +10,8 @@ export function getPaginatedData(size: number, page: number, contacts: Contact[]
   const viewStart: number = size * page - size;
   return contacts.slice(viewStart === 0 ? 0 : viewStart, size * page);
 }
+
+export function filterByName(contacts: Contact[], text: string) {
+  if (text === "") return contacts;
+  return contacts.filter(contact => contact.name.toLocaleLowerCase().startsWith(text.toLowerCase()));
+}

@@ -11,6 +11,7 @@ import { Contact } from "./types"
 import { useRouter } from "next/navigation"
 import { useState } from 'react';
 import { paint, bg, border, text } from './colors';
+import { filterByName, getPaginatedData } from './utils';
 
 export default function Home() {
   return (
@@ -23,15 +24,24 @@ export default function Home() {
 }
 
 function ContactListBoard() {
+  const [searchText, setSearchText] = useState("");
+  
+  const contacts: Contact[] = getLocalContacts();
+  const filteredContacts: Contact[] = filterByName(contacts, searchText);
+
+  const handleSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  }
+
   return (
     <Box className="w-5/12 mx-auto">
-      <ContactListHeader/>
-      <PageableContactList/>
+      <ContactListHeader textFieldOnChange={handleSearchText} textFieldValue={searchText}/>
+      <PageableContactList contacts={filteredContacts}/>
     </Box>
   )
 }
 
-function ContactListHeader() {
+function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void}) {
   const [openModal, setOpenModal] = useState(false);
 
   return (
@@ -63,6 +73,8 @@ function ContactListHeader() {
               ...paint(text("on-tertiary"))
             }
           }}
+          onChange={props.textFieldOnChange}
+          value={props.textFieldValue}
         />
         <Button
           onClick={() => setOpenModal(true)}
@@ -80,7 +92,7 @@ function ContactListHeader() {
   )
 }
 
-function PageableContactList() {
+function PageableContactList({ contacts }: { contacts: Contact[] }) {
   const [page, setPage] = useState(1);
 
   const handlePagination: (event: React.ChangeEvent<unknown>, value: number) => void = (_, value) => {
@@ -88,7 +100,6 @@ function PageableContactList() {
   }
   
   const countPerPage: number = 6;
-  const contacts: Contact[] = getLocalContacts();
   const paginationCount: number = Math.floor(contacts.length / countPerPage);
 
   return (
