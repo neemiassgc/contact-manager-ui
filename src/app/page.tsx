@@ -1,11 +1,12 @@
 "use client"
-import { InputAdornment, Button, Box, Avatar, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField } from '@mui/material';
+import { InputAdornment, Button, Box, Avatar, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField, Divider } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import DataArrayIcon from '@mui/icons-material/DataArray';
 import { getLocalContacts, setSelectedContact } from './storage';
 import { Contact } from "./types"
 import { useRouter } from "next/navigation"
@@ -36,7 +37,17 @@ function ContactListBoard() {
   return (
     <Box className="w-5/12 mx-auto">
       <ContactListHeader textFieldOnChange={handleSearchText} textFieldValue={searchText}/>
-      <PageableContactList contacts={filteredContacts}/>
+      {
+        filteredContacts.length > 0 ?
+        <PageableContactList contacts={filteredContacts}/> :
+        <>
+          <Divider/>
+          <Box className="w-full text-center mt-3" sx={{...text("on-surface"), opacity: 0.7}}>
+            <DataArrayIcon fontSize="large"/>
+            <span className="text-2xl align-middle ml-2">Nothing</span>
+          </Box>
+        </>
+      }
     </Box>
   )
 }
