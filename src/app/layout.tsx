@@ -32,11 +32,11 @@ function Header() {
     <header className="w-full text-right p-3 flex justify-between items-center border-b"
       style={paint(bg("surface-container"), text("on-surface"), border("outline-variant"))}
     >
-      <Box className="ml-5">
+      <Box className="ml-1 sm:ml-5">
         <ContactPhoneIcon fontSize="large"/>
         <span className="ml-2 align-middle text-md">Contact Manager</span>
       </Box>
-      <Box className="flex items-center mr-10">
+      <Box className="flex items-center mr-1 sm:mr-10">
         <Box className="flex items-center gap-2">
           <Avatar sx={paint(bg("primary"), text("on-primary"))}>R</Avatar>
           <Typography>Ronald</Typography>

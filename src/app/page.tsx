@@ -35,7 +35,7 @@ function ContactListBoard() {
   }
 
   return (
-    <Box className="w-5/12 mx-auto">
+    <Box className="p-5 w-full sm:p-0 sm:w-8/12 md:w-7/12 lg:w-5/12 mx-auto">
       <ContactListHeader textFieldOnChange={handleSearchText} textFieldValue={searchText}/>
       {
         filteredContacts.length > 0 ?
@@ -57,7 +57,7 @@ function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (e
 
   return (
     <>
-      <Box className="w-full flex mb-3 justify-between">
+      <Box className="w-full flex mb-3 justify-center flex-wrap-reverse gap-3 sm:gap-0 sm:justify-between">
         <TextField
           sx={{
             "& .MuiOutlinedInput-root": {
@@ -90,7 +90,8 @@ function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (e
         <Button
           onClick={() => setOpenModal(true)}
           variant="contained"
-          size="small"
+          className="w-fit"
+          size="medium"
           sx={{
             ...paint(bg("primary"), text("on-primary")),
             "&:hover": paint(bg("primary-container"), text("on-primary-container")),

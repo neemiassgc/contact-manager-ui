@@ -30,7 +30,7 @@ export default function Page() {
   const selectedContact: Contact = getSelectedContact();
 
   return (
-    <Box className="w-1/2 mx-auto mt-10 mb-5">
+    <Box className="w-11/12 md:w-1/2 mx-auto mt-10 mb-5">
       <Breadcrumbs sx={paint(text("on-surface"))}>
         <Link href="/">Home</Link>
         <Typography>Profile</Typography>
@@ -142,16 +142,18 @@ function AddressBoard(props: { addresses: AddressType}) {
   const addressKeys: string[] = toKeys(props.addresses);
 
   return (
-    <Box className="w-full p-3 border rounded-lg" sx={paint(border("outline-variant"))}>
-      <Box className="w-full mb-5 flex">
-        <ToggleButtonGroup
+    <Box className="w-full p-3 border rounded-lg" sx={border("outline-variant")}>
+      <Box className="w-full mb-5 flex justify-evenly">
+        <Tooltip title="Delete Address">
+          <IconButton sx={text("secondary")}><DeleteIcon sx={{fontSize: 27}}/></IconButton>
+        </Tooltip>
+        <ToggleButtonGroup 
           sx={{
             ...paint(bg("secondary-container"), text("on-secondary-container")),
             "& .MuiToggleButton-root.Mui-selected": {
               ...paint(bg("secondary"), text("on-secondary"))
             }
           }}
-          className="mx-auto"
           value={alignment} exclusive
           onChange={handleAlignment} size="small"
         >
@@ -159,19 +161,14 @@ function AddressBoard(props: { addresses: AddressType}) {
             addressKeys.map((item, index) => <ToggleButton sx={{color: "inherit"}} key={index} value={index}>{item}</ToggleButton>)
           }
         </ToggleButtonGroup>
-        <Box sx={paint(text("primary"))}>
-          <Tooltip title="Delete Address">
-            <IconButton sx={paint(text("secondary"))}><DeleteIcon className="text-2xl"/></IconButton>
-          </Tooltip>
-          <Tooltip title="Create New Address">
-            <IconButton sx={{color: "inherit"}} onClick={() => setCreating(true)}><AddBoxRoundedIcon className="text-2xl"/></IconButton>
-          </Tooltip>
-        </Box>
+        <Tooltip title="Create New Address">
+          <IconButton sx={text("secondary")} onClick={() => setCreating(true)}><AddBoxRoundedIcon sx={{fontSize: 27}}/></IconButton>
+        </Tooltip>
       </Box>
         {
           addressKeys.map((label, i) => {
             return (
-              <Box key={i} className={"flex gap-2 flex-wrap justify-start "+(alignment !== i ? "hidden" : "")}>
+              <Box key={i} className={"flex gap-2 flex-wrap justify-center lg:justify-start "+(alignment !== i ? "hidden" : "")}>
                 {
                   toKeys(props.addresses[label]).map((prop, j) => {
                     return <ContentBox key={j} label={prop} content={props.addresses[label][prop]}/>
@@ -201,8 +198,8 @@ function ContentBox(props: {label: string, content: string, deleteHandle?: () =>
   <Box className={classes.join(" ")}
     sx={paint(bg("secondary"), text("on-secondary"))}
   >
-    <span style={{color: "inherit"}} className="text-start text-sm">{props.label}</span>
-    <Box className="flex gap-0">
+    <span style={{color: "inherit", opacity: 0.9}} className="text-center sm:text-start text-sm">{props.label}</span>
+    <Box className="flex gap-0 flex-wrap justify-center sm:justify-normal">
       <span style={{color: "inherit"}} className="text-center h-fit my-auto">{props.content}</span>
       {
       props.deleteHandle &&
@@ -220,16 +217,16 @@ function CreationPlaceholder(props: {onClick: () => void}) {
     <Box
       onClick={props.onClick}
       className="border-4 border-dotted rounded-lg hover:cursor-pointer flex flex-col justify-center p-3"
-      sx={paint(border("outline-variant"), text("on-surface"))}
+      sx={border("outline-variant")}
     >
-      <AddBoxRoundedIcon fontSize="large" sx={paint(text("secondary"))}/>
+      <AddBoxRoundedIcon fontSize="large" sx={text("secondary")}/>
     </Box>
   )
 }
 
 function PromptModal(props: {open: boolean, title: string, fieldNames?: string[], handleClose: () => void, handleSave: () => void}) {
-  const textTertiary = paint(text("tertiary"));
-  const borderTertiary = paint(border("tertiary"));
+  const textTertiary = text("tertiary");
+  const borderTertiary = border("tertiary");
   const textFieldStyles: object = {
     sx: {
       "& label, label.Mui-focused": textTertiary,
@@ -263,8 +260,8 @@ function PromptModal(props: {open: boolean, title: string, fieldNames?: string[]
           }
         </Box>
         <Box className="w-full flex justify-center mt-2">
-          <IconButton sx={paint(text("primary"))} onClick={props.handleSave} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-          <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+          <IconButton sx={text("primary")} onClick={props.handleSave} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton sx={text("error")} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
         </Box>
       </DialogContent>
     </Dialog>
