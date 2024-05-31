@@ -7,12 +7,12 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
-import { getLocalContacts, setSelectedContact } from './storage';
-import { Contact } from "./types"
+import { getLocalContacts, setSelectedContact } from './lib/storage';
+import { Contact } from "./lib/types"
 import { useRouter } from "next/navigation"
 import { useState } from 'react';
-import { paint, bg, border, text } from './colors';
-import { filterByName, getPaginatedData } from './utils';
+import { paint, bg, border, text } from './lib/colors';
+import { filterByName, getPaginatedData } from './lib/utils';
 
 export default function Home() {
   return (

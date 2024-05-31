@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Avatar, Box, Typography } from "@mui/material";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
-import { paint, bg, border, text } from "./colors";
+import { paint, bg, border, text } from "./lib/colors";
 
 const inter = Inter({ subsets: ["latin"] });
 

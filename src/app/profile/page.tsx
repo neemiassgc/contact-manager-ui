@@ -19,11 +19,11 @@ import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import { toKeys } from "../utils";
-import { Contact, AddressType } from "../types";
+import { toKeys } from "../lib/utils";
+import { Contact, AddressType } from "../lib/types";
 import { useState } from "react";
-import { getSelectedContact } from "../storage";
-import { bg, text, paint, border, color} from "../colors";
+import { getSelectedContact } from "../lib/storage";
+import { bg, text, paint, border, color} from "../lib/colors";
 import Link from "next/link";
 
 export default function Page() {
