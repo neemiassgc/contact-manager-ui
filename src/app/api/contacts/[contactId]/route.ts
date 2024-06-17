@@ -1,11 +1,11 @@
 import { getAccessToken, AccessTokenError } from "@auth0/nextjs-auth0"
 import { NextResponse } from "next/server";
 
-const resourceServerUri = "http://localhost:8080/api"
+const resourceServerUri = "http://localhost:8080/api/contacts/"
 
-export async function GET() {
+export async function GET(_: Request, { params }: { params: { contactId: string }}) {
   try {
-    const fetchRequest = await authorizedFetch(resourceServerUri+"/contacts");
+    const fetchRequest = await authorizedFetch(resourceServerUri+params.contactId);
     if (!fetchRequest.ok)
       return new NextResponse(await fetchRequest.text(), { status: fetchRequest.status })
     return NextResponse.json(await fetchRequest.json());
