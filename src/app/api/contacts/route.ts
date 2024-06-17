@@ -3,14 +3,14 @@ import { NextResponse } from "next/server";
 
 const resourceServerUri = "http://localhost:8080/api"
 
-export async function GET({ params }: { params: { contactId: string }}) {
+export async function GET() {
   try {
     const token = await getAccessToken();
     if (token.accessToken) {
       const fetchRequest = await authorizedFetch(resourceServerUri+"/contacts", { token: token.accessToken });
       if (!fetchRequest.ok)
         return new NextResponse(await fetchRequest.text(), { status: fetchRequest.status })
-      return await fetchRequest.json();
+      return NextResponse.json(await fetchRequest.json());
     }
     return new NextResponse("Unauthorized", { status: 401 });
   }
