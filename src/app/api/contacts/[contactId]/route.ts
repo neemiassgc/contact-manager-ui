@@ -1,5 +1,6 @@
-import { getAccessToken, AccessTokenError } from "@auth0/nextjs-auth0"
+import { AccessTokenError } from "@auth0/nextjs-auth0"
 import { NextResponse } from "next/server";
+import { authorizedFetch } from "../misc";
 
 const resourceServerUri = "http://localhost:8080/api/contacts/"
 
@@ -19,15 +20,4 @@ export async function GET(_: Request, { params }: { params: { contactId: string 
       return new NextResponse(error.message, { status: 401 });
     return new NextResponse("Something went wrong with the server", { status: 400 });
   }
-}
-
-async function authorizedFetch(url: string, inputHeaders?: object) {
-  const token = await getAccessToken();
-  const headers = {
-    authorization: `Bearer ${token}`,
-    accept: "*/*",
-    ...inputHeaders
-  }
-  if (token.accessToken) return fetch(url, { headers });
-  throw new Error("Unauthorized");
 }
