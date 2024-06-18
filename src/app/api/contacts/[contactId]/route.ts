@@ -11,3 +11,27 @@ export async function GET(_: Request, { params }: { params: { contactId: string 
     return NextResponse.json(await fetchRequest.json());
   })
 }
+
+export async function PATCH(request: Request, { params }: { params: { contactId: string }}) {
+  return safe(async () => {
+    const settings: object = {
+      method: "PATCH",
+      headers: {
+        contentType: "application/json"
+      },
+      body: request.body
+    }
+    const fetchRequest = await authorizedFetch(resourceServerUri+params.contactId, settings);
+    return new NextResponse(request.body, { status: fetchRequest.status });
+  });
+}
+
+export async function DELETE(_: Request, { params }: { params: { contactId: string }}) {
+  return safe(async () => {
+    const settings: object = {
+      method: "DELETE"
+    }
+    const fetchRequest = await authorizedFetch(resourceServerUri+params.contactId, settings);
+    return new NextResponse(fetchRequest.body, { status: fetchRequest.status });
+  });
+}
