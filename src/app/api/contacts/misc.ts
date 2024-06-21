@@ -1,15 +1,17 @@
 import { getAccessToken, AccessTokenError } from "@auth0/nextjs-auth0"
+import { RequestInit } from "next/dist/server/web/spec-extension/request";
 import { NextResponse } from "next/server";
 
-export async function authorizedFetch(url: string, inputHeaders?: object) {
+export async function authorizedFetch(url: string, settings?: RequestInit) {
   const token = await getAccessToken();
+  const { headers = { } } = settings ?? {}
   if (token.accessToken) {
-    const headers = {
+    const essentialHeaders = {
+      ...headers,
       authorization: `Bearer ${token.accessToken}`,
-      accept: "*/*",
-      ...inputHeaders
+      accept: "*/*"
     }
-    return fetch(url, { headers });
+    return fetch(url, { ...settings, headers: essentialHeaders });
   }
   throw new Error("Unauthorized");
 }

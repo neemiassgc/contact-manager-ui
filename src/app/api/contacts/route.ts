@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       method: "POST",
       body: request.body,
       headers: {
-        contentType: "application/json"
+        ["Content-Type"]: "application/json"
       }
     }
     const fetchRequest = await authorizedFetch(resourceServerUri, settings);

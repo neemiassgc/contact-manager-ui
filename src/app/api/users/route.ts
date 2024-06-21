@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import { authorizedFetch, safe } from "../contacts/misc";
 
-const resourceServerUri: string = "/api/users"
+const resourceServerUri: string = "http://localhost:8080/api/users"
 
 export async function POST(request: Request) {
   return safe(async () => {
     const settings: object = {
       method: "POST",
-      body: request.body,
+      body: await request.text(),
       headers: {
-        contentType: "application/json"
+        ["Content-Type"]: "application/json"
       }
     }
     const fetchRequest = await authorizedFetch(resourceServerUri, settings);
