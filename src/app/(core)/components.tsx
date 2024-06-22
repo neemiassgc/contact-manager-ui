@@ -1,6 +1,7 @@
 "use client"
-import { Box } from "@mui/material";
-import { text } from "../lib/colors";
+import { Avatar, Box, Typography } from "@mui/material";
+import { bg, border, paint, text } from "../lib/colors";
+import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { CircularProgress } from "@mui/material";
 import ErrorIcon from '@mui/icons-material/Error';
@@ -17,6 +18,25 @@ function ErrorScreen({ label }: { label: string}) {
         <span className="w-full block" style={text("on-surface")}>{label}</span>
       </Box>
     </Box>
+  )
+}
+
+export function Header({ name, picture }: { name: string, picture: string}) {
+  return (
+    <header className="w-full text-right p-3 flex justify-between items-center border-b"
+      style={paint(bg("surface-container"), text("on-surface"), border("outline-variant"))}
+    >
+      <Box className="ml-1 sm:ml-5">
+        <ContactPhoneIcon fontSize="large"/>
+        <span className="ml-2 align-middle text-md">Contact Manager</span>
+      </Box>
+      <Box className="flex items-center mr-1 sm:mr-10">
+        <Box className="flex items-center gap-2">
+          <Avatar sx={paint(bg("primary"), text("on-primary"))} src={picture}/>
+          <Typography>{name}</Typography>
+        </Box>
+      </Box>
+    </header>
   )
 }
 
