@@ -19,7 +19,7 @@ import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import { toKeys } from "../../lib/utils";
+import { toKeys } from "../../lib/misc";
 import { Contact, AddressType } from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
