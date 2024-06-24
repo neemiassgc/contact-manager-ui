@@ -10,12 +10,17 @@ export function Loading() {
   return <CircularProgress className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
 }
 
-function ErrorScreen({ label }: { label: string}) {
+export function ErrorScreen({ label }: { label: string }) {
   return (
     <Box className="w-screen h-screen flex justify-center items-center">
       <Box className="text-center w-fit h-fit -mt-48">
         <ErrorIcon className="w-20 h-20" fontSize="large" sx={text("error")}/>
-        <span className="w-full block" style={text("on-surface")}>{label}</span>
+        <span className="w-full block" style={text("on-surface")}>
+          {
+            label === "fetch failed"
+            ? "It wasn't possible to connect to the server!" : label
+          }
+        </span>
       </Box>
     </Box>
   )
