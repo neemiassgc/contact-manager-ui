@@ -1,4 +1,4 @@
-import { Contact } from "./types";
+import { Contact, ErrorType } from "./types";
 
 export function toKeys(input: object): string[] {
   const keys: string[] = [];
@@ -14,4 +14,8 @@ export function getPaginatedData(size: number, page: number, contacts: Contact[]
 export function filterByName(contacts: Contact[], text: string) {
   if (text === "") return contacts;
   return contacts.filter(contact => contact.name.toLocaleLowerCase().startsWith(text.toLowerCase()));
+}
+
+export function isUserNotFound(error: any): boolean {
+  return error instanceof ErrorType && error.statusCode === 404 && error.message === "User not found";
 }
