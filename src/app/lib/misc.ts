@@ -19,3 +19,7 @@ export function filterByName(contacts: Contact[], text: string) {
 export function isUserNotFound(error: any): boolean {
   return error instanceof ErrorType && error.statusCode === 404 && error.message === "User not found";
 }
+
+export function isApplicationJson(contentType: string): boolean {
+  return contentType.includes("application/json");
+}
