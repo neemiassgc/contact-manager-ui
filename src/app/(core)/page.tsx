@@ -7,27 +7,44 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
-import { getLocalContacts, setSelectedContact } from '../lib/storage';
+import { setSelectedContact } from '../lib/storage';
 import { Contact } from "../lib/types"
 import { useRouter } from "next/navigation"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
-import { filterByName, getPaginatedData } from '../lib/utils';
+import { filterByName, getPaginatedData, isUserNotFound } from '../lib/misc';
+import { useAllContacts } from '../lib/hooks';
+import { ErrorScreen, Loading } from './components';
+import { createNewUser } from '../lib/net';
+import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Home() {
+  const { user } = useUser();
+  const { data, error, isLoading } = useAllContacts();
+
+  useEffect(() => {
+    if (error) {
+      if (isUserNotFound(error))
+        createNewUser((user as UserProfile).name as string)
+          .then(() => window.location.reload());
+    }
+  }, [error, user])
+
   return (
     <>
       <main className="mt-16 w-full p-1">
-        <ContactListBoard/>
+        {
+          (error && isUserNotFound(error)) || isLoading ? <Loading/>
+          : error ? <ErrorScreen label={error.message}/> : <ContactListBoard contacts={data as Contact[]}/>
+        }
       </main>
     </>
   );
 }
 
-function ContactListBoard() {
+function ContactListBoard({ contacts }: { contacts: Contact[] }) {
   const [searchText, setSearchText] = useState("");
   
-  const contacts: Contact[] = getLocalContacts();
   const filteredContacts: Contact[] = filterByName(contacts, searchText);
 
   const handleSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
