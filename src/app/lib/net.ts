@@ -1,3 +1,4 @@
+import { isApplicationJson } from "./misc";
 import { Contact, ErrorType } from "./types";
 
 function getOrigin(): string {
@@ -13,7 +14,7 @@ export function createNewUser(username: string) {
       contentType: "application/json"
     }
   }
-  return fetch(getOrigin()+"/api/users", settings);
+  return requester(getOrigin()+"/api/users", settings);
 }
 
 export function fetchAllContacts() {
@@ -24,7 +25,9 @@ async function requester(url: string, options?: object): Promise<Contact[]> {
   const request = await fetch(url, options);
 
   if (!request.ok) {
-    throw new ErrorType(await request.text(), request.status);
+    if (request.headers.has("Content-Type") && isApplicationJson(request.headers.get("Content-Type") as string))
+      throw new ErrorType(await request.json(), request.status);
+    else throw new ErrorType(await request.text(), request.status);
   }
 
   return await request.json();
