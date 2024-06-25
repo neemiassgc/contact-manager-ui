@@ -20,8 +20,7 @@ export function fetchAllContacts() {
   return requester(getOrigin()+"/api/contacts");
 }
 
-async function requester(url: string, options?: object): Promise<Contact[] | string> {
-  console.log(url)
+async function requester(url: string, options?: object): Promise<Contact[]> {
   const request = await fetch(url, options);
 
   if (!request.ok) {
