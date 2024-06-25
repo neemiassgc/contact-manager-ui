@@ -4,6 +4,18 @@ function getOrigin(): string {
   return window.location.origin;
 }
 
+export function createNewUser(username: string) {
+  const body: string = JSON.stringify({ username });
+  const settings: object = {
+    method: "POST",
+    body: body,
+    headers: {
+      contentType: "application/json"
+    }
+  }
+  return fetch(getOrigin()+"/api/users", settings);
+}
+
 export function fetchAllContacts() {
   return requester(getOrigin()+"/api/contacts");
 }
