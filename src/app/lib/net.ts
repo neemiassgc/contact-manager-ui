@@ -4,6 +4,10 @@ function getOrigin(): string {
   return window.location.origin;
 }
 
+export function fetchAllContacts() {
+  return requester(getOrigin()+"/api/contacts");
+}
+
 async function requester(url: string, options?: object): Promise<Contact[] | string> {
   console.log(url)
   const request = await fetch(url, options);
