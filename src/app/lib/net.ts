@@ -14,21 +14,37 @@ export function createNewUser(username: string) {
       contentType: "application/json"
     }
   }
-  return requester(getOrigin()+"/api/users", settings);
+  return poster(getOrigin()+"/api/users", settings);
+}
+
+async function poster(url: string, options?: object): Promise<null> {
+  const response = await fetch(url, options);
+
+  await checkForError(response);
+
+  return null;
 }
 
 export function fetchAllContacts() {
-  return requester(getOrigin()+"/api/contacts");
+  return getter(getOrigin()+"/api/contacts");
 }
 
-async function requester(url: string, options?: object): Promise<Contact[]> {
-  const request = await fetch(url, options);
+async function getter(url: string, options?: object): Promise<Contact[]> {
+  const response = await fetch(url, options);
 
-  if (!request.ok) {
-    if (request.headers.has("Content-Type") && isApplicationJson(request.headers.get("Content-Type") as string))
-      throw new ErrorType(await request.json(), request.status);
-    else throw new ErrorType(await request.text(), request.status);
+  await checkForError(response);
+
+  return response.json();
+}
+
+async function checkForError(response: Response) {
+  if (!response.ok) {
+    if (
+      response.headers.has("Content-Type") &&
+      isApplicationJson(response.headers.get("Content-Type") as string)
+    ) {
+      throw new ErrorType(await response.json(), response.status);
+    }
+    else throw new ErrorType(await response.text(), response.status);
   }
-
-  return await request.json();
 }
