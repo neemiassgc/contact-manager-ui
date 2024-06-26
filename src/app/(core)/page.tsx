@@ -1,5 +1,5 @@
 "use client"
-import { InputAdornment, Button, Box, Avatar, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField, Divider } from '@mui/material';
+import { InputAdornment, Button, Box, Avatar, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField, Divider, CircularProgress } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
@@ -20,15 +20,15 @@ import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Home() {
   const { user } = useUser();
-  const { data, error, isLoading } = useAllContacts();
+  const { data, error, isLoading, reload } = useAllContacts();
 
   useEffect(() => {
     if (error) {
       if (isUserNotFound(error))
         createNewUser((user as UserProfile).name as string)
-          .then(() => window.location.reload());
+          .then(() => reload())
     }
-  }, [error, user])
+  }, [error, user, reload])
 
   return (
     <>
