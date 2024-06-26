@@ -3,12 +3,15 @@ import { fetchAllContacts } from "./net"
 import { Contact, ErrorType } from "./types";
 import { getLocalContacts, saveLocalContacts } from "./storage";
 
-export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoading: boolean } {
+export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoading: boolean, reload: () => void } {
   const [data, setData] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<ErrorType | undefined>(undefined);
 
-  useEffect(() => {
+  const load = () => {
+    setError(undefined);
+    setIsLoading(true);
+
     const localContacts: Contact[] | null = getLocalContacts();
     if (localContacts) {
       setData(localContacts)
@@ -23,7 +26,9 @@ export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoadin
       })
       .catch(exception => setError(exception))
       .finally(() => setIsLoading(false));
-  }, []);
+  }
+
+  useEffect(load, []);
   
-  return {data, error, isLoading};
+  return {data, error, isLoading, reload: load};
 }
