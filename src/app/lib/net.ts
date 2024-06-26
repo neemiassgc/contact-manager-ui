@@ -1,24 +1,20 @@
 import { isApplicationJson } from "./misc";
 import { Contact, ErrorType } from "./types";
 
-function getOrigin(): string {
-  return window.location.origin;
+function getUrl(path: string): string {
+  return window.location.origin + path;
 }
 
 export function createNewUser(username: string) {
   const body: string = JSON.stringify({ username });
-  const settings: object = {
-    method: "POST",
-    body: body,
-    headers: {
-      contentType: "application/json"
-    }
+  const header = {
+    ["Content-Type"]: "application/json"
   }
-  return poster(getOrigin()+"/api/users", settings);
+  return poster(getUrl("/api/users"), header, body);
 }
 
-async function poster(url: string, options?: object): Promise<null> {
-  const response = await fetch(url, options);
+async function poster(url: string, headers: HeadersInit, body: string): Promise<null> {
+  const response = await fetch(url, { method: "POST", headers, body });
 
   await checkForError(response);
 
@@ -26,7 +22,7 @@ async function poster(url: string, options?: object): Promise<null> {
 }
 
 export function fetchAllContacts() {
-  return getter(getOrigin()+"/api/contacts");
+  return getter(getUrl("/api/contacts"));
 }
 
 async function getter(url: string, options?: object): Promise<Contact[]> {
