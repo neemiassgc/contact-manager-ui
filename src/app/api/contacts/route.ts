@@ -17,11 +17,12 @@ export async function POST(request: Request) {
     const settings: object = {
       method: "POST",
       body: request.body,
+      duplex: "half",
       headers: {
         ["Content-Type"]: "application/json"
       }
     }
     const fetchRequest = await authorizedFetch(resourceServerUri, settings);
-    return new NextResponse(null, { status: fetchRequest.status });
+    return new NextResponse(fetchRequest.body, { status: fetchRequest.status });
   });
 }
