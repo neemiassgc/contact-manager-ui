@@ -30,3 +30,10 @@ export class ErrorType extends Error {
     this.statusCode = statusCode;
   }
 }
+
+export interface ShortContact {
+  [field: string]: string,
+  name: string,
+  phoneLabel: string,
+  phoneValue: string
+}
