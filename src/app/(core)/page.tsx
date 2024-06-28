@@ -1,5 +1,9 @@
 "use client"
-import { InputAdornment, Button, Box, Avatar, Pagination, IconButton, Dialog, DialogTitle, Typography, DialogActions, DialogContent, TextField, Divider, CircularProgress } from '@mui/material';
+import {
+  InputAdornment, Button, Box, Avatar, Pagination,
+  IconButton, Dialog, DialogTitle, Typography, DialogActions,
+  DialogContent, TextField, Divider, CircularProgress
+} from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,9 +12,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import { setSelectedContact } from '../lib/storage';
-import { Contact } from "../lib/types"
+import { Contact, ShortContact } from "../lib/types"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
 import { filterByName, getPaginatedData, isUserNotFound } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
@@ -116,7 +120,7 @@ function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (e
           }}
           startIcon={<PersonAddIcon/>}>Add Contact</Button>
       </Box>
-      <CreationModal open={openModal} handleClose={() => setOpenModal(false)} handleYes={()=>{}}/>
+      <ContactCreationModal open={openModal} handleClose={() => setOpenModal(false)} handleYes={()=>{}}/>
     </>
   )
 }
@@ -207,7 +211,17 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
   )
 }
 
-function CreationModal(props: {open: boolean, handleClose: () => void, handleYes: () => void}) {
+
+function ContactCreationModal(props: {open: boolean, handleClose: () => void, handleYes: () => void}) {
+  const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
+
+  const setName = (event: ChangeEvent<HTMLInputElement>) =>
+    setTextFieldData({...textFieldData, name: event.target.value});
+  const setPhoneLabel = (event: ChangeEvent<HTMLInputElement>) =>
+    setTextFieldData({...textFieldData, phoneLabel: event.target.value});
+  const setPhoneValue = (event: ChangeEvent<HTMLInputElement>) =>
+    setTextFieldData({...textFieldData, phoneValue: event.target.value});
+
   const containerSx: object = paint(bg("surface"), text("on-surface"));
   const textTertiary = paint(text("tertiary"));
   const borderTertiary = paint(border("tertiary"));
@@ -236,6 +250,8 @@ function CreationModal(props: {open: boolean, handleClose: () => void, handleYes
       <DialogContent sx={containerSx}>
         <Box className="w-full mb-2 pt-1">
           <TextField
+            value={textFieldData.name}
+            onChange={setName}
             {...textFieldStyles}
             className="w-full"
             label="contact name" placeholder="contact name"
@@ -244,11 +260,15 @@ function CreationModal(props: {open: boolean, handleClose: () => void, handleYes
         </Box>
         <Box className="w-full flex gap-2">
           <TextField
+            value={textFieldData.phoneLabel}
+            onChange={setPhoneLabel}
             {...textFieldStyles}
             label="phone label" placeholder="phone label"
             size="small" variant="outlined"
           />
           <TextField
+            onChange={setPhoneValue}
+            value={textFieldData.phoneValue}
             {...textFieldStyles}
             label="phone" placeholder="phone"
             size="small" variant="outlined"
