@@ -33,7 +33,13 @@ export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoadin
   return {data, error, isLoading, reload: load};
 }
 
-export function useCreateNewContact(): { isLoading: boolean, error?: Error, addNewContact: (contact: ShortContact) => void} {
+export function useCreateNewContact():
+  {
+    isLoading: boolean,
+    error?: Error,
+    addNewContact: (contact: ShortContact) => void,
+    reset: () => void
+  } {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
 
@@ -47,6 +53,10 @@ export function useCreateNewContact(): { isLoading: boolean, error?: Error, addN
       .then(() => alert("success"))
       .catch(setError)
       .finally(() => setIsLoading(false));
+    },
+    reset: () => {
+      setError(undefined);
+      setIsLoading(false);
     }
   }
 }
