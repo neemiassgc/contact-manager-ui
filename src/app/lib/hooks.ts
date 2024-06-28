@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchAllContacts } from "./net"
-import { Contact, ErrorType } from "./types";
+import { createNewContact, fetchAllContacts } from "./net"
+import { Contact, ErrorType, ShortContact } from "./types";
 import { getLocalContacts, saveLocalContacts } from "./storage";
 
 export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoading: boolean, reload: () => void } {
@@ -31,4 +31,22 @@ export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoadin
   useEffect(load, []);
   
   return {data, error, isLoading, reload: load};
+}
+
+export function useCreateNewContact(): { isLoading: boolean, error?: Error, addNewContact: (contact: ShortContact) => void} {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  return {
+    isLoading,
+    error,
+    addNewContact: contact => {
+      setError(undefined);
+      setIsLoading(true);
+      createNewContact(contact)
+      .then(() => alert("success"))
+      .catch(setError)
+      .finally(() => setIsLoading(false));
+    }
+  }
 }
