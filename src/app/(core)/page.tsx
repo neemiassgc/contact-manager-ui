@@ -19,7 +19,7 @@ import { paint, bg, border, text } from '../lib/colors';
 import { filterByName, getPaginatedData, isUserNotFound } from '../lib/misc';
 import { useAllContacts, useCreateNewContact } from '../lib/hooks';
 import { ErrorScreen, Loading } from './components';
-import { createNewUser } from '../lib/net';
+import { createNewContact, createNewUser } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Home() {
@@ -214,7 +214,8 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
 
 function ContactCreationModal(props: { open: boolean, handleClose: () => void }) {
   const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
-  const { isLoading, error, addNewContact, reset } = useCreateNewContact();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
   const setName = (event: ChangeEvent<HTMLInputElement>) =>
     setTextFieldData({...textFieldData, name: event.target.value});
@@ -249,9 +250,24 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
     else return "";
   }
 
+  const addNewContact = () => {
+    setError(undefined);
+    setIsLoading(true);
+    createNewContact({
+      name: textFieldData.name,
+      phoneLabel: textFieldData.phoneLabel,
+      phoneValue: textFieldData.phoneValue
+    })
+    .then(() => setError(undefined))
+    .catch(setError)
+    .finally(() => setIsLoading(false));
+  }
+  
+
   const closeAndReset = () => {
     props.handleClose();
-    reset();
+    setError(undefined);
+    setIsLoading(false);
     setTextFieldData({
       name: "",
       phoneLabel: "",
@@ -310,16 +326,8 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
           {
             isLoading ? <CircularProgress size="3rem"/> :
             <>
-              <IconButton
-                sx={paint(text("primary"))}
-                onClick={() => addNewContact({
-                    name: textFieldData.name,
-                    phoneLabel: textFieldData.phoneLabel,
-                    phoneValue: textFieldData.phoneValue
-                  })
-                }
-                size="small">
-                  <CheckCircleIcon fontSize="large"/>
+              <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
+                <CheckCircleIcon fontSize="large"/>
               </IconButton>
               <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
             </>
