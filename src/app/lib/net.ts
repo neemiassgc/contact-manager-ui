@@ -13,6 +13,23 @@ export function createNewUser(username: string) {
   return poster(getUrl("/api/users"), header, body);
 }
 
+export async function createNewContact(contact: ShortContact) {
+  validateContact(contact);
+
+  const body: string = JSON.stringify({
+    name: contact.name,
+    phoneNumbers: {
+      [contact.phoneLabel]: contact.phoneValue
+    }
+  })
+
+  const header = {
+    ["Content-Type"]: "application/json"
+  }
+
+  return poster(getUrl("/api/contacts"), header, body);
+}
+
 function validateContact({ name, phoneLabel, phoneValue }: ShortContact): void {
   const violations: {
     [index: string]: string[],
