@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
 import { filterByName, getPaginatedData, isUserNotFound } from '../lib/misc';
-import { useAllContacts } from '../lib/hooks';
+import { useAllContacts, useCreateNewContact } from '../lib/hooks';
 import { ErrorScreen, Loading } from './components';
 import { createNewUser } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
@@ -214,6 +214,7 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
 
 function ContactCreationModal(props: {open: boolean, handleClose: () => void, handleYes: () => void}) {
   const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
+  const { isLoading, error, addNewContact } = useCreateNewContact();
 
   const setName = (event: ChangeEvent<HTMLInputElement>) =>
     setTextFieldData({...textFieldData, name: event.target.value});
@@ -242,17 +243,30 @@ function ContactCreationModal(props: {open: boolean, handleClose: () => void, ha
     }
   }
 
+  const extractErrorHelperText = (fieldName: string) => {
+    if (error)
+      return (JSON.parse(error.message) as ShortContact)[fieldName];
+    else return "";
+  }
+
   return (
     <Dialog open={props.open}>
       <DialogTitle sx={containerSx}>
-        <Typography sx={{color: "inherit"}} className="text-center">Create a new contact</Typography>
+        <Typography sx={{color: "inherit"}} className="text-center">
+          {
+            isLoading ? "Creating..." : "Create a new contact"
+          }
+        </Typography>
       </DialogTitle>
       <DialogContent sx={containerSx}>
         <Box className="w-full mb-2 pt-1">
           <TextField
             value={textFieldData.name}
             onChange={setName}
+            error={!!error && extractErrorHelperText("name").length > 0}
+            helperText={extractErrorHelperText("name")[0]}
             {...textFieldStyles}
+            disabled={isLoading}
             className="w-full"
             label="contact name" placeholder="contact name"
             size="small" variant="outlined"
@@ -262,14 +276,20 @@ function ContactCreationModal(props: {open: boolean, handleClose: () => void, ha
           <TextField
             value={textFieldData.phoneLabel}
             onChange={setPhoneLabel}
+            error={!!error && extractErrorHelperText("phoneLabel").length > 0}
+            helperText={extractErrorHelperText("phoneLabel")[0]}
             {...textFieldStyles}
+            disabled={isLoading}
             label="phone label" placeholder="phone label"
             size="small" variant="outlined"
           />
           <TextField
             onChange={setPhoneValue}
             value={textFieldData.phoneValue}
+            error={!!error && extractErrorHelperText("phoneValue").length > 0}
+            helperText={extractErrorHelperText("phoneValue")[0]}
             {...textFieldStyles}
+            disabled={isLoading}
             label="phone" placeholder="phone"
             size="small" variant="outlined"
           />
@@ -277,8 +297,23 @@ function ContactCreationModal(props: {open: boolean, handleClose: () => void, ha
       </DialogContent>
       <DialogActions sx={containerSx}>
         <Box className="w-full flex justify-center gap-3">
-          <IconButton sx={paint(text("primary"))} onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-          <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+          {
+            isLoading ? <CircularProgress size="3rem"/> :
+            <>
+              <IconButton
+                sx={paint(text("primary"))}
+                onClick={() => addNewContact({
+                    name: textFieldData.name,
+                    phoneLabel: textFieldData.phoneLabel,
+                    phoneValue: textFieldData.phoneValue
+                  })
+                }
+                size="small">
+                  <CheckCircleIcon fontSize="large"/>
+              </IconButton>
+              <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+            </>
+          } 
         </Box>
       </DialogActions>
     </Dialog>
