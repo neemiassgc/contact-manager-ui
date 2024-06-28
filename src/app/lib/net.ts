@@ -1,5 +1,5 @@
 import { isApplicationJson } from "./misc";
-import { Contact, ErrorType, ShortContact } from "./types";
+import { Contact, ErrorType, ShortContact, ViolationError } from "./types";
 
 function getUrl(path: string): string {
   return window.location.origin + path;
@@ -51,7 +51,7 @@ function validateContact({ name, phoneLabel, phoneValue }: ShortContact): void {
   
   for (let key in violations)
     if (violations[key].length > 0)
-      throw new Error(JSON.stringify(violations));
+      throw new ViolationError(JSON.stringify(violations));
 }
 
 async function poster(url: string, headers: HeadersInit, body: string): Promise<null> {

@@ -12,7 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import { setSelectedContact } from '../lib/storage';
-import { Contact, ShortContact } from "../lib/types"
+import { Contact, ShortContact, ViolationError } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
@@ -245,7 +245,7 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
   }
 
   const extractErrorHelperText = (fieldName: string) => {
-    if (error)
+    if (error && error instanceof ViolationError)
       return (JSON.parse(error.message) as ShortContact)[fieldName];
     else return "";
   }
@@ -277,63 +277,68 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
 
   return (
     <Dialog open={props.open}>
-      <DialogTitle sx={containerSx}>
-        <Typography sx={{color: "inherit"}} className="text-center">
-          {
-            isLoading ? "Creating..." : "Create a new contact"
-          }
-        </Typography>
-      </DialogTitle>
-      <DialogContent sx={containerSx}>
-        <Box className="w-full mb-2 pt-1">
-          <TextField
-            value={textFieldData.name}
-            onChange={setName}
-            error={!!error && extractErrorHelperText("name").length > 0}
-            helperText={extractErrorHelperText("name")[0]}
-            {...textFieldStyles}
-            disabled={isLoading}
-            className="w-full"
-            label="contact name" placeholder="contact name"
-            size="small" variant="outlined"
-          />
-        </Box>
-        <Box className="w-full flex gap-2">
-          <TextField
-            value={textFieldData.phoneLabel}
-            onChange={setPhoneLabel}
-            error={!!error && extractErrorHelperText("phoneLabel").length > 0}
-            helperText={extractErrorHelperText("phoneLabel")[0]}
-            {...textFieldStyles}
-            disabled={isLoading}
-            label="phone label" placeholder="phone label"
-            size="small" variant="outlined"
-          />
-          <TextField
-            onChange={setPhoneValue}
-            value={textFieldData.phoneValue}
-            error={!!error && extractErrorHelperText("phoneValue").length > 0}
-            helperText={extractErrorHelperText("phoneValue")[0]}
-            {...textFieldStyles}
-            disabled={isLoading}
-            label="phone" placeholder="phone"
-            size="small" variant="outlined"
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions sx={containerSx}>
-        <Box className="w-full flex justify-center gap-3">
-          {
-            isLoading ? <CircularProgress size="3rem"/> :
-            <>
-              <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
-                <CheckCircleIcon fontSize="large"/>
-              </IconButton>
-              <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
-            </>
-          } 
-        </Box>
-      </DialogActions>
+      {
+        error && !(error instanceof ViolationError) ? <span>something went wrong</span> :
+        <>
+          <DialogTitle sx={containerSx}>
+            <Typography sx={{color: "inherit"}} className="text-center">
+              {
+                isLoading ? "Creating..." : "Create a new contact"
+              }
+            </Typography>
+          </DialogTitle>
+          <DialogContent sx={containerSx}>
+            <Box className="w-full mb-2 pt-1">
+              <TextField
+                value={textFieldData.name}
+                onChange={setName}
+                error={!!error && extractErrorHelperText("name").length > 0}
+                helperText={extractErrorHelperText("name")[0]}
+                {...textFieldStyles}
+                disabled={isLoading}
+                className="w-full"
+                label="contact name" placeholder="contact name"
+                size="small" variant="outlined"
+              />
+            </Box>
+            <Box className="w-full flex gap-2">
+              <TextField
+                value={textFieldData.phoneLabel}
+                onChange={setPhoneLabel}
+                error={!!error && extractErrorHelperText("phoneLabel").length > 0}
+                helperText={extractErrorHelperText("phoneLabel")[0]}
+                {...textFieldStyles}
+                disabled={isLoading}
+                label="phone label" placeholder="phone label"
+                size="small" variant="outlined"
+              />
+              <TextField
+                onChange={setPhoneValue}
+                value={textFieldData.phoneValue}
+                error={!!error && extractErrorHelperText("phoneValue").length > 0}
+                helperText={extractErrorHelperText("phoneValue")[0]}
+                {...textFieldStyles}
+                disabled={isLoading}
+                label="phone" placeholder="phone"
+                size="small" variant="outlined"
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions sx={containerSx}>
+            <Box className="w-full flex justify-center gap-3">
+              {
+                isLoading ? <CircularProgress size="3rem"/> :
+                <>
+                  <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
+                    <CheckCircleIcon fontSize="large"/>
+                  </IconButton>
+                  <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+                </>
+              } 
+            </Box>
+          </DialogActions>
+        </>
+      }
     </Dialog>
   )
 }
