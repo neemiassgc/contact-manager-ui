@@ -120,7 +120,7 @@ function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (e
           }}
           startIcon={<PersonAddIcon/>}>Add Contact</Button>
       </Box>
-      <ContactCreationModal open={openModal} handleClose={() => setOpenModal(false)} handleYes={()=>{}}/>
+      <ContactCreationModal open={openModal} handleClose={() => setOpenModal(false)}/>
     </>
   )
 }
@@ -212,9 +212,9 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
 }
 
 
-function ContactCreationModal(props: {open: boolean, handleClose: () => void, handleYes: () => void}) {
+function ContactCreationModal(props: { open: boolean, handleClose: () => void }) {
   const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
-  const { isLoading, error, addNewContact } = useCreateNewContact();
+  const { isLoading, error, addNewContact, reset } = useCreateNewContact();
 
   const setName = (event: ChangeEvent<HTMLInputElement>) =>
     setTextFieldData({...textFieldData, name: event.target.value});
@@ -248,6 +248,16 @@ function ContactCreationModal(props: {open: boolean, handleClose: () => void, ha
       return (JSON.parse(error.message) as ShortContact)[fieldName];
     else return "";
   }
+
+  const closeAndReset = () => {
+    props.handleClose();
+    reset();
+    setTextFieldData({
+      name: "",
+      phoneLabel: "",
+      phoneValue: ""
+    });
+  };
 
   return (
     <Dialog open={props.open}>
@@ -311,7 +321,7 @@ function ContactCreationModal(props: {open: boolean, handleClose: () => void, ha
                 size="small">
                   <CheckCircleIcon fontSize="large"/>
               </IconButton>
-              <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+              <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
             </>
           } 
         </Box>
