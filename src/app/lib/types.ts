@@ -31,6 +31,12 @@ export class ErrorType extends Error {
   }
 }
 
+export class ViolationError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export interface ShortContact {
   [field: string]: string,
   name: string,
