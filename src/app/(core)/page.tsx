@@ -11,13 +11,14 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
+import ErrorIcon from '@mui/icons-material/Error';
 import { setSelectedContact } from '../lib/storage';
 import { Contact, ShortContact, ViolationError } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
-import { filterByName, getPaginatedData, isUserNotFound } from '../lib/misc';
-import { useAllContacts, useCreateNewContact } from '../lib/hooks';
+import { filterByName, getPaginatedData, isNotUndefined, isNotViolationError, isUserNotFound } from '../lib/misc';
+import { useAllContacts } from '../lib/hooks';
 import { ErrorScreen, Loading } from './components';
 import { createNewContact, createNewUser } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
@@ -245,7 +246,7 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
   }
 
   const extractErrorHelperText = (fieldName: string) => {
-    if (error && error instanceof ViolationError)
+    if (error instanceof ViolationError)
       return (JSON.parse(error.message) as ShortContact)[fieldName];
     else return "";
   }
@@ -278,21 +279,28 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
   return (
     <Dialog open={props.open}>
       {
-        error && !(error instanceof ViolationError) ? <span>something went wrong</span> :
-        <>
-          <DialogTitle sx={containerSx}>
-            <Typography sx={{color: "inherit"}} className="text-center">
-              {
-                isLoading ? "Creating..." : "Create a new contact"
-              }
-            </Typography>
-          </DialogTitle>
-          <DialogContent sx={containerSx}>
+        !(isNotUndefined(error) && isNotViolationError(error as Error)) &&
+        <DialogTitle sx={containerSx}>
+          <Typography sx={{color: "inherit"}} className="text-center">
+            {
+              isLoading ? "Creating..." : "Create a new contact"
+            }
+          </Typography>
+        </DialogTitle>
+      }
+      <DialogContent sx={containerSx}>
+        {
+          isNotUndefined(error) && isNotViolationError(error as Error) ?
+          <Box className="p-4 text-center">
+            <ErrorIcon className="w-20 h-20 mb-3" fontSize="large" sx={text("error")}/>
+            <span style={text("on-surface")} className="block">{(error as Error).message}</span>
+          </Box> :
+          <>
             <Box className="w-full mb-2 pt-1">
               <TextField
                 value={textFieldData.name}
                 onChange={setName}
-                error={!!error && extractErrorHelperText("name").length > 0}
+                error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
                 helperText={extractErrorHelperText("name")[0]}
                 {...textFieldStyles}
                 disabled={isLoading}
@@ -305,7 +313,7 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
               <TextField
                 value={textFieldData.phoneLabel}
                 onChange={setPhoneLabel}
-                error={!!error && extractErrorHelperText("phoneLabel").length > 0}
+                error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
                 helperText={extractErrorHelperText("phoneLabel")[0]}
                 {...textFieldStyles}
                 disabled={isLoading}
@@ -315,7 +323,7 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
               <TextField
                 onChange={setPhoneValue}
                 value={textFieldData.phoneValue}
-                error={!!error && extractErrorHelperText("phoneValue").length > 0}
+                error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
                 helperText={extractErrorHelperText("phoneValue")[0]}
                 {...textFieldStyles}
                 disabled={isLoading}
@@ -323,22 +331,25 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
                 size="small" variant="outlined"
               />
             </Box>
-          </DialogContent>
-          <DialogActions sx={containerSx}>
-            <Box className="w-full flex justify-center gap-3">
+          </>
+        }
+      </DialogContent>
+      <DialogActions sx={containerSx}>
+        <Box className="w-full flex justify-center gap-3">
+          {
+            isLoading ? <CircularProgress size="3rem"/> :
+            <>
               {
-                isLoading ? <CircularProgress size="3rem"/> :
-                <>
-                  <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
-                    <CheckCircleIcon fontSize="large"/>
-                  </IconButton>
-                  <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
-                </>
-              } 
-            </Box>
-          </DialogActions>
-        </>
-      }
+                !(isNotUndefined(error) && isNotViolationError(error as Error)) &&
+                <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
+                  <CheckCircleIcon fontSize="large"/>
+                </IconButton>
+              }
+              <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+            </>
+          } 
+        </Box>
+      </DialogActions>
     </Dialog>
   )
 }
