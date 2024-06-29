@@ -1,4 +1,4 @@
-import { Contact, ErrorType } from "./types";
+import { Contact, ErrorType, ViolationError } from "./types";
 
 export function toKeys(input: object): string[] {
   const keys: string[] = [];
@@ -22,4 +22,16 @@ export function isUserNotFound(error: any): boolean {
 
 export function isApplicationJson(contentType: string): boolean {
   return contentType.includes("application/json");
+}
+
+export function isNotUndefined(obj?: any): boolean {
+  return !!obj;
+}
+
+export function isViolationError(error: Error): boolean {
+  return error instanceof ViolationError;
+}
+
+export function isNotViolationError(error: Error): boolean {
+  return !isViolationError(error);
 }
