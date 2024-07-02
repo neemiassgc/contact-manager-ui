@@ -43,3 +43,5 @@ export interface ShortContact {
   phoneLabel: string,
   phoneValue: string
 }
+
+export type Severity = "success" | "error" | "info" | "warning"
