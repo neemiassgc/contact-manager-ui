@@ -2,7 +2,9 @@
 import {
   InputAdornment, Button, Box, Avatar, Pagination,
   IconButton, Dialog, DialogTitle, Typography, DialogActions,
-  DialogContent, TextField, Divider, CircularProgress
+  DialogContent, TextField, Divider, CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -13,7 +15,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import ErrorIcon from '@mui/icons-material/Error';
 import { setSelectedContact } from '../lib/storage';
-import { Contact, ShortContact, ViolationError } from "../lib/types"
+import { Contact, Severity, ShortContact, ViolationError } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
@@ -76,6 +78,15 @@ function ContactListBoard({ contacts }: { contacts: Contact[] }) {
 
 function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void}) {
   const [openModal, setOpenModal] = useState(false);
+  const [snack, setSnack] = useState<{ open: boolean, severity: Severity, text: string}>(
+    { open: false, severity: "success", text: ""}
+  );
+
+  const openSnack = (severity: Severity, text: string) => {
+    setSnack({ open: true, severity, text });
+  }
+
+  const closeSnack = () => setSnack({ open: false, severity: "success", text: ""});
 
   return (
     <>
@@ -121,7 +132,16 @@ function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (e
           }}
           startIcon={<PersonAddIcon/>}>Add Contact</Button>
       </Box>
-      <ContactCreationModal open={openModal} handleClose={() => setOpenModal(false)}/>
+      <ContactCreationModal openSnack={openSnack} open={openModal} handleClose={() => setOpenModal(false)}/>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "right"} }
+        open={snack.open}
+        autoHideDuration={5000}
+        message={"Success"}
+        onClose={closeSnack}
+      >
+        <Alert onClose={closeSnack} className="w-full" variant="filled" severity={snack.severity}>{snack.text}</Alert>
+      </Snackbar>
     </>
   )
 }
@@ -213,7 +233,7 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
 }
 
 
-function ContactCreationModal(props: { open: boolean, handleClose: () => void }) {
+function ContactCreationModal(props: { open: boolean, handleClose: () => void, openSnack: (severity: Severity, text: string) => void }) {
   const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -259,11 +279,13 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
       phoneLabel: textFieldData.phoneLabel,
       phoneValue: textFieldData.phoneValue
     })
-    .then(() => setError(undefined))
+    .then(() => {
+      closeAndReset();
+      props.openSnack("success", "Successfully created!");
+    })
     .catch(setError)
     .finally(() => setIsLoading(false));
   }
-  
 
   const closeAndReset = () => {
     props.handleClose();
@@ -298,37 +320,43 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void })
           <>
             <Box className="w-full mb-2 pt-1">
               <TextField
+                disabled={isLoading}
                 value={textFieldData.name}
                 onChange={setName}
                 error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
                 helperText={extractErrorHelperText("name")[0]}
                 {...textFieldStyles}
-                disabled={isLoading}
                 className="w-full"
-                label="contact name" placeholder="contact name"
-                size="small" variant="outlined"
+                label="contact name"
+                placeholder="contact name"
+                size="small"
+                variant="outlined"
               />
             </Box>
             <Box className="w-full flex gap-2">
               <TextField
+                disabled={isLoading}
                 value={textFieldData.phoneLabel}
                 onChange={setPhoneLabel}
                 error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
                 helperText={extractErrorHelperText("phoneLabel")[0]}
                 {...textFieldStyles}
-                disabled={isLoading}
-                label="phone label" placeholder="phone label"
-                size="small" variant="outlined"
+                label="phone label"
+                placeholder="phone label"
+                size="small"
+                variant="outlined"
               />
               <TextField
+                disabled={isLoading}
                 onChange={setPhoneValue}
                 value={textFieldData.phoneValue}
                 error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
                 helperText={extractErrorHelperText("phoneValue")[0]}
                 {...textFieldStyles}
-                disabled={isLoading}
-                label="phone" placeholder="phone"
-                size="small" variant="outlined"
+                label="phone"
+                placeholder="phone"
+                size="small"
+                variant="outlined"
               />
             </Box>
           </>
