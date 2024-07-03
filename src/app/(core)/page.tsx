@@ -15,7 +15,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import ErrorIcon from '@mui/icons-material/Error';
 import { clearLocalContacts, setSelectedContact } from '../lib/storage';
-import { Contact, Severity, ShortContact, ViolationError } from "../lib/types"
+import { Contact, Run, Severity, ShortContact, ViolationError } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
@@ -64,7 +64,7 @@ export default function Home() {
   );
 }
 
-function ContactListBoard(props: { contacts: Contact[], reloadContacts: () => void, showSuccessAlert: () => void }) {
+function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, showSuccessAlert: Run }) {
   const [searchText, setSearchText] = useState("");
   
   const filteredContacts: Contact[] = filterByName(props.contacts, searchText);
@@ -99,8 +99,8 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: () => vo
 function ContactListHeader(props: {
   textFieldValue: string,
   textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  reloadContacts: () => void,
-  showSuccessAlert: () => void
+  reloadContacts: Run,
+  showSuccessAlert: Run
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -230,7 +230,7 @@ function ContactList({ data }: { data: Contact[] }) {
   )
 }
 
-function ConsentModal(props: {open: boolean, contactName: string, handleClose: () => void, handleYes: () => void}) {
+function ConsentModal(props: {open: boolean, contactName: string, handleClose: Run, handleYes: Run}) {
   return(
     <Dialog open={props.open}>
       <DialogTitle sx={paint(bg("surface"), text("on-surface"))}><Typography>Delete &apos;{props.contactName}&apos;?</Typography></DialogTitle>
@@ -247,9 +247,9 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
 
 function ContactCreationModal(props: {
   open: boolean,
-  handleClose: () => void,
-  showSuccessAlert: () => void,
-  reloadContacts: () => void
+  handleClose: Run,
+  showSuccessAlert: Run,
+  reloadContacts: Run
 }) {
   const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
   const [isLoading, setIsLoading] = useState(false);

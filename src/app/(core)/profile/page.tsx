@@ -20,14 +20,14 @@ import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { toKeys } from "../../lib/misc";
-import { Contact, AddressType } from "../../lib/types";
+import { Contact, AddressType, Run } from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, border, color} from "../../lib/colors";
 import Link from "next/link";
 
 export default function Page() {
-  const selectedContact: Contact = getSelectedContact();
+  const selectedContact: Contact = getSelectedContact() as Contact;
 
   return (
     <Box className="w-11/12 md:w-1/2 mx-auto mt-10 mb-5">
@@ -189,7 +189,7 @@ function AddressBoard(props: { addresses: AddressType}) {
   )
 }
 
-function ContentBox(props: {label: string, content: string, deleteHandle?: () => void}) {
+function ContentBox(props: {label: string, content: string, deleteHandle?: Run}) {
   const classes: string[] = [
     "w-fit", "flex", "flex-col", "gap-0", "justify-center",
     "border", "rounded-lg", "p-2", "hover:cursor-pointer"
@@ -212,7 +212,7 @@ function ContentBox(props: {label: string, content: string, deleteHandle?: () =>
   )
 }
 
-function CreationPlaceholder(props: {onClick: () => void}) {
+function CreationPlaceholder(props: {onClick: Run}) {
   return (
     <Box
       onClick={props.onClick}
@@ -224,7 +224,7 @@ function CreationPlaceholder(props: {onClick: () => void}) {
   )
 }
 
-function PromptModal(props: {open: boolean, title: string, fieldNames?: string[], handleClose: () => void, handleSave: () => void}) {
+function PromptModal(props: {open: boolean, title: string, fieldNames?: string[], handleClose: Run, handleSave: Run}) {
   const textTertiary = text("tertiary");
   const borderTertiary = border("tertiary");
   const textFieldStyles: object = {

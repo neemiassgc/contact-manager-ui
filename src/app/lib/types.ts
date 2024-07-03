@@ -45,3 +45,5 @@ export interface ShortContact {
 }
 
 export type Severity = "success" | "error" | "info" | "warning"
+
+export type Run = () => void;
