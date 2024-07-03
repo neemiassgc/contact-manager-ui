@@ -14,7 +14,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import ErrorIcon from '@mui/icons-material/Error';
-import { setSelectedContact } from '../lib/storage';
+import { clearLocalContacts, setSelectedContact } from '../lib/storage';
 import { Contact, Severity, ShortContact, ViolationError } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -28,6 +28,7 @@ import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 export default function Home() {
   const { user } = useUser();
   const { data, error, isLoading, reload } = useAllContacts();
+  const [successAlert, setSuccessAlert] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -35,24 +36,38 @@ export default function Home() {
         createNewUser((user as UserProfile).name as string)
           .then(() => reload())
     }
-  }, [error, user, reload])
+  }, [error, user, reload]);
+
+  const hideSuccessAlert = () => setSuccessAlert(false);
 
   return (
     <>
       <main className="mt-16 w-full p-1">
         {
           (error && isUserNotFound(error)) || isLoading ? <Loading/>
-          : error ? <ErrorScreen label={error.message}/> : <ContactListBoard contacts={data as Contact[]}/>
+          : error ? <ErrorScreen label={error.message}/> :
+          <ContactListBoard showSuccessAlert={() => setSuccessAlert(true)} reloadContacts={reload} contacts={data as Contact[]}/>
         }
+        <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "right"} }
+          open={successAlert}
+          autoHideDuration={5000}
+          message={"Success"}
+          onClose={hideSuccessAlert}
+        >
+        <Alert onClose={hideSuccessAlert} className="w-full" variant="filled" severity="success">
+          Contact created successfully!
+        </Alert>
+      </Snackbar>
       </main>
     </>
   );
 }
 
-function ContactListBoard({ contacts }: { contacts: Contact[] }) {
+function ContactListBoard(props: { contacts: Contact[], reloadContacts: () => void, showSuccessAlert: () => void }) {
   const [searchText, setSearchText] = useState("");
   
-  const filteredContacts: Contact[] = filterByName(contacts, searchText);
+  const filteredContacts: Contact[] = filterByName(props.contacts, searchText);
 
   const handleSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -60,7 +75,12 @@ function ContactListBoard({ contacts }: { contacts: Contact[] }) {
 
   return (
     <Box className="p-5 w-full sm:p-0 sm:w-8/12 md:w-7/12 lg:w-5/12 mx-auto">
-      <ContactListHeader textFieldOnChange={handleSearchText} textFieldValue={searchText}/>
+      <ContactListHeader
+        showSuccessAlert={props.showSuccessAlert}
+        reloadContacts={props.reloadContacts}
+        textFieldOnChange={handleSearchText}
+        textFieldValue={searchText}
+      />
       {
         filteredContacts.length > 0 ?
         <PageableContactList contacts={filteredContacts}/> :
@@ -76,17 +96,13 @@ function ContactListBoard({ contacts }: { contacts: Contact[] }) {
   )
 }
 
-function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void}) {
+function ContactListHeader(props: {
+  textFieldValue: string,
+  textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  reloadContacts: () => void,
+  showSuccessAlert: () => void
+}) {
   const [openModal, setOpenModal] = useState(false);
-  const [snack, setSnack] = useState<{ open: boolean, severity: Severity, text: string}>(
-    { open: false, severity: "success", text: ""}
-  );
-
-  const openSnack = (severity: Severity, text: string) => {
-    setSnack({ open: true, severity, text });
-  }
-
-  const closeSnack = () => setSnack({ open: false, severity: "success", text: ""});
 
   return (
     <>
@@ -132,16 +148,12 @@ function ContactListHeader(props: {textFieldValue: string, textFieldOnChange: (e
           }}
           startIcon={<PersonAddIcon/>}>Add Contact</Button>
       </Box>
-      <ContactCreationModal openSnack={openSnack} open={openModal} handleClose={() => setOpenModal(false)}/>
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "right"} }
-        open={snack.open}
-        autoHideDuration={5000}
-        message={"Success"}
-        onClose={closeSnack}
-      >
-        <Alert onClose={closeSnack} className="w-full" variant="filled" severity={snack.severity}>{snack.text}</Alert>
-      </Snackbar>
+      <ContactCreationModal
+        reloadContacts={props.reloadContacts}
+        showSuccessAlert={props.showSuccessAlert}
+        open={openModal}
+        handleClose={() => setOpenModal(false)}
+      />
     </>
   )
 }
@@ -233,7 +245,12 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: (
 }
 
 
-function ContactCreationModal(props: { open: boolean, handleClose: () => void, openSnack: (severity: Severity, text: string) => void }) {
+function ContactCreationModal(props: {
+  open: boolean,
+  handleClose: () => void,
+  showSuccessAlert: () => void,
+  reloadContacts: () => void
+}) {
   const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -281,7 +298,9 @@ function ContactCreationModal(props: { open: boolean, handleClose: () => void, o
     })
     .then(() => {
       closeAndReset();
-      props.openSnack("success", "Successfully created!");
+      clearLocalContacts()
+      props.showSuccessAlert();
+      props.reloadContacts();
     })
     .catch(setError)
     .finally(() => setIsLoading(false));
