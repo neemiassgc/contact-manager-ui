@@ -14,8 +14,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import ErrorIcon from '@mui/icons-material/Error';
-import { clearLocalContacts, setSelectedContact } from '../lib/storage';
-import { Contact, Run, Severity, ShortContact, ViolationError } from "../lib/types"
+import {
+  addUnseenContactName, clearLocalContacts, getAllUnseenContactNames,
+  removeUnseenContactName, setSelectedContact
+} from '../lib/storage';
+import { Contact, Run, ShortContact, ViolationError } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
@@ -197,31 +200,46 @@ function ContactList({ data }: { data: Contact[] }) {
   const [openModal, setOpenModal] = useState(false);
   const [contactName, setContactName] = useState("");
 
+  const unseenContactNames: string[] = getAllUnseenContactNames();
+
   return (
     <>
       <Box className="w-full rounded-xl border" sx={paint(bg("surface"), text("on-surface"), border("outline-variant"))}>
         {
           data.map((contact, index) => {
-            return <ListItem key={index} secondaryAction={
-              <IconButton onClick={() => {
-                setOpenModal(true)
-                setContactName(contact.name);
-              }}>
-                <DeleteForeverIcon sx={text("on-surface")}/>
-              </IconButton>
-            }>
-              <ListItemButton onClick={() => {
-                setSelectedContact(contact);
-                router.push("/profile")
-              }}>
-                <ListItemAvatar>
-                  <Avatar sx={paint(bg("secondary"), text("on-secondary"))}>
-                    {contact.name[0].toUpperCase()}
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText sx={text("on-surface")} primary={contact.name}/>
-              </ListItemButton>
-            </ListItem>
+            return (
+              <ListItem key={index} secondaryAction={
+                <IconButton onClick={() => {
+                  setOpenModal(true)
+                  setContactName(contact.name);
+                }}>
+                  <DeleteForeverIcon sx={text("on-surface")}/>
+                </IconButton>
+              }>
+                <ListItemButton onClick={() => {
+                  setSelectedContact(contact);
+                  removeUnseenContactName(contact.name);
+                  router.push("/profile")
+                }}>
+                  <ListItemAvatar>
+                    <Avatar
+                      sx={
+                        unseenContactNames.includes(contact.name)
+                        ? paint(bg("tertiary"), text("on-tertiary"))
+                        : paint(bg("secondary"), text("on-secondary"))
+                      }
+                    >
+                      {contact.name[0].toUpperCase()}
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    sx={text("on-surface")}
+                    primary={contact.name}
+                    secondary={unseenContactNames.includes(contact.name) ? "New" : null}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )
           })
         }
       </Box>
@@ -300,6 +318,7 @@ function ContactCreationModal(props: {
       closeAndReset();
       clearLocalContacts()
       props.showSuccessAlert();
+      addUnseenContactName(textFieldData.name);
       props.reloadContacts();
     })
     .catch(setError)
