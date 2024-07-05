@@ -24,7 +24,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
 import { filterByName, getPaginatedData, isNotUndefined, isNotViolationError, isUserNotFound } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { ErrorScreen, Loading } from './components';
+import { ContactBoardLoading, ErrorScreen } from './components';
 import { createNewContact, createNewUser } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
@@ -47,7 +47,7 @@ export default function Home() {
     <>
       <main className="mt-16 w-full p-1">
         {
-          (error && isUserNotFound(error)) || isLoading ? <Loading/>
+          (error && isUserNotFound(error)) || isLoading ? <ContactBoardLoading/>
           : error ? <ErrorScreen label={error.message}/> :
           <ContactListBoard showSuccessAlert={() => setSuccessAlert(true)} reloadContacts={reload} contacts={data as Contact[]}/>
         }

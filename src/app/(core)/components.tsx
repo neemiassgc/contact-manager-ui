@@ -1,13 +1,51 @@
 "use client"
-import { Avatar, Box, Typography } from "@mui/material";
+import { Avatar, Box, Button, Skeleton, Typography } from "@mui/material";
 import { bg, border, paint, text } from "../lib/colors";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { CircularProgress } from "@mui/material";
 import ErrorIcon from '@mui/icons-material/Error';
+import { iterator } from "../lib/misc";
 
 export function Loading() {
   return <CircularProgress className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
+}
+
+export function ContactBoardLoading() {
+  return (
+    <Box className="p-5 w-full sm:p-0 sm:w-8/12 md:w-7/12 lg:w-5/12 mx-auto">
+      <Box className="w-full flex mb-5 justify-center flex-wrap-reverse gap-3 sm:gap-0 sm:justify-between">
+        <Skeleton variant="rounded" animation="wave" width={255} height={40}/>
+        <Box className="relative">
+          <Button
+            variant="contained"
+            disabled
+            startIcon={<PersonAddIcon/>}
+          >
+            Add Contact
+          </Button>
+          <CircularProgress
+            size={28}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: '-14px',
+              marginLeft: '-14px',
+            }}
+            variant="indeterminate"/>
+        </Box>
+      </Box>
+      <Box className="w-full flex flex-col gap-3">
+        {
+          iterator(6).map((_, i)=> {
+            return <Skeleton className="" key={i} variant="rounded" animation="wave" height={53}/>
+          })
+        }
+      </Box>
+    </Box>
+  )
 }
 
 export function ErrorScreen({ label }: { label: string }) {
