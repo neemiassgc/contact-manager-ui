@@ -47,7 +47,7 @@ function validateContact({ name, phoneLabel, phoneValue }: ShortContact): void {
   if (phoneLabel.length < 3) violations.phoneLabel.push("label must be at least 3 characters long");
   if (phoneLabel.length > 10) violations.phoneLabel.push("label must be a maximum of 10 characters long");
   if (phoneLabel.includes(" ")) violations.phoneLabel.push("label must not have blank spaces");
-  if (phoneValue.length < 13) violations.phoneValue.push("phone number is too short");
+  if (!/^\+[0-9 ]{10,15}$|^\+?[0-9 ]{11,15}$/.test(phoneValue)) violations.phoneValue.push("phone number is not valid");
   
   for (let key in violations)
     if (violations[key].length > 0)
