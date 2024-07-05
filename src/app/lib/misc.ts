@@ -35,3 +35,9 @@ export function isViolationError(error: Error): boolean {
 export function isNotViolationError(error: Error): boolean {
   return !isViolationError(error);
 }
+
+export function iterator(size: number): any[] {
+  const array: any[] = [];
+  for (let i = 0; i < size; i++) array.push(null);
+  return array;
+}
