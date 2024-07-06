@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchAllContacts } from "./net"
 import { Contact, ErrorType } from "./types";
 import { getLocalContacts, saveLocalContacts } from "./storage";
+import { loginIfTokenIsExpired } from "./misc";
 
 export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoading: boolean, reload: () => void } {
   const [data, setData] = useState<Contact[]>([]);
@@ -24,7 +25,10 @@ export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoadin
         setData(responseBody)
         saveLocalContacts(responseBody)
       })
-      .catch(exception => setError(exception))
+      .catch(exception => {
+        setError(exception);
+        loginIfTokenIsExpired(exception);
+      })
       .finally(() => setIsLoading(false));
   }
 

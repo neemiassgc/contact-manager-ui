@@ -41,3 +41,8 @@ export function iterator(size: number): any[] {
   for (let i = 0; i < size; i++) array.push(null);
   return array;
 }
+
+export function loginIfTokenIsExpired(error: ErrorType) {
+  if (error && error.message === "The access token expired and a refresh token is not available. The user will need to sign in again.")
+    window.location.assign("/api/auth/login");
+}
