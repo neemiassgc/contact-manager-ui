@@ -47,3 +47,5 @@ export interface ShortContact {
 export type Severity = "success" | "error" | "info" | "warning"
 
 export type Run = () => void;
+
+export type ShowAlertFunc = (msg: string, severity?: Severity) => void;
