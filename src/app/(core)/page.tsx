@@ -13,16 +13,15 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
-import ErrorIcon from '@mui/icons-material/Error';
 import {
   addUnseenContactName, clearLocalContacts, getAllUnseenContactNames,
   removeUnseenContactName, setSelectedContact
 } from '../lib/storage';
-import { Contact, Run, ShortContact, ViolationError } from "../lib/types"
+import { Contact, Run, ShortContact, ViolationError, Severity, ShowAlertFunc } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
-import { filterByName, getPaginatedData, isNotUndefined, isNotViolationError, isUserNotFound } from '../lib/misc';
+import { filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
 import { ContactBoardLoading, ErrorScreen } from './components';
 import { createNewContact, createNewUser } from '../lib/net';
@@ -31,7 +30,9 @@ import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 export default function Home() {
   const { user } = useUser();
   const { data, error, isLoading, reload } = useAllContacts();
-  const [successAlert, setSuccessAlert] = useState(false);
+  const [snack, setSnack] = useState<{ open: boolean, severity: Severity, msg: string}>({
+    open: false, severity: "success", msg: "success"
+  });
 
   useEffect(() => {
     if (error) {
@@ -41,7 +42,9 @@ export default function Home() {
     }
   }, [error, user, reload]);
 
-  const hideSuccessAlert = () => setSuccessAlert(false);
+  const hideAlert = () => setSnack({ open: false, severity: "success", msg: ""});
+
+  const showAlert: ShowAlertFunc = (msg, severity = "success") => setSnack({ open: true, severity, msg });
 
   return (
     <>
@@ -49,17 +52,16 @@ export default function Home() {
         {
           (error && isUserNotFound(error)) || isLoading ? <ContactBoardLoading/>
           : error ? <ErrorScreen label={error.message}/> :
-          <ContactListBoard showSuccessAlert={() => setSuccessAlert(true)} reloadContacts={reload} contacts={data as Contact[]}/>
+          <ContactListBoard showAlert={showAlert} reloadContacts={reload} contacts={data as Contact[]}/>
         }
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "right"} }
-          open={successAlert}
+          open={snack.open}
           autoHideDuration={5000}
-          message={"Success"}
-          onClose={hideSuccessAlert}
+          onClose={hideAlert}
         >
-        <Alert onClose={hideSuccessAlert} className="w-full" variant="filled" severity="success">
-          Contact created successfully!
+        <Alert onClose={hideAlert} className="w-full" variant="filled" severity={snack.severity}>
+          {snack.msg}
         </Alert>
       </Snackbar>
       </main>
@@ -67,7 +69,7 @@ export default function Home() {
   );
 }
 
-function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, showSuccessAlert: Run }) {
+function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, showAlert: ShowAlertFunc }) {
   const [searchText, setSearchText] = useState("");
   
   const filteredContacts: Contact[] = filterByName(props.contacts, searchText);
@@ -79,7 +81,7 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, sho
   return (
     <Box className="p-5 w-full sm:p-0 sm:w-8/12 md:w-7/12 lg:w-5/12 mx-auto">
       <ContactListHeader
-        showSuccessAlert={props.showSuccessAlert}
+        showAlert={props.showAlert}
         reloadContacts={props.reloadContacts}
         textFieldOnChange={handleSearchText}
         textFieldValue={searchText}
@@ -103,7 +105,7 @@ function ContactListHeader(props: {
   textFieldValue: string,
   textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   reloadContacts: Run,
-  showSuccessAlert: Run
+  showAlert: ShowAlertFunc
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -153,7 +155,7 @@ function ContactListHeader(props: {
       </Box>
       <ContactCreationModal
         reloadContacts={props.reloadContacts}
-        showSuccessAlert={props.showSuccessAlert}
+        showAlert={props.showAlert}
         open={openModal}
         handleClose={() => setOpenModal(false)}
       />
@@ -266,7 +268,7 @@ function ConsentModal(props: {open: boolean, contactName: string, handleClose: R
 function ContactCreationModal(props: {
   open: boolean,
   handleClose: Run,
-  showSuccessAlert: Run,
+  showAlert: ShowAlertFunc,
   reloadContacts: Run
 }) {
   const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
@@ -317,11 +319,18 @@ function ContactCreationModal(props: {
     .then(() => {
       closeAndReset();
       clearLocalContacts()
-      props.showSuccessAlert();
+      props.showAlert("Successfully created!");
       addUnseenContactName(textFieldData.name);
       props.reloadContacts();
     })
-    .catch(setError)
+    .catch(error => {
+      if (isViolationError(error)) {
+        setError(error);
+        return;
+      }
+      props.showAlert(error.message === "fetch failed" ? "Something went wrong!" : error.message, "error");
+      closeAndReset();
+    })
     .finally(() => setIsLoading(false));
   }
 
@@ -338,79 +347,64 @@ function ContactCreationModal(props: {
 
   return (
     <Dialog open={props.open}>
-      {
-        !(isNotUndefined(error) && isNotViolationError(error as Error)) &&
-        <DialogTitle sx={containerSx}>
-          <Typography sx={{color: "inherit"}} className="text-center">
-            {
-              isLoading ? "Creating..." : "Create a new contact"
-            }
-          </Typography>
-        </DialogTitle>
-      }
+      <DialogTitle sx={containerSx}>
+        <Typography sx={{color: "inherit"}} className="text-center">
+          {
+            isLoading ? "Creating..." : "Create a new contact"
+          }
+        </Typography>
+      </DialogTitle>
       <DialogContent sx={containerSx}>
-        {
-          isNotUndefined(error) && isNotViolationError(error as Error) ?
-          <Box className="p-4 text-center">
-            <ErrorIcon className="w-20 h-20 mb-3" fontSize="large" sx={text("error")}/>
-            <span style={text("on-surface")} className="block">{(error as Error).message}</span>
-          </Box> :
-          <>
-            <Box className="w-full mb-2 pt-1">
-              <TextField
-                disabled={isLoading}
-                value={textFieldData.name}
-                onChange={setName}
-                error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
-                helperText={extractErrorHelperText("name")[0]}
-                {...textFieldStyles}
-                className="w-full"
-                label="contact name"
-                placeholder="contact name"
-                size="small"
-                variant="outlined"
-              />
-            </Box>
-            <Box className="w-full flex gap-2">
-              <TextField
-                disabled={isLoading}
-                value={textFieldData.phoneLabel}
-                onChange={setPhoneLabel}
-                error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
-                helperText={extractErrorHelperText("phoneLabel")[0]}
-                {...textFieldStyles}
-                label="phone label"
-                placeholder="phone label"
-                size="small"
-                variant="outlined"
-              />
-              <TextField
-                disabled={isLoading}
-                onChange={setPhoneValue}
-                value={textFieldData.phoneValue}
-                error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
-                helperText={extractErrorHelperText("phoneValue")[0]}
-                {...textFieldStyles}
-                label="phone"
-                placeholder="phone"
-                size="small"
-                variant="outlined"
-              />
-            </Box>
-          </>
-        }
+        <Box className="w-full mb-2 pt-1">
+          <TextField
+            disabled={isLoading}
+            value={textFieldData.name}
+            onChange={setName}
+            error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
+            helperText={extractErrorHelperText("name")[0]}
+            {...textFieldStyles}
+            className="w-full"
+            label="contact name"
+            placeholder="contact name"
+            size="small"
+            variant="outlined"
+          />
+        </Box>
+        <Box className="w-full flex gap-2">
+          <TextField
+            disabled={isLoading}
+            value={textFieldData.phoneLabel}
+            onChange={setPhoneLabel}
+            error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
+            helperText={extractErrorHelperText("phoneLabel")[0]}
+            {...textFieldStyles}
+            label="phone label"
+            placeholder="phone label"
+            size="small"
+            variant="outlined"
+          />
+          <TextField
+            disabled={isLoading}
+            onChange={setPhoneValue}
+            value={textFieldData.phoneValue}
+            error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
+            helperText={extractErrorHelperText("phoneValue")[0]}
+            {...textFieldStyles}
+            label="phone"
+            placeholder="phone"
+            size="small"
+            variant="outlined"
+          />
+        </Box>
       </DialogContent>
       <DialogActions sx={containerSx}>
         <Box className="w-full flex justify-center gap-3">
           {
             isLoading ? <CircularProgress size="3rem"/> :
             <>
-              {
-                !(isNotUndefined(error) && isNotViolationError(error as Error)) &&
-                <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
-                  <CheckCircleIcon fontSize="large"/>
-                </IconButton>
-              }
+              <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
+                <CheckCircleIcon fontSize="large"/>
+              </IconButton>
               <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
             </>
           } 
