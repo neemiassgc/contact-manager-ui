@@ -1,5 +1,5 @@
 "use client"
-import { Avatar, Box, Button, Skeleton, Typography } from "@mui/material";
+import { Avatar, Badge, Box, Button, Skeleton, Typography } from "@mui/material";
 import { bg, border, paint, text } from "../lib/colors";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -105,5 +105,21 @@ export function ScreenLoading({ children }: { children: React.ReactNode }) {
         </>
       }
     </>
+  )
+}
+
+export function BadgedAvatar({ badged, letter }: { badged: boolean, letter: string }) {
+   return (
+    <Badge invisible={!badged} color='secondary' badgeContent=" " variant='dot'>
+      <Avatar
+        sx={
+          badged
+          ? paint(bg("tertiary"), text("on-tertiary"))
+          : paint(bg("secondary"), text("on-secondary"))
+        }
+      >
+        {letter}
+      </Avatar>
+    </Badge>
   )
 }

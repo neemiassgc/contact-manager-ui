@@ -3,8 +3,7 @@ import {
   InputAdornment, Button, Box, Avatar, Pagination,
   IconButton, Dialog, DialogTitle, Typography, DialogActions,
   DialogContent, TextField, Divider, CircularProgress,
-  Snackbar,
-  Alert
+  Snackbar, Alert
 } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -23,7 +22,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
 import { filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { ContactBoardLoading, ErrorScreen } from './components';
+import { BadgedAvatar, ContactBoardLoading, ErrorScreen } from './components';
 import { createNewContact, createNewUser } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
@@ -42,7 +41,7 @@ export default function Home() {
     }
   }, [error, user, reload]);
 
-  const hideAlert = () => setSnack({ open: false, severity: "success", msg: ""});
+  const hideAlert = () => setSnack({ ...snack, open: false });
 
   const showAlert: ShowAlertFunc = (msg, severity = "success") => setSnack({ open: true, severity, msg });
 
@@ -224,15 +223,10 @@ function ContactList({ data }: { data: Contact[] }) {
                   router.push("/profile")
                 }}>
                   <ListItemAvatar>
-                    <Avatar
-                      sx={
-                        unseenContactNames.includes(contact.name)
-                        ? paint(bg("tertiary"), text("on-tertiary"))
-                        : paint(bg("secondary"), text("on-secondary"))
-                      }
-                    >
-                      {contact.name[0].toUpperCase()}
-                    </Avatar>
+                    <BadgedAvatar
+                      badged={unseenContactNames.includes(contact.name)}
+                      letter={contact.name[0].toUpperCase()}
+                    />
                   </ListItemAvatar>
                   <ListItemText
                     sx={text("on-surface")}
