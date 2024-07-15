@@ -20,7 +20,7 @@ import { Contact, Run, ShortContact, ViolationError, Severity, ShowAlertFunc } f
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
-import { filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
+import { convertNetworkErrorMessage, filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
 import { BadgedAvatar, ContactBoardLoading, ErrorScreen } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
@@ -366,7 +366,7 @@ function ContactCreationModal(props: {
         setError(error);
         return;
       }
-      props.showAlert(error.message === "fetch failed" ? "Something went wrong!" : error.message, "error");
+      props.showAlert(convertNetworkErrorMessage(error.message));
       closeAndReset();
     })
     .finally(() => setIsLoading(false));

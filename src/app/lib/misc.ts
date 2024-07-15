@@ -70,3 +70,7 @@ export function validateContact({ name, phoneLabel, phoneValue }: ShortContact):
     if (violations[key].length > 0)
       throw new ViolationError(JSON.stringify(violations));
 }
+
+export function convertNetworkErrorMessage(msg: string): string {
+  return msg === "fetch failed" ? "It wasn't possible to communicate with the server!" : msg;
+}
