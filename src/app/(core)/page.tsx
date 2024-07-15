@@ -23,7 +23,7 @@ import { paint, bg, border, text } from '../lib/colors';
 import { filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
 import { BadgedAvatar, ContactBoardLoading, ErrorScreen } from './components';
-import { createNewContact, createNewUser } from '../lib/net';
+import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Home() {
@@ -87,7 +87,11 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, sho
       />
       {
         filteredContacts.length > 0 ?
-        <PageableContactList contacts={filteredContacts}/> :
+        <PageableContactList
+          reloadContacts={props.reloadContacts}
+          showAlert={props.showAlert}
+          contacts={filteredContacts}
+        /> :
         <>
           <Divider/>
           <Box className="w-full text-center mt-3" sx={{...text("on-surface"), opacity: 0.7}}>
@@ -162,7 +166,7 @@ function ContactListHeader(props: {
   )
 }
 
-function PageableContactList({ contacts }: { contacts: Contact[] }) {
+function PageableContactList(props: { contacts: Contact[], reloadContacts: Run, showAlert: ShowAlertFunc }) {
   const [page, setPage] = useState(1);
 
   const handlePagination: (event: React.ChangeEvent<unknown>, value: number) => void = (_, value) => {
@@ -170,13 +174,17 @@ function PageableContactList({ contacts }: { contacts: Contact[] }) {
   }
   
   const countPerPage: number = 6;
-  const paginationCount: number = Math.floor(contacts.length / countPerPage);
+  const paginationCount: number = Math.floor(props.contacts.length / countPerPage);
 
   return (
     <>
-      <ContactList data={getPaginatedData(countPerPage, page, contacts)}/>
+      <ContactList
+        reloadContacts={props.reloadContacts}
+        showAlert={props.showAlert}
+        data={getPaginatedData(countPerPage, page, props.contacts)}
+      />
       {
-        contacts.length > countPerPage &&
+        props.contacts.length > countPerPage &&
         <Box className="p-2">
           <Pagination
             sx={{
@@ -186,7 +194,7 @@ function PageableContactList({ contacts }: { contacts: Contact[] }) {
               "& .MuiPaginationItem-root": paint(text("on-surface"))
             }}
             className="w-fit mx-auto"
-            count={contacts.length % countPerPage === 0 ? paginationCount : paginationCount + 1}
+            count={props.contacts.length % countPerPage === 0 ? paginationCount : paginationCount + 1}
             page={page}
             onChange={handlePagination}
             size="large" />
@@ -196,23 +204,38 @@ function PageableContactList({ contacts }: { contacts: Contact[] }) {
   )
 }
 
-function ContactList({ data }: { data: Contact[] }) {
+function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: ShowAlertFunc}) {
   const router = useRouter();
-  const [openModal, setOpenModal] = useState(false);
-  const [contactName, setContactName] = useState("");
+  const [consentModal, setConsentModal] = useState({loading: false, open: false});
+  const [contactData, setContactData] = useState({ name: "", id: ""});
 
   const unseenContactNames: string[] = getAllUnseenContactNames();
+
+  const removeContact = () => {
+    setConsentModal({...consentModal, loading: true})
+    deleteContact(contactData.id)
+      .then(() => {
+        setConsentModal({loading: false, open: false});
+        clearLocalContacts();
+        props.reloadContacts();
+        props.showAlert("Contact deleted successfully!");
+      })
+      .catch(error => {
+        props.showAlert(convertNetworkErrorMessage(error.message), "error");
+      })
+      .finally(() => setConsentModal({open: false, loading: false}));
+  }
 
   return (
     <>
       <Box className="w-full rounded-xl border" sx={paint(bg("surface"), text("on-surface"), border("outline-variant"))}>
         {
-          data.map((contact, index) => {
+          props.data.map((contact, index) => {
             return (
               <ListItem key={index} secondaryAction={
                 <IconButton onClick={() => {
-                  setOpenModal(true)
-                  setContactName(contact.name);
+                  setConsentModal({loading: false, open: true});
+                  setContactData({ name: contact.name, id: contact.id });
                 }}>
                   <DeleteForeverIcon sx={text("on-surface")}/>
                 </IconButton>
@@ -239,21 +262,42 @@ function ContactList({ data }: { data: Contact[] }) {
           })
         }
       </Box>
-      <ConsentModal open={openModal} contactName={contactName} handleClose={() => setOpenModal(false)} handleYes={()=>{}}/>
+      <ConsentModal
+        loading={consentModal.loading}
+        open={consentModal.open}
+        contactName={contactData.name}
+        handleClose={() => setConsentModal({loading: false, open: false})}
+        handleYes={removeContact}
+      />
     </>
   )
 }
 
-function ConsentModal(props: {open: boolean, contactName: string, handleClose: Run, handleYes: Run}) {
+function ConsentModal(props: {loading: boolean, open: boolean, contactName: string, handleClose: Run, handleYes: Run}) {
   return(
     <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface"), text("on-surface"))}><Typography>Delete &apos;{props.contactName}&apos;?</Typography></DialogTitle>
-      <DialogActions sx={paint(bg("surface"), text("on-surface"))}>
-        <Box className="w-full flex justify-center gap-3">
-          <IconButton sx={paint(text("primary"))} onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-          <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
-        </Box>
-      </DialogActions>
+      <DialogTitle sx={paint(bg("surface"), text("on-surface"))}>
+        <Typography className="text-center">
+          {
+            props.loading ? "Deleting..." : 
+            `Delete '${props.contactName}'?`
+          }
+        </Typography>
+      </DialogTitle>
+      {
+        props.loading ?
+        <DialogContent>
+          <Box className="px-8">
+            <CircularProgress size="4rem"/>
+          </Box>
+        </DialogContent> :
+        <DialogActions sx={paint(bg("surface"), text("on-surface"))}>
+          <Box className="w-full flex justify-center gap-3">
+            <IconButton sx={paint(text("primary"))} onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+            <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+          </Box>
+        </DialogActions>
+      }
     </Dialog>
   )
 }
