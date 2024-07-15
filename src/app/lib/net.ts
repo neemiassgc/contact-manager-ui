@@ -50,6 +50,14 @@ async function getter(url: string, options?: object): Promise<Contact[]> {
   return response.json();
 }
 
+export async function deleteContact(contactId: string): Promise<null> {
+  const response = await fetch(getUrl("/api/contacts/"+contactId), { method: "DELETE" });
+
+  await checkForError(response);
+
+  return null;
+}
+
 async function checkForError(response: Response) {
   if (!response.ok) {
     if (
