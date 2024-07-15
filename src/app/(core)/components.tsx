@@ -7,9 +7,10 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { CircularProgress } from "@mui/material";
 import ErrorIcon from '@mui/icons-material/Error';
 import { iterator } from "../lib/misc";
+import { clearLocalContacts, removeAllUnseenContactNames } from "../lib/storage";
 
-export function Loading() {
-  return <CircularProgress className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
+export function Loading({ color = "primary" }: { color?: "warning" | "primary" }) {
+  return <CircularProgress color={color} className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
 }
 
 export function ContactBoardLoading() {
@@ -86,12 +87,17 @@ export function Header({ name, picture }: { name: string, picture: string}) {
 export function ScreenLoading({ children }: { children: React.ReactNode }) {
   const { user, error, isLoading } = useUser();
 
-  if ((!user && !isLoading)) window.location.assign("/api/auth/login");
+  if ((!user && !isLoading)) {
+    window.location.assign("/api/auth/login");
+    removeAllUnseenContactNames();
+    clearLocalContacts();
+    return <Loading color="warning"/>
+  }
 
   return (
     <>
       {
-        error ? <ErrorScreen label={error.message}/> :
+        error ? <ErrorScreen label={error.name}/> :
         !user || isLoading ? <Loading/> :
         <>
           <Header name={user.name as string} picture={user.picture as string}/>
