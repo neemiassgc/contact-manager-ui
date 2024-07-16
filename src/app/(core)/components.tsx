@@ -1,13 +1,15 @@
 "use client"
-import { Avatar, Badge, Box, Button, Skeleton, Typography } from "@mui/material";
+import { Avatar, Badge, Box, Button, Divider, IconButton, Skeleton, Tooltip, Typography } from "@mui/material";
 import { bg, border, paint, text } from "../lib/colors";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { CircularProgress } from "@mui/material";
 import ErrorIcon from '@mui/icons-material/Error';
 import { iterator } from "../lib/misc";
 import { clearLocalContacts, removeAllUnseenContactNames } from "../lib/storage";
+import { useState } from "react";
 
 export function Loading({ color = "primary" }: { color?: "warning" | "primary" }) {
   return <CircularProgress color={color} className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
@@ -74,10 +76,12 @@ export function Header({ name, picture }: { name: string, picture: string}) {
         <ContactPhoneIcon fontSize="large"/>
         <span className="ml-2 align-middle text-md">Contact Manager</span>
       </Box>
-      <Box className="flex items-center mr-1 sm:mr-10">
+      <Box className="w-fit mr-1 sm:mr-10 gap-4">
         <Box className="flex items-center gap-2">
-          <Avatar sx={paint(bg("primary"), text("on-primary"))} src={picture}/>
+          <Avatar className="w-12 h-12" sx={paint(bg("primary"), text("on-primary"))} src={picture}/>
           <Typography>{name}</Typography>
+          <Divider className="mx-2" orientation="vertical" flexItem/>
+          <LogoutButton/>
         </Box>
       </Box>
     </header>
@@ -121,5 +125,48 @@ export function BadgedAvatar({ badged, letter }: { badged: boolean, letter: stri
         {letter}
       </Avatar>
     </Badge>
+  )
+}
+
+export function LogoutButton() {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = () => {
+    setLoading(true);
+    clearLocalContacts();
+    removeAllUnseenContactNames();
+    window.location.assign("/api/auth/logout");
+  }
+
+  return (
+    <Tooltip title="Logout" arrow>
+      <IconButton
+        onClick={handleClick}
+        sx={{
+          ...paint(bg("primary"), text("on-primary")),
+          ":hover": {
+            ...paint(bg("primary-container"), text("on-primary-container"))
+          }
+        }}
+        size="medium"
+        disabled={loading}
+      >
+        <LogoutIcon fontSize="small"/>
+      {
+        loading &&
+        <CircularProgress
+          thickness={4}
+          size={41}
+          color="success"
+          sx={{
+            position: 'absolute',
+            top: -2,
+            left: -2,
+            zIndex: 1,
+          }}
+        />
+        }
+      </IconButton>
+    </Tooltip>
   )
 }
