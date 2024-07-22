@@ -1,4 +1,4 @@
-import { Contact, ErrorType, ShortContact, ViolationError } from "./types";
+import { Address, Contact, ErrorType, ShortContact, ViolationError } from "./types";
 
 export function toKeys(input: object): string[] {
   const keys: string[] = [];
@@ -73,4 +73,9 @@ export function validateContact({ name, phoneLabel, phoneValue }: ShortContact):
 
 export function convertNetworkErrorMessage(msg: string): string {
   return msg === "fetch failed" ? "It wasn't possible to communicate with the server!" : msg;
+}
+
+export function formatAddress({city, country, street, zipcode, state}: Address): string {
+  return `${street}; ${city}, ${state}, ${zipcode}; ${country}`;
+}
 }
