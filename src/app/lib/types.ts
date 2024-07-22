@@ -7,7 +7,7 @@ export interface Address {
   zipcode: string
 }
 
-interface StringType {
+export interface StringType {
   [propName: string]: string
 }
 
