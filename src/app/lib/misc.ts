@@ -78,4 +78,9 @@ export function convertNetworkErrorMessage(msg: string): string {
 export function formatAddress({city, country, street, zipcode, state}: Address): string {
   return `${street}; ${city}, ${state}, ${zipcode}; ${country}`;
 }
+
+export function locateCountryFlag(countryName: string): string {
+  if (countryName.toLowerCase() === "eua") return "/flag/usa.svg";
+  if (countryName.toLowerCase() === "brasil") return "/flag/brazil.svg";
+  return `/flag/${countryName.toLowerCase()}.svg`;
 }
