@@ -371,7 +371,7 @@ function ContactCreationModal(props: {
         setError(error);
         return;
       }
-      props.showAlert(convertNetworkErrorMessage(error.message));
+      props.showAlert(convertNetworkErrorMessage(error.message), "error");
       closeAndReset();
     })
     .finally(() => setIsLoading(false));
