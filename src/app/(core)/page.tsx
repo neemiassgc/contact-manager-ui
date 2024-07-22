@@ -78,7 +78,7 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, sho
   }
 
   return (
-    <Box className="p-5 w-full sm:p-0 sm:w-8/12 md:w-7/12 lg:w-5/12 mx-auto">
+    <Box className="p-6 w-full sm:w-9/12 md:w-8/12 lg:w-1/2 xl:w-5/12 mx-auto border rounded-xl" sx={bg("surface-container-high")}>
       <ContactListHeader
         showAlert={props.showAlert}
         reloadContacts={props.reloadContacts}
@@ -93,7 +93,7 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, sho
           contacts={filteredContacts}
         /> :
         <>
-          <Divider/>
+          <Divider sx={bg("outline-variant")}/>
           <Box className="w-full text-center mt-3" sx={{...text("on-surface"), opacity: 0.7}}>
             <DataArrayIcon fontSize="large"/>
             <span className="text-2xl align-middle ml-2">Nothing</span>
@@ -230,34 +230,39 @@ function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: S
     <>
       <Box className="w-full rounded-xl border" sx={paint(bg("surface"), text("on-surface"), border("outline-variant"))}>
         {
-          props.data.map((contact, index) => {
+          props.data.map((contact, index, list) => {
             return (
-              <ListItem key={index} secondaryAction={
-                <IconButton onClick={() => {
-                  setConsentModal({loading: false, open: true});
-                  setContactData({ name: contact.name, id: contact.id });
-                }}>
-                  <DeleteForeverIcon sx={text("on-surface")}/>
-                </IconButton>
-              }>
-                <ListItemButton onClick={() => {
-                  setSelectedContact(contact);
-                  removeUnseenContactName(contact.name);
-                  router.push("/profile")
-                }}>
-                  <ListItemAvatar>
-                    <BadgedAvatar
-                      badged={unseenContactNames.includes(contact.name)}
-                      letter={contact.name[0].toUpperCase()}
+              <>
+                <ListItem key={index} secondaryAction={
+                  <IconButton onClick={() => {
+                    setConsentModal({loading: false, open: true});
+                    setContactData({ name: contact.name, id: contact.id });
+                  }}>
+                    <DeleteForeverIcon sx={text("on-surface")}/>
+                  </IconButton>
+                }>
+                  <ListItemButton onClick={() => {
+                    setSelectedContact(contact);
+                    removeUnseenContactName(contact.name);
+                    router.push("/profile")
+                  }}>
+                    <ListItemAvatar>
+                      <BadgedAvatar
+                        badged={unseenContactNames.includes(contact.name)}
+                        letter={contact.name[0].toUpperCase()}
+                      />
+                    </ListItemAvatar>
+                    <ListItemText
+                      sx={text("on-surface")}
+                      primary={contact.name}
+                      secondary={unseenContactNames.includes(contact.name) ? "New" : null}
                     />
-                  </ListItemAvatar>
-                  <ListItemText
-                    sx={text("on-surface")}
-                    primary={contact.name}
-                    secondary={unseenContactNames.includes(contact.name) ? "New" : null}
-                  />
-                </ListItemButton>
-              </ListItem>
+                  </ListItemButton>
+                </ListItem>
+                {
+                  index !== list.length - 1 && <Divider variant="middle"/> 
+                }
+              </>
             )
           })
         }
