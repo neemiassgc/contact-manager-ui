@@ -1,4 +1,4 @@
-type ColorRole =
+export type ColorRole =
   "primary" | "on-primary" | "primary-container" | "on-primary-container" |
   "secondary" | "on-secondary" | "secondary-container" | "on-secondary-container" |
   "tertiary" | "on-tertiary" | "tertiary-container" | "on-tertiary-container" |
