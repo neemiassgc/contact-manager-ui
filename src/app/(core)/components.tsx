@@ -176,6 +176,56 @@ export function LogoutButton() {
     </Tooltip>
   )
 
+export function SplitButton({ options }: { options: { title: string, onClick: Run }[] }) {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <>
+      <ButtonGroup ref={anchorRef} className="mb-3">
+        <DefaultButton onClick={() => setOpen(true)} title="New">
+          <AddIcon/>
+        </DefaultButton>
+      </ButtonGroup>
+      <Popper
+        className="z-10"
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        transition
+        disablePortal
+      >
+        {({ TransitionProps, placement }) => (
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin:
+                placement === 'bottom' ? 'center top' : 'center bottom',
+            }}
+          >
+            <Paper sx={paint(bg("surface-container-lowest"), text("on-surface"))}>
+              <ClickAwayListener onClickAway={() => setOpen(false)}>
+                <MenuList id="split-button-menu" autoFocusItem>
+                  {
+                    options.map(option => (
+                      <MenuItem
+                        key={option.title}
+                        onClick={() => { setOpen(false); option.onClick()}}
+                      >
+                        {option.title}
+                      </MenuItem>
+                    ))
+                  }
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
+    </>
+  );
+}
+
 export function DefaultButton({ title, onClick, colorVariant = "primary", children, className}: {
   title: string,
   onClick: Run,
