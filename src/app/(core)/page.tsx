@@ -1,6 +1,6 @@
 "use client"
 import {
-  InputAdornment, Button, Box, Avatar, Pagination,
+  InputAdornment, Button, Box, Pagination,
   IconButton, Dialog, DialogTitle, Typography, DialogActions,
   DialogContent, TextField, Divider, CircularProgress,
   Snackbar, Alert
@@ -151,7 +151,7 @@ function ContactListHeader(props: {
           size="medium"
           sx={{
             ...paint(bg("primary"), text("on-primary")),
-            "&:hover": paint(bg("primary-container"), text("on-primary-container")),
+            "&:hover": paint(bg("primary"), text("on-primary")),
             borderRadius: 2
           }}
           startIcon={<PersonAddIcon/>}>Add Contact</Button>
@@ -281,7 +281,7 @@ function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: S
 function ConsentModal(props: {loading: boolean, open: boolean, contactName: string, handleClose: Run, handleYes: Run}) {
   return(
     <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface"), text("on-surface"))}>
+      <DialogTitle sx={paint(bg("surface-container-high"), text("on-surface"))}>
         <Typography className="text-center">
           {
             props.loading ? "Deleting..." : 
@@ -289,6 +289,7 @@ function ConsentModal(props: {loading: boolean, open: boolean, contactName: stri
           }
         </Typography>
       </DialogTitle>
+      <Divider variant="middle" sx={bg("outline-variant")}/>
       {
         props.loading ?
         <DialogContent>
@@ -296,7 +297,7 @@ function ConsentModal(props: {loading: boolean, open: boolean, contactName: stri
             <CircularProgress size="4rem"/>
           </Box>
         </DialogContent> :
-        <DialogActions sx={paint(bg("surface"), text("on-surface"))}>
+        <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
           <Box className="w-full flex justify-center gap-3">
             <IconButton sx={paint(text("primary"))} onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
             <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
@@ -325,7 +326,6 @@ function ContactCreationModal(props: {
   const setPhoneValue = (event: ChangeEvent<HTMLInputElement>) =>
     setTextFieldData({...textFieldData, phoneValue: event.target.value});
 
-  const containerSx: object = paint(bg("surface"), text("on-surface"));
   const textTertiary = paint(text("tertiary"));
   const borderTertiary = paint(border("tertiary"));
   const textFieldStyles: object = {
@@ -390,14 +390,15 @@ function ContactCreationModal(props: {
 
   return (
     <Dialog open={props.open}>
-      <DialogTitle sx={containerSx}>
+      <DialogTitle sx={paint(bg("surface-container-highest"), text("on-surface"))}>
         <Typography sx={{color: "inherit"}} className="text-center">
           {
             isLoading ? "Creating..." : "Create a new contact"
           }
         </Typography>
       </DialogTitle>
-      <DialogContent sx={containerSx}>
+      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="w-full mb-2 pt-1">
           <TextField
             disabled={isLoading}
@@ -440,7 +441,8 @@ function ContactCreationModal(props: {
           />
         </Box>
       </DialogContent>
-      <DialogActions sx={containerSx}>
+      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="w-full flex justify-center gap-3">
           {
             isLoading ? <CircularProgress size="3rem"/> :
