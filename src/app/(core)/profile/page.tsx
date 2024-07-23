@@ -152,31 +152,17 @@ function ListCard(props: { titleIcon: React.ReactElement, addButtonTitle: string
           })
         }
       </List>
-      <AddButton title={props.addButtonTitle}/>
     </Box>
   )
 }
 
-function AddButton({ title }: { title: string }) {
-  return (
-    <Button
-      variant="contained"
-      className="w-fit float-end capitalize"
-      size="small"
-      disableElevation
-      sx={{
-        ...paint(bg("primary"), text("on-primary")),
-        "&:hover": paint(bg("primary"), text("on-primary")),
-        borderRadius: 2
-      }}
-      startIcon={<AddIcon/>}
-    >
-      {title}
-    </Button>
-  )
+type PromptModalType = { open: boolean, title: string, handleClose: Run, handleAccept: Run }
+
+function AddressPromptModal(props: PromptModalType) {
+  return <PromptModal {...props} fieldNames={["street", "country", "city", "state", "zipcode"]} />
 }
 
-function PromptModal(props: {open: boolean, title: string, fieldNames?: string[], handleClose: Run, handleSave: Run}) {
+function PromptModal(props: PromptModalType & { fieldNames?: string[] }) {
   const textTertiary = text("tertiary");
   const borderTertiary = border("tertiary");
   const textFieldStyles: object = {
