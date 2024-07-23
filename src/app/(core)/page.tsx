@@ -1,6 +1,6 @@
 "use client"
 import {
-  InputAdornment, Button, Box, Pagination,
+  InputAdornment, Box, Pagination,
   IconButton, Dialog, DialogTitle, Typography, DialogActions,
   DialogContent, TextField, Divider, CircularProgress,
   Snackbar, Alert
@@ -22,7 +22,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
 import { convertNetworkErrorMessage, filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { BadgedAvatar, ContactBoardLoading, ErrorScreen } from './components';
+import { BadgedAvatar, ContactBoardLoading, DefaultButton, ErrorScreen } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
@@ -144,17 +144,9 @@ function ContactListHeader(props: {
           onChange={props.textFieldOnChange}
           value={props.textFieldValue}
         />
-        <Button
-          onClick={() => setOpenModal(true)}
-          variant="contained"
-          className="w-fit"
-          size="medium"
-          sx={{
-            ...paint(bg("primary"), text("on-primary")),
-            "&:hover": paint(bg("primary"), text("on-primary")),
-            borderRadius: 2
-          }}
-          startIcon={<PersonAddIcon/>}>Add Contact</Button>
+        <DefaultButton onClick={() => setOpenModal(true)} title="Add Contact">
+          <PersonAddIcon/>
+        </DefaultButton>
       </Box>
       <ContactCreationModal
         reloadContacts={props.reloadContacts}

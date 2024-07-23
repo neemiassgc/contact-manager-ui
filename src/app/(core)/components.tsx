@@ -175,4 +175,28 @@ export function LogoutButton() {
       </IconButton>
     </Tooltip>
   )
+
+export function DefaultButton({ title, onClick, colorVariant = "primary", children, className}: {
+  title: string,
+  onClick: Run,
+  colorVariant?: "primary" | "secondary" | "tertiary"
+  children: ReactElement,
+  className?: string
+}) {
+  const styles = paint(bg(colorVariant), text(("on-"+colorVariant) as ColorRole));
+  return (
+    <Button
+      onClick={onClick}
+      variant="contained"
+      className={"w-fit capitalize "+className}
+      size="medium"
+      sx={{
+        ...styles, "&:hover": styles,
+        borderRadius: 2
+      }}
+      startIcon={children}
+    >
+      {title}
+    </Button>
+  )
 }
