@@ -198,8 +198,9 @@ function PromptModal(props: {open: boolean, title: string, fieldNames?: string[]
   }
   return (
     <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface"), text("on-surface"))}><Typography className="font-bold text-center">{props.title}</Typography></DialogTitle>
-      <DialogContent sx={paint(bg("surface"), text("on-surface"))}>
+      <DialogTitle sx={paint(bg("surface-container-high"), text("on-surface"))}><Typography className="text-center">{props.title}</Typography></DialogTitle>
+      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="flex flex-col gap-2 w-full p-1 h-full">
           <TextField {...textFieldStyles} variant="outlined" size="small" label="label" placeholder="label"/>
           {
@@ -212,11 +213,14 @@ function PromptModal(props: {open: boolean, title: string, fieldNames?: string[]
             </>
           }
         </Box>
+      </DialogContent>
+      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="w-full flex justify-center mt-2">
-          <IconButton sx={text("primary")} onClick={props.handleSave} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
+          <IconButton sx={text("primary")} onClick={props.handleAccept} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
           <IconButton sx={text("error")} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
         </Box>
-      </DialogContent>
+      </DialogActions>
     </Dialog>
   )
 }
