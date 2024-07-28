@@ -22,7 +22,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
 import { convertNetworkErrorMessage, filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { BadgedAvatar, ContactBoardLoading, DefaultButton, ErrorScreen } from './components';
+import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
@@ -93,7 +93,7 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, sho
           contacts={filteredContacts}
         /> :
         <>
-          <Divider sx={bg("outline-variant")}/>
+          <CustomDivider/>
           <Box className="w-full text-center mt-3" sx={{...text("on-surface"), opacity: 0.7}}>
             <DataArrayIcon fontSize="large"/>
             <span className="text-2xl align-middle ml-2">Nothing</span>
@@ -281,7 +281,7 @@ function ConsentModal(props: {loading: boolean, open: boolean, contactName: stri
           }
         </Typography>
       </DialogTitle>
-      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <CustomDivider/>
       {
         props.loading ?
         <DialogContent>
@@ -389,7 +389,7 @@ function ContactCreationModal(props: {
           }
         </Typography>
       </DialogTitle>
-      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <CustomDivider/>
       <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="w-full mb-2 pt-1">
           <TextField
@@ -433,7 +433,7 @@ function ContactCreationModal(props: {
           />
         </Box>
       </DialogContent>
-      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <CustomDivider/>
       <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="w-full flex justify-center gap-3">
           {

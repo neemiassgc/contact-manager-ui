@@ -19,7 +19,7 @@ import { Contact, AddressType, Run, StringType } from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, border } from "../../lib/colors";
-import { SplitButton } from "../components";
+import { CustomDivider, SplitButton } from "../components";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact() as Contact;
@@ -229,7 +229,7 @@ function PromptModal(props: PromptModalType & { fieldNames?: string[] }) {
   return (
     <Dialog open={props.open}>
       <DialogTitle sx={paint(bg("surface-container-high"), text("on-surface"))}><Typography className="text-center">{props.title}</Typography></DialogTitle>
-      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <CustomDivider/>
       <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="flex flex-col gap-2 w-full p-1 h-full">
           <TextField {...textFieldStyles} variant="outlined" size="small" label="label" placeholder="label"/>
@@ -244,7 +244,7 @@ function PromptModal(props: PromptModalType & { fieldNames?: string[] }) {
           }
         </Box>
       </DialogContent>
-      <Divider variant="middle" sx={bg("outline-variant")}/>
+      <CustomDivider/>
       <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="w-full flex justify-center mt-2">
           <IconButton sx={text("primary")} onClick={props.handleAccept} size="small"><CheckCircleIcon fontSize="large"/></IconButton>

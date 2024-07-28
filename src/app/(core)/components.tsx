@@ -175,6 +175,11 @@ export function LogoutButton() {
       </IconButton>
     </Tooltip>
   )
+}
+
+export function CustomDivider() {
+  return <Divider variant="middle" sx={bg("outline-variant")}/>;
+}
 
 export function SplitButton({ options }: { options: { title: string, onClick: Run }[] }) {
   const [open, setOpen] = useState(false);
