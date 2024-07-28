@@ -19,6 +19,7 @@ import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, border } from "../../lib/colors";
 import Link from "next/link";
+import { SplitButton } from "../components";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact() as Contact;
@@ -38,50 +39,85 @@ export default function Page() {
 function Header(props: {contactName: string}) {
   const [editing, setEditing] = useState(false);
 
-  return <Box className="w-full flex flex-col justify-center items-center">
-    <Avatar
-      sx={{
-        width: 100, height: 100, fontSize: 50,
-        ...paint(bg("primary"), text("on-primary"))
-      }}
-      src="/flag.svg"
-    >{props.contactName[0]}</Avatar>
-    <Box className="ml-5 mt-1">
-      <span style={paint(text("on-surface"))}>{props.contactName}</span>
-      <Tooltip title="Edit Contact Name" arrow>
-        <IconButton onClick={() => setEditing(true)}>
-          <EditNoteRoundedIcon sx={paint(text("on-surface"))} fontSize="medium"/>
-        </IconButton>
-      </Tooltip>
+  return (
+    <Box className="w-full flex flex-col justify-center items-center">
+      <Avatar
+        sx={{
+          width: 100, height: 100, fontSize: 50,
+          ...paint(bg("primary"), text("on-primary"))
+        }}
+        src="/flag.svg"
+      >{props.contactName[0]}</Avatar>
+      <Box className="ml-5 mt-1">
+        <span style={paint(text("on-surface"))}>{props.contactName}</span>
+        <Tooltip title="Edit Contact Name" arrow>
+          <IconButton onClick={() => setEditing(true)}>
+            <EditNoteRoundedIcon sx={paint(text("on-surface"))} fontSize="medium"/>
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <PromptModal
+        open={editing}
+        title="Edit the name of the contact"
+        handleClose={() => setEditing(false)}
+        handleAccept={()=>{}}
+      />
     </Box>
-    <PromptModal
-      open={editing}
-      title="Edit the name of the contact"
-      handleClose={() => setEditing(false)}
-      handleSave={()=>{}}
-    />
-  </Box>
+  )
 }
 
 function Body(props: { contact: Contact }) {
+  const [modal, setModal] = useState({ phoneModal: false, emailModal: false, addressModal: false })
+
+  const openModal: (prop: string) => Run = prop =>
+    () => setModal({ ...modal, ...{ [prop]: true } })
+
+  const closeModal: (prop: string) => Run = prop =>
+    () => setModal({ ...modal, ...{ [prop]: false } })
+
   return (
     <Box className="w-full mt-5">
+      <SplitButton
+        options={[
+          {
+            title: "Add new phone number",
+            onClick: openModal("phoneModal")
+          },
+          {
+            title: "Add new email",
+            onClick: openModal("emailModal")
+          },
+          {
+            title: "Add new address",
+            onClick: openModal("addressModal")
+          }
+        ]}
+      />
       <Box className="w-full flex flex-col md:flex-row justify-center gap-10 md:gap-5 lg:gap-10 xl:gap-20">
         <Box className="flex-1">
           <ListCard
             titleIcon={<PhoneIcon className="mr-2"/>}
             cardTitle="Phone Numbers"
-            addButtonTitle="Add Phone Number"
             content={props.contact.phoneNumbers}
           />
-          
+          <PromptModal
+            open={modal.phoneModal}
+            title={"Create New Phone Number"}
+            handleAccept={() => {}}
+            handleClose={closeModal("phoneModal")}
+          />
         </Box>
         <Box className="flex-1 rounded-xl border">
           <ListCard
             titleIcon={<AlternateEmailIcon className="mr-2"/>}
             cardTitle="Emails"
-            addButtonTitle="Add Email"
             content={props.contact.emails}
+          />
+          <PromptModal
+            open={modal.emailModal}
+            title={"Create New Email"}
+            handleAccept={() => {}}
+            handleClose={closeModal("emailModal")}
           />
         </Box>
       </Box>
@@ -89,15 +125,24 @@ function Body(props: { contact: Contact }) {
         <ListCard
           titleIcon={<DomainIcon className="mr-2"/>}
           cardTitle="Addresses"
-          addButtonTitle="Add Address"
           content={props.contact.addresses}
+        />
+        <AddressPromptModal
+          open={modal.addressModal}
+          title={"Create New Address"}
+          handleAccept={() => {}}
+          handleClose={closeModal("addressModal")}
         />
       </Box>
     </Box>
   )
 }
 
-function ListCard(props: { titleIcon: React.ReactElement, addButtonTitle: string, cardTitle: string, content: StringType | AddressType }) {
+function ListCard(props: {
+  titleIcon: React.ReactElement,
+  cardTitle: string,
+  content: StringType | AddressType
+}) {
   return (
     <Box className="w-full p-9 rounded-2xl" sx={paint(bg("surface-container-high"))}>
       <List
