@@ -13,12 +13,12 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import Link from "next/link";
 import { formatAddress, locateCountryFlag, toKeys } from "../../lib/misc";
 import { Contact, AddressType, Run, StringType } from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, border } from "../../lib/colors";
-import Link from "next/link";
 import { SplitButton } from "../components";
 
 export default function Page() {
