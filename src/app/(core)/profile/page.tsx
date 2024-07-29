@@ -228,7 +228,7 @@ function PromptModal(props: PromptModalType & { fieldNames?: string[] }) {
   }
   return (
     <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface-container-high"), text("on-surface"))}><Typography className="text-center">{props.title}</Typography></DialogTitle>
+      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}><Typography className="text-center">{props.title}</Typography></DialogTitle>
       <CustomDivider/>
       <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="flex flex-col gap-2 w-full p-1 h-full">

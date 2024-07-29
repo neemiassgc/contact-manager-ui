@@ -3,7 +3,7 @@ import {
   InputAdornment, Box, Pagination,
   IconButton, Dialog, DialogTitle, Typography, DialogActions,
   DialogContent, TextField, Divider, CircularProgress,
-  Snackbar, Alert
+  Snackbar, Alert,
 } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -273,7 +273,7 @@ function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: S
 function ConsentModal(props: {loading: boolean, open: boolean, contactName: string, handleClose: Run, handleYes: Run}) {
   return(
     <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface-container-high"), text("on-surface"))}>
+      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Typography className="text-center">
           {
             props.loading ? "Deleting..." : 
@@ -382,7 +382,7 @@ function ContactCreationModal(props: {
 
   return (
     <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface-container-highest"), text("on-surface"))}>
+      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Typography sx={{color: "inherit"}} className="text-center">
           {
             isLoading ? "Creating..." : "Create a new contact"
