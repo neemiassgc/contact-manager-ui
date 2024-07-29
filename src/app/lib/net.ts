@@ -39,10 +39,10 @@ async function poster(url: string, headers: HeadersInit, body: string): Promise<
 }
 
 export function fetchAllContacts() {
-  return getter(getUrl("/api/contacts"));
+  return getter<Contact[]>(getUrl("/api/contacts"));
 }
 
-async function getter(url: string, options?: object): Promise<Contact[]> {
+async function getter<T>(url: string, options?: object): Promise<T> {
   const response = await fetch(url, options);
 
   await checkForError(response);
