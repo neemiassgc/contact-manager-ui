@@ -51,3 +51,23 @@ export const color: (colorRole: ColorRole) => string = colorRole => colorMap[col
 export function paint(...cssProps: object[]): object {
   return cssProps.reduce((prev, curr) => ({...prev, ...curr}), {});
 }
+
+const textTertiary = text("tertiary");
+const borderTertiary = border("tertiary");
+
+export const textFieldTheme: object = {
+  sx: {
+    "& label, label.Mui-focused": textTertiary,
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': borderTertiary,
+      '&:hover fieldset': borderTertiary,
+      '&.Mui-focused fieldset': borderTertiary,
+    },
+  },
+  inputProps: {
+    sx: {
+      "&::placeholder": textTertiary,
+      ...textTertiary
+    }
+  }
+}

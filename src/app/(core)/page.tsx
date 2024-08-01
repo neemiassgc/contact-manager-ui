@@ -19,7 +19,7 @@ import {
 import { Contact, Run, ShortContact, ViolationError, Severity, ShowAlertFunc } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
-import { paint, bg, border, text } from '../lib/colors';
+import { paint, bg, border, text, textFieldTheme } from '../lib/colors';
 import { convertNetworkErrorMessage, filterByName, formatPhoneValue, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
 import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, SelectCountry } from './components';
@@ -320,25 +320,6 @@ function ContactCreationModal(props: {
   const setPhoneValue = (event: ChangeEvent<HTMLInputElement>) =>
     setTextFieldData({...textFieldData, phoneValue: formatPhoneValue(textFieldData.phoneValue, event.target.value)});
 
-  const textTertiary = paint(text("tertiary"));
-  const borderTertiary = paint(border("tertiary"));
-  const textFieldStyles: object = {
-    sx: {
-      "& label, label.Mui-focused": textTertiary,
-      '& .MuiOutlinedInput-root': {
-        '& fieldset': borderTertiary,
-        '&:hover fieldset': borderTertiary,
-        '&.Mui-focused fieldset': borderTertiary,
-      },
-    },
-    inputProps: {
-      sx: {
-        "&::placeholder": textTertiary,
-        ...textTertiary
-      }
-    }
-  }
-
   const extractErrorHelperText = (fieldName: string) => {
     if (error instanceof ViolationError)
       return (JSON.parse(error.message) as ShortContact)[fieldName];
@@ -401,7 +382,7 @@ function ContactCreationModal(props: {
             onChange={setName}
             error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
             helperText={extractErrorHelperText("name")[0]}
-            {...textFieldStyles}
+            {...textFieldTheme}
             className="w-full"
             label="contact name"
             placeholder="contact name"
@@ -414,7 +395,7 @@ function ContactCreationModal(props: {
             onChange={setPhoneLabel}
             error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
             helperText={extractErrorHelperText("phoneLabel")[0]}
-            {...textFieldStyles}
+            {...textFieldTheme}
             label="phone label"
             placeholder="phone label"
             size="small"
@@ -424,9 +405,8 @@ function ContactCreationModal(props: {
         <Box className="w-full pt-1 flex gap-2">
           <SelectCountry
             className="basis-24"
-            value={textFieldData.countryCode}
-            setValue={event => setTextFieldData({...textFieldData, countryCode: event.target.value})}
-            styles={textFieldStyles}
+            onChange={value => setTextFieldData({...textFieldData, countryCode: value})}
+            styles={textFieldTheme}
           />
           <TextField
             disabled={isLoading}
@@ -434,7 +414,7 @@ function ContactCreationModal(props: {
             value={textFieldData.phoneValue}
             error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
             helperText={extractErrorHelperText("phoneValue")[0]}
-            {...textFieldStyles}
+            {...textFieldTheme}
             className="flex-1"
             label="phone"
             placeholder="phone"
