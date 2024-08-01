@@ -1,8 +1,9 @@
 "use client"
 import {
   Avatar, Badge, Box, Button, ButtonGroup,
-  ClickAwayListener, Divider, Grow, IconButton, MenuItem,
-  MenuList, Paper, Popper, Skeleton, Tooltip, Typography
+  ClickAwayListener, Divider, FormControl, Grow, IconButton, InputLabel, MenuItem,
+  MenuList, Paper, Popper, Skeleton, Tooltip, Typography, Select,
+  SelectChangeEvent
 } from "@mui/material";
 import { bg, border, ColorRole, paint, text } from "../lib/colors";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
@@ -12,10 +13,11 @@ import AddIcon from '@mui/icons-material/AddToPhotos';
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { CircularProgress } from "@mui/material";
 import ErrorIcon from '@mui/icons-material/Error';
-import { iterator } from "../lib/misc";
+import { getFlagEmoji, iterator } from "../lib/misc";
 import { clearLocalContacts, removeAllUnseenContactNames } from "../lib/storage";
-import { ReactElement, useRef, useState } from "react";
-import { Run } from "../lib/types";
+import { ReactElement, useEffect, useRef, useState } from "react";
+import { CountryCode, Run } from "../lib/types";
+import { getCountryCodes } from "../lib/net";
 
 export function Loading({ color = "primary" }: { color?: "warning" | "primary" }) {
   return <CircularProgress color={color} className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
@@ -253,5 +255,36 @@ export function DefaultButton({ title, onClick, colorVariant = "primary", childr
     >
       {title}
     </Button>
+  )
+}
+
+export function SelectCountry(props: { value: string, setValue: (event: SelectChangeEvent) => void, className?: string, styles: any }) {
+  const [data, setData] = useState<CountryCode[]>([])
+
+  useEffect(() => {
+    getCountryCodes()
+      .then(setData)
+  }, [])
+
+  return (
+    <FormControl {...props.styles} className={props.className} size="small">
+      <InputLabel id="input-label">Country</InputLabel>
+      <Select
+        sx={text("tertiary")}
+        labelId="input-label"
+        value={props.value}
+        onChange={props.setValue}
+        label="Country"
+        renderValue={_ => props.value}
+      >
+        {
+          data.sort((a, b) => a.name.localeCompare(b.name)).map((countryCode, key) =>
+            <MenuItem sx={text("tertiary")} key={key} value={countryCode.dial_code}>
+              {countryCode.name} {getFlagEmoji(countryCode.code)} {countryCode.dial_code}
+            </MenuItem>
+          )
+        }
+      </Select>
+    </FormControl>
   )
 }

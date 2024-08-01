@@ -22,7 +22,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
 import { convertNetworkErrorMessage, filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen } from './components';
+import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, SelectCountry } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
@@ -307,7 +307,9 @@ function ContactCreationModal(props: {
   showAlert: ShowAlertFunc,
   reloadContacts: Run
 }) {
-  const [textFieldData, setTextFieldData] = useState<ShortContact>({ name: "", phoneLabel: "", phoneValue: "" })
+  const [textFieldData, setTextFieldData] = useState<ShortContact & {countryCode: string}>(
+    { name: "", phoneLabel: "", phoneValue: "", countryCode: "+1"}
+  )
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
 
@@ -349,7 +351,7 @@ function ContactCreationModal(props: {
     createNewContact({
       name: textFieldData.name,
       phoneLabel: textFieldData.phoneLabel,
-      phoneValue: textFieldData.phoneValue
+      phoneValue: textFieldData.countryCode + textFieldData.phoneValue
     })
     .then(() => {
       closeAndReset();
@@ -376,7 +378,8 @@ function ContactCreationModal(props: {
     setTextFieldData({
       name: "",
       phoneLabel: "",
-      phoneValue: ""
+      phoneValue: "",
+      countryCode: "+1",
     });
   };
 
@@ -391,7 +394,7 @@ function ContactCreationModal(props: {
       </DialogTitle>
       <CustomDivider/>
       <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Box className="w-full mb-2 pt-1">
+        <Box className="w-full flex gap-2 mb-1">
           <TextField
             disabled={isLoading}
             value={textFieldData.name}
@@ -405,8 +408,6 @@ function ContactCreationModal(props: {
             size="small"
             variant="outlined"
           />
-        </Box>
-        <Box className="w-full flex gap-2">
           <TextField
             disabled={isLoading}
             value={textFieldData.phoneLabel}
@@ -419,6 +420,14 @@ function ContactCreationModal(props: {
             size="small"
             variant="outlined"
           />
+        </Box>
+        <Box className="w-full pt-1 flex gap-2">
+          <SelectCountry
+            className="basis-24"
+            value={textFieldData.countryCode}
+            setValue={event => setTextFieldData({...textFieldData, countryCode: event.target.value})}
+            styles={textFieldStyles}
+          />
           <TextField
             disabled={isLoading}
             onChange={setPhoneValue}
@@ -426,6 +435,7 @@ function ContactCreationModal(props: {
             error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
             helperText={extractErrorHelperText("phoneValue")[0]}
             {...textFieldStyles}
+            className="flex-1"
             label="phone"
             placeholder="phone"
             size="small"
