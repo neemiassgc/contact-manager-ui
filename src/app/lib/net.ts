@@ -1,5 +1,5 @@
 import { isApplicationJson, validateContact } from "./misc";
-import { Contact, ErrorType, ShortContact } from "./types";
+import { Contact, CountryCode, ErrorType, ShortContact } from "./types";
 
 function getUrl(path: string): string {
   return window.location.origin + path;
@@ -40,6 +40,10 @@ async function poster(url: string, headers: HeadersInit, body: string): Promise<
 
 export function fetchAllContacts() {
   return getter<Contact[]>(getUrl("/api/contacts"));
+}
+
+export function getCountryCodes() {
+  return getter<CountryCode[]>("/country-codes.json");
 }
 
 async function getter<T>(url: string, options?: object): Promise<T> {
