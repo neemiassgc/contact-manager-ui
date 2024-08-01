@@ -20,7 +20,7 @@ import { Contact, Run, ShortContact, ViolationError, Severity, ShowAlertFunc } f
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text } from '../lib/colors';
-import { convertNetworkErrorMessage, filterByName, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
+import { convertNetworkErrorMessage, filterByName, formatPhoneValue, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
 import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, SelectCountry } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
@@ -318,7 +318,7 @@ function ContactCreationModal(props: {
   const setPhoneLabel = (event: ChangeEvent<HTMLInputElement>) =>
     setTextFieldData({...textFieldData, phoneLabel: event.target.value});
   const setPhoneValue = (event: ChangeEvent<HTMLInputElement>) =>
-    setTextFieldData({...textFieldData, phoneValue: event.target.value});
+    setTextFieldData({...textFieldData, phoneValue: formatPhoneValue(textFieldData.phoneValue, event.target.value)});
 
   const textTertiary = paint(text("tertiary"));
   const borderTertiary = paint(border("tertiary"));
