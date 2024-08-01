@@ -84,3 +84,13 @@ export function locateCountryFlag(countryName: string): string {
   if (countryName.toLowerCase() === "brasil") return "/flag/brazil.svg";
   return `/flag/${countryName.toLowerCase()}.svg`;
 }
+
+export function isTheLastElement(index: number, list: string[]): boolean {
+  return index !== list.length - 1;
+}
+
+export function getFlagEmoji(countryCode: string): string {
+  return countryCode.toUpperCase().replace(/./g, char => 
+    String.fromCodePoint(127397 + char.charCodeAt(0))
+  );
+}
