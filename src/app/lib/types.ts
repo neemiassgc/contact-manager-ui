@@ -55,3 +55,11 @@ export interface CountryCode {
   dial_code: string,
   code: string
 }
+
+export interface ModalType {
+  open: boolean,
+  isLoading: boolean,
+  title: string,
+  handleClose: Run,
+  handleAccept: Run
+}

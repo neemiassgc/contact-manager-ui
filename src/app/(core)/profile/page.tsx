@@ -201,9 +201,7 @@ function ListCard(props: {
   )
 }
 
-type PromptModalType = { open: boolean, title: string, handleClose: Run, handleAccept: Run }
-
-function AddressPromptModal(props: PromptModalType) {
+function AddressPromptModal(props: ModalType) {
   const fieldNames: string[] = ["street", "country", "city", "state", "zipcode"];
   return (
     <PromptModal {...props}>
@@ -219,7 +217,7 @@ function AddressPromptModal(props: PromptModalType) {
   )
 }
 
-function PhoneNumberPromptModal(props: PromptModalType) {
+function PhoneNumberPromptModal(props: ModalType) {
   return (
     <PromptModal {...props}>
       <TextField
@@ -249,7 +247,7 @@ function PhoneNumberPromptModal(props: PromptModalType) {
   )
 }
 
-function EmailPromptModal(props: PromptModalType) {
+function EmailPromptModal(props: ModalType) {
 
   const fieldNames: string[] = ["label", "value"];
   
@@ -266,7 +264,7 @@ function EmailPromptModal(props: PromptModalType) {
   )
 }
 
-function PromptModal(props: PromptModalType & { children: ReactNode }) {
+function PromptModal(props: ModalType & { children: ReactNode }) {
   return (
     <Dialog open={props.open}>
       <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
