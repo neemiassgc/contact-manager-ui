@@ -16,10 +16,10 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Link from "next/link";
 import { formatAddress, locateCountryFlag, toKeys } from "../../lib/misc";
 import { Contact, AddressType, Run, StringType } from "../../lib/types";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
-import { bg, text, paint, border } from "../../lib/colors";
-import { CustomDivider, SplitButton } from "../components";
+import { bg, text, paint, border, textFieldTheme } from "../../lib/colors";
+import { CustomDivider, SelectCountry, SplitButton } from "../components";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact() as Contact;
@@ -56,7 +56,7 @@ function Header(props: {contactName: string}) {
           </IconButton>
         </Tooltip>
       </Box>
-      <PromptModal
+      <EmailPromptModal
         open={editing}
         title="Edit the name of the contact"
         handleClose={() => setEditing(false)}
@@ -100,7 +100,7 @@ function Body(props: { contact: Contact }) {
             cardTitle="Phone Numbers"
             content={props.contact.phoneNumbers}
           />
-          <PromptModal
+          <PhoneNumberPromptModal
             open={modal.phoneModal}
             title={"Create New Phone Number"}
             handleAccept={() => {}}
@@ -113,7 +113,7 @@ function Body(props: { contact: Contact }) {
             cardTitle="Emails"
             content={props.contact.emails}
           />
-          <PromptModal
+          <EmailPromptModal
             open={modal.emailModal}
             title={"Create New Email"}
             handleAccept={() => {}}
@@ -204,45 +204,77 @@ function ListCard(props: {
 type PromptModalType = { open: boolean, title: string, handleClose: Run, handleAccept: Run }
 
 function AddressPromptModal(props: PromptModalType) {
-  return <PromptModal {...props} fieldNames={["street", "country", "city", "state", "zipcode"]} />
+  const fieldNames: string[] = ["street", "country", "city", "state", "zipcode"];
+  return (
+    <PromptModal {...props}>
+      <Box className="flex flex-col gap-2 w-full p-1 h-full">
+        <>
+          {
+            fieldNames.map((fieldName: string, index: number) =>
+              <TextField {...textFieldTheme}  key={index} variant="outlined" size="small" label={fieldName} placeholder={fieldName}/>)
+          }
+        </>
+      </Box>
+    </PromptModal>
+  )
 }
 
-function PromptModal(props: PromptModalType & { fieldNames?: string[] }) {
-  const textTertiary = text("tertiary");
-  const borderTertiary = border("tertiary");
-  const textFieldStyles: object = {
-    sx: {
-      "& label, label.Mui-focused": textTertiary,
-      '& .MuiOutlinedInput-root': {
-        '& fieldset': borderTertiary,
-        '&:hover fieldset': borderTertiary,
-        '&.Mui-focused fieldset': borderTertiary,
-      },
-    },
-    inputProps: {
-      sx: {
-        "&::placeholder": textTertiary,
-        ...textTertiary
-      }
-    }
-  }
+function PhoneNumberPromptModal(props: PromptModalType) {
+  return (
+    <PromptModal {...props}>
+      <TextField
+        {...textFieldTheme}
+        label="phone label"
+        placeholder="phone label"
+        size="small"
+        variant="outlined"
+        className="mb-1 w-full"
+      />
+      <Box className="w-full pt-1 flex gap-2">
+        <SelectCountry
+          className="basis-24"
+          onChange={() => {}}
+          styles={textFieldTheme}
+        />
+        <TextField
+          {...textFieldTheme}
+          className="flex-1"
+          label="phone"
+          placeholder="phone"
+          size="small"
+          variant="outlined"
+        />
+      </Box>
+    </PromptModal>
+  )
+}
+
+function EmailPromptModal(props: PromptModalType) {
+
+  const fieldNames: string[] = ["label", "value"];
+  
+  return (
+    <PromptModal {...props}>
+      <Box className="flex flex-col gap-2 w-full p-1 h-full">
+        {
+          fieldNames.map((value, key) => 
+            <TextField key={key} {...textFieldTheme} variant="outlined" size="small" label={value} placeholder={value}/>
+          )
+        }
+      </Box>
+    </PromptModal>
+  )
+}
+
+function PromptModal(props: PromptModalType & { children: ReactNode }) {
   return (
     <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}><Typography className="text-center">{props.title}</Typography></DialogTitle>
+      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
+        <Typography className="text-center">{props.title}</Typography>
+      </DialogTitle>
       <CustomDivider/>
       <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Box className="flex flex-col gap-2 w-full p-1 h-full">
-          <TextField {...textFieldStyles} variant="outlined" size="small" label="label" placeholder="label"/>
-          {
-            !props.fieldNames ? <TextField {...textFieldStyles} variant="outlined" size="small" label="value" placeholder="value"/> :
-            <>
-              {
-                props.fieldNames.map((fieldName: string, index: number) =>
-                  <TextField {...textFieldStyles}  key={index} variant="outlined" size="small" label={fieldName} placeholder="label"/>)
-              }
-            </>
-          }
-        </Box>
+        {props.children}
       </DialogContent>
       <CustomDivider/>
       <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
