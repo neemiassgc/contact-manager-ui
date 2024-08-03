@@ -62,6 +62,18 @@ export async function deleteContact(contactId: string): Promise<null> {
   return null;
 }
 
+export async function patcher(url: string, body: string): Promise<null> {
+  const response = await fetch(url, {
+    method: "PATCH",
+    headers: { ["Content-Type"]: "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  await checkForError(response);
+
+  return null;
+}
+
 async function checkForError(response: Response) {
   if (!response.ok) {
     if (
