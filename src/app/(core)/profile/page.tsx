@@ -153,61 +153,77 @@ function ListCard(props: {
   cardTitle: string,
   content: StringType | AddressType
 }) {
+  const [open, setOpen] = useState(false);
+  const [currentModalTitle, setCurrentModalTitle] = useState("");
+
   return (
-    <Box className="w-full p-9 rounded-2xl" sx={paint(bg("surface-container-high"))}>
-      <List
-        className="rounded-b-xl border-b-2"
-        sx={paint(bg("surface"), text("on-surface"), bg("surface-container-high"))}
-        subheader={
-        <ListSubheader
-          component="div" className="rounded-t-xl text-center"
-          sx={paint(bg("secondary"), text("on-secondary"))}>
-          <Box className="flex-shrink mr-2">
-            {props.titleIcon}
-            <span>{props.cardTitle}</span>
-          </Box>
-        </ListSubheader>
-      }>
-        {
-          toKeys(props.content).map((key, index, list) => {
-            return (
-              <>
-                <ListItem disableGutters
-                  className="border-x-2"
-                  sx={bg("surface")}
-                  key={key}
-                  secondaryAction={
-                    <IconButton>
-                      <ClearIcon sx={text("on-surface")}/>
-                    </IconButton>
-                  }
-                >
-                  <ListItemButton>
-                    {
-                      typeof props.content[key] === "object" &&
-                      <ListItemAvatar>
-                        <Avatar src={locateCountryFlag(props.content[key].country)}>
-                          {props.content[key].country[0]}
-                        </Avatar>
-                      </ListItemAvatar>
+    <>
+      <Box className="w-full p-9 rounded-2xl" sx={paint(bg("surface-container-high"))}>
+        <List
+          className="rounded-b-xl border-b-2"
+          sx={paint(bg("surface"), text("on-surface"), bg("surface-container-high"))}
+          subheader={
+          <ListSubheader
+            component="div" className="rounded-t-xl text-center"
+            sx={paint(bg("secondary"), text("on-secondary"))}>
+            <Box className="flex-shrink mr-2">
+              {props.titleIcon}
+              <span>{props.cardTitle}</span>
+            </Box>
+          </ListSubheader>
+        }>
+          {
+            toKeys(props.content).map((key, index, list) => {
+              return (
+                <>
+                  <ListItem disableGutters
+                    className="border-x-2"
+                    sx={bg("surface")}
+                    key={key}
+                    secondaryAction={
+                      <IconButton onClick={() => {
+                        setOpen(true);
+                        setCurrentModalTitle(typeof props.content[key] === "string" ? props.content[key] : "this address")
+                      }}>
+                        <ClearIcon sx={text("on-surface")}/>
+                      </IconButton>
                     }
-                    <ListItemText
-                      primary={
-                        typeof props.content[key] === "object" ? formatAddress(props.content[key]) : props.content[key]
+                  >
+                    <ListItemButton>
+                      {
+                        typeof props.content[key] === "object" &&
+                        <ListItemAvatar>
+                          <Avatar src={locateCountryFlag(props.content[key].country)}>
+                            {props.content[key].country[0]}
+                          </Avatar>
+                        </ListItemAvatar>
                       }
-                      secondary={key}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                {
-                  index !== list.length - 1 && <Divider variant="middle"/> 
-                }
-              </>
-            )
-          })
-        }
-      </List>
-    </Box>
+                      <ListItemText
+                        primary={
+                          typeof props.content[key] === "object" ? formatAddress(props.content[key]) : props.content[key]
+                        }
+                        secondary={key}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                  {
+                    index !== list.length - 1 && <Divider variant="middle"/> 
+                  }
+                </>
+              )
+            })
+          }
+        </List>
+      </Box>
+      <Modal
+        mini
+        isLoading={false}
+        open={open}
+        title={"Delete '"+currentModalTitle+"'?"}
+        handleClose={() => setOpen(false)}
+        handleAccept={() => {}}
+      />
+    </>
   )
 }
 
