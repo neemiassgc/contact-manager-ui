@@ -246,15 +246,15 @@ function AddressPromptModal(props: ModalType) {
 function PhoneNumberPromptModal(props: ModalType) {
   return (
     <Modal {...props}>
-      <TextField
-        {...textFieldTheme}
-        label="phone label"
-        placeholder="phone label"
-        size="small"
-        variant="outlined"
-        className="mb-1 w-full"
-      />
-      <Box className="w-full pt-1 flex gap-2">
+      <Box className="flex gap-2 mb-1 flex-wrap">
+        <TextField
+          {...textFieldTheme}
+          label="phone label"
+          placeholder="phone label"
+          size="small"
+          variant="outlined"
+          className="basis-full sm:basis-3/12 flex-auto"
+        />
         <SelectCountry
           className="basis-24"
           onChange={() => {}}
@@ -262,7 +262,7 @@ function PhoneNumberPromptModal(props: ModalType) {
         />
         <TextField
           {...textFieldTheme}
-          className="flex-1"
+          className="basis-1/2 flex-grow"
           label="phone"
           placeholder="phone"
           size="small"
