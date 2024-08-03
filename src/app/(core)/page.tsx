@@ -22,7 +22,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { paint, bg, border, text, textFieldTheme } from '../lib/colors';
 import { convertNetworkErrorMessage, filterByName, formatPhoneValue, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, SelectCountry } from './components';
+import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Modal, SelectCountry } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 
@@ -259,47 +259,17 @@ function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: S
           })
         }
       </Box>
-      <ConsentModal
-        loading={consentModal.loading}
+      <Modal
+        mini
+        isLoading={consentModal.loading}
         open={consentModal.open}
-        contactName={contactData.name}
+        title={"Delete "+contactData.name+"?"}
         handleClose={() => setConsentModal({loading: false, open: false})}
-        handleYes={removeContact}
+        handleAccept={removeContact}
       />
     </>
   )
 }
-
-function ConsentModal(props: {loading: boolean, open: boolean, contactName: string, handleClose: Run, handleYes: Run}) {
-  return(
-    <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Typography className="text-center">
-          {
-            props.loading ? "Deleting..." : 
-            `Delete '${props.contactName}'?`
-          }
-        </Typography>
-      </DialogTitle>
-      <CustomDivider/>
-      {
-        props.loading ?
-        <DialogContent>
-          <Box className="px-8">
-            <CircularProgress size="4rem"/>
-          </Box>
-        </DialogContent> :
-        <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
-          <Box className="w-full flex justify-center gap-3">
-            <IconButton sx={paint(text("primary"))} onClick={props.handleYes} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-            <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
-          </Box>
-        </DialogActions>
-      }
-    </Dialog>
-  )
-}
-
 
 function ContactCreationModal(props: {
   open: boolean,
@@ -365,78 +335,54 @@ function ContactCreationModal(props: {
   };
 
   return (
-    <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Typography sx={{color: "inherit"}} className="text-center">
-          {
-            isLoading ? "Creating..." : "Create a new contact"
-          }
-        </Typography>
-      </DialogTitle>
-      <CustomDivider/>
-      <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Box className="w-full flex gap-2 mb-1">
-          <TextField
-            disabled={isLoading}
-            value={textFieldData.name}
-            onChange={setName}
-            error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
-            helperText={extractErrorHelperText("name")[0]}
-            {...textFieldTheme}
-            className="w-full"
-            label="contact name"
-            placeholder="contact name"
-            size="small"
-            variant="outlined"
-          />
-          <TextField
-            disabled={isLoading}
-            value={textFieldData.phoneLabel}
-            onChange={setPhoneLabel}
-            error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
-            helperText={extractErrorHelperText("phoneLabel")[0]}
-            {...textFieldTheme}
-            label="phone label"
-            placeholder="phone label"
-            size="small"
-            variant="outlined"
-          />
-        </Box>
-        <Box className="w-full pt-1 flex gap-2">
-          <SelectCountry
-            className="basis-24"
-            onChange={value => setTextFieldData({...textFieldData, countryCode: value})}
-            styles={textFieldTheme}
-          />
-          <TextField
-            disabled={isLoading}
-            onChange={setPhoneValue}
-            value={textFieldData.phoneValue}
-            error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
-            helperText={extractErrorHelperText("phoneValue")[0]}
-            {...textFieldTheme}
-            className="flex-1"
-            label="phone"
-            placeholder="phone"
-            size="small"
-            variant="outlined"
-          />
-        </Box>
-      </DialogContent>
-      <CustomDivider/>
-      <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Box className="w-full flex justify-center gap-3">
-          {
-            isLoading ? <CircularProgress size="3rem"/> :
-            <>
-              <IconButton sx={paint(text("primary"))} onClick={addNewContact} size="small">
-                <CheckCircleIcon fontSize="large"/>
-              </IconButton>
-              <IconButton sx={paint(text("error"))} onClick={closeAndReset} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
-            </>
-          } 
-        </Box>
-      </DialogActions>
-    </Dialog>
+    <Modal title="Create new contact" open={props.open} isLoading={isLoading} handleAccept={addNewContact} handleClose={closeAndReset}>
+      <Box className="w-full flex gap-2 mb-1">
+        <TextField
+          disabled={isLoading}
+          value={textFieldData.name}
+          onChange={setName}
+          error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
+          helperText={extractErrorHelperText("name")[0]}
+          {...textFieldTheme}
+          className="w-full"
+          label="contact name"
+          placeholder="contact name"
+          size="small"
+          variant="outlined"
+        />
+        <TextField
+          disabled={isLoading}
+          value={textFieldData.phoneLabel}
+          onChange={setPhoneLabel}
+          error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
+          helperText={extractErrorHelperText("phoneLabel")[0]}
+          {...textFieldTheme}
+          label="phone label"
+          placeholder="phone label"
+          size="small"
+          variant="outlined"
+        />
+      </Box>
+      <Box className="w-full pt-1 flex gap-2">
+        <SelectCountry
+          className="basis-24"
+          onChange={value => setTextFieldData({...textFieldData, countryCode: value})}
+          styles={textFieldTheme}
+        />
+        <TextField
+          disabled={isLoading}
+          onChange={setPhoneValue}
+          value={textFieldData.phoneValue}
+          error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
+          helperText={extractErrorHelperText("phoneValue")[0]}
+          {...textFieldTheme}
+          className="flex-1"
+          label="phone"
+          placeholder="phone"
+          size="small"
+          variant="outlined"
+        />
+      </Box>
+    </Modal>
   )
 }

@@ -3,20 +3,22 @@ import {
   Avatar, Badge, Box, Button, ButtonGroup,
   ClickAwayListener, Divider, FormControl, Grow, IconButton, InputLabel, MenuItem,
   MenuList, Paper, Popper, Skeleton, Tooltip, Typography, Select,
-  SelectChangeEvent
+  Dialog, DialogTitle, DialogContent, DialogActions
 } from "@mui/material";
 import { bg, border, ColorRole, paint, text } from "../lib/colors";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddIcon from '@mui/icons-material/AddToPhotos';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import ErrorIcon from '@mui/icons-material/Error';
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { CircularProgress } from "@mui/material";
-import ErrorIcon from '@mui/icons-material/Error';
 import { getFlagEmoji, iterator } from "../lib/misc";
 import { clearLocalContacts, removeAllUnseenContactNames } from "../lib/storage";
-import { ReactElement, useEffect, useRef, useState } from "react";
-import { CountryCode, Run } from "../lib/types";
+import { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
+import { CountryCode, ModalType, Run } from "../lib/types";
 import { getCountryCodes } from "../lib/net";
 
 export function Loading({ color = "primary" }: { color?: "warning" | "primary" }) {
@@ -290,5 +292,42 @@ export function SelectCountry(props: { onChange: (value: string) => void, classN
         }
       </Select>
     </FormControl>
+  )
+}
+
+export function Modal({ mini = false, ...props }: ModalType & { children?: ReactNode, mini?: boolean }) {
+  return (
+    <Dialog open={props.open}>
+      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
+        <Typography sx={{color: "inherit"}} className="text-center">
+          {
+            props.isLoading ? "Loading..." : props.title
+          }
+        </Typography>
+      </DialogTitle>
+      <CustomDivider/>
+      {
+        !mini &&
+        <>
+          <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
+            {props.children}
+          </DialogContent>
+          <CustomDivider/>
+        </>
+      }
+      <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
+        <Box className="w-full flex justify-center gap-3">
+          {
+            props.isLoading ? <CircularProgress size="3rem"/> :
+            <>
+              <IconButton sx={paint(text("primary"))} onClick={props.handleAccept} size="small">
+                <CheckCircleIcon fontSize="large"/>
+              </IconButton>
+              <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+            </>
+          } 
+        </Box>
+      </DialogActions>
+    </Dialog>
   )
 }

@@ -2,24 +2,21 @@
 
 import {
   Avatar, Box, TextField, Tooltip, IconButton,
-  Breadcrumbs, Typography, DialogContent, DialogTitle, Dialog,
-  ListSubheader, List, ListItem, ListItemButton, ListItemAvatar,
-  ListItemText, Divider, DialogActions
+  Breadcrumbs, Typography, ListSubheader, List, ListItem,
+  ListItemButton, ListItemAvatar, ListItemText, Divider
 } from "@mui/material";
 import PhoneIcon from '@mui/icons-material/Phone';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import DomainIcon from '@mui/icons-material/Domain';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Link from "next/link";
 import { formatAddress, locateCountryFlag, toKeys } from "../../lib/misc";
-import { Contact, AddressType, Run, StringType } from "../../lib/types";
-import { ReactNode, useState } from "react";
+import { Contact, AddressType, Run, StringType, ModalType } from "../../lib/types";
+import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
-import { bg, text, paint, border, textFieldTheme } from "../../lib/colors";
-import { CustomDivider, SelectCountry, SplitButton } from "../components";
+import { bg, text, paint, textFieldTheme } from "../../lib/colors";
+import { Modal, SelectCountry, SplitButton } from "../components";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact() as Contact;
@@ -56,12 +53,22 @@ function Header(props: {contactName: string}) {
           </IconButton>
         </Tooltip>
       </Box>
-      <EmailPromptModal
+      <Modal
+        isLoading={false}
         open={editing}
         title="Edit the name of the contact"
         handleClose={() => setEditing(false)}
         handleAccept={()=>{}}
-      />
+      >
+         <TextField
+          {...textFieldTheme}
+          className="w-full"
+          label="New name"
+          placeholder="New name"
+          size="small"
+          variant="outlined"
+        />
+      </Modal>
     </Box>
   )
 }
@@ -101,6 +108,7 @@ function Body(props: { contact: Contact }) {
             content={props.contact.phoneNumbers}
           />
           <PhoneNumberPromptModal
+            isLoading={false}
             open={modal.phoneModal}
             title={"Create New Phone Number"}
             handleAccept={() => {}}
@@ -114,6 +122,7 @@ function Body(props: { contact: Contact }) {
             content={props.contact.emails}
           />
           <EmailPromptModal
+            isLoading={false}
             open={modal.emailModal}
             title={"Create New Email"}
             handleAccept={() => {}}
@@ -128,6 +137,7 @@ function Body(props: { contact: Contact }) {
           content={props.contact.addresses}
         />
         <AddressPromptModal
+          isLoading={false}
           open={modal.addressModal}
           title={"Create New Address"}
           handleAccept={() => {}}
@@ -204,7 +214,7 @@ function ListCard(props: {
 function AddressPromptModal(props: ModalType) {
   const fieldNames: string[] = ["street", "country", "city", "state", "zipcode"];
   return (
-    <PromptModal {...props}>
+    <Modal {...props}>
       <Box className="flex flex-col gap-2 w-full p-1 h-full">
         <>
           {
@@ -213,13 +223,13 @@ function AddressPromptModal(props: ModalType) {
           }
         </>
       </Box>
-    </PromptModal>
+    </Modal>
   )
 }
 
 function PhoneNumberPromptModal(props: ModalType) {
   return (
-    <PromptModal {...props}>
+    <Modal {...props}>
       <TextField
         {...textFieldTheme}
         label="phone label"
@@ -243,7 +253,7 @@ function PhoneNumberPromptModal(props: ModalType) {
           variant="outlined"
         />
       </Box>
-    </PromptModal>
+    </Modal>
   )
 }
 
@@ -252,7 +262,7 @@ function EmailPromptModal(props: ModalType) {
   const fieldNames: string[] = ["label", "value"];
   
   return (
-    <PromptModal {...props}>
+    <Modal {...props}>
       <Box className="flex flex-col gap-2 w-full p-1 h-full">
         {
           fieldNames.map((value, key) => 
@@ -260,27 +270,6 @@ function EmailPromptModal(props: ModalType) {
           )
         }
       </Box>
-    </PromptModal>
-  )
-}
-
-function PromptModal(props: ModalType & { children: ReactNode }) {
-  return (
-    <Dialog open={props.open}>
-      <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Typography className="text-center">{props.title}</Typography>
-      </DialogTitle>
-      <CustomDivider/>
-      <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        {props.children}
-      </DialogContent>
-      <CustomDivider/>
-      <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Box className="w-full flex justify-center mt-2">
-          <IconButton sx={text("primary")} onClick={props.handleAccept} size="small"><CheckCircleIcon fontSize="large"/></IconButton>
-          <IconButton sx={text("error")} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
-        </Box>
-      </DialogActions>
-    </Dialog>
+    </Modal>
   )
 }
