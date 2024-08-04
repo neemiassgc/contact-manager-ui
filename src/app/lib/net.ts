@@ -1,41 +1,25 @@
 import { isApplicationJson, validateContact } from "./misc";
 import { Contact, CountryCode, ErrorType, ShortContact } from "./types";
 
-function getUrl(path: string): string {
-  return window.location.origin + path;
-}
-
 export function createNewUser(username: string) {
-  const body: string = JSON.stringify({ username });
-  const header = {
-    ["Content-Type"]: "application/json"
-  }
-  return poster(getUrl("/api/users"), header, body);
+  return poster(getUrl("/api/users"), { username });
 }
 
 export async function createNewContact(contact: ShortContact) {
   validateContact(contact);
 
-  const body: string = JSON.stringify({
+  const body: object = {
     name: contact.name,
     phoneNumbers: {
       [contact.phoneLabel]: contact.phoneValue
     }
-  })
-
-  const header = {
-    ["Content-Type"]: "application/json"
   }
 
-  return poster(getUrl("/api/contacts"), header, body);
+  return poster(getUrl("/api/contacts"), body);
 }
 
-async function poster(url: string, headers: HeadersInit, body: string): Promise<null> {
-  const response = await fetch(url, { method: "POST", headers, body });
-
-  await checkForError(response);
-
-  return null;
+async function poster(url: string, body: object): Promise<void> {
+  requester(url, "POST", body);
 }
 
 export function fetchAllContacts() {
@@ -54,27 +38,28 @@ async function getter<T>(url: string, options?: object): Promise<T> {
   return response.json();
 }
 
-export async function deleteContact(contactId: string): Promise<null> {
-  const response = await fetch(getUrl("/api/contacts/"+contactId), { method: "DELETE" });
-
-  await checkForError(response);
-
-  return null;
+export async function deleteContact(contactId: string): Promise<void> {
+  requester(getUrl("/api/contacts/"+contactId), "DELETE");
 }
 
-export async function patcher(url: string, body: string): Promise<null> {
-  const response = await fetch(url, {
-    method: "PATCH",
-    headers: { ["Content-Type"]: "application/json" },
-    body: JSON.stringify(body)
-  });
-
-  await checkForError(response);
-
-  return null;
+export async function patcher(url: string, body: object): Promise<void> {
+  requester(url, "PATCH", body);
 }
 
-async function checkForError(response: Response) {
+async function requester(url: string, method: "POST" | "PATCH" | "DELETE", body?: object): Promise<void> {
+  const options: RequestInit = { method }
+
+  if (method !== "DELETE") {
+    options.headers = { ["Content-Type"]: "application/json" };
+    options.body = JSON.stringify(body);
+  }
+  
+  const response = await fetch(url, options);
+
+  await checkForError(response);
+}
+
+async function checkForError(response: Response): Promise<void> {
   if (!response.ok) {
     if (
       response.headers.has("Content-Type") &&
@@ -84,4 +69,8 @@ async function checkForError(response: Response) {
     }
     else throw new ErrorType(await response.text(), response.status);
   }
+}
+
+function getUrl(path: string): string {
+  return window.location.origin + path;
 }
