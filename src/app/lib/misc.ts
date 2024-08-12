@@ -105,4 +105,12 @@ export function removeProperty(object: StringType | AddressType, propertyName: s
     if (key !== propertyName) outputObject[key] = object[key];
   return outputObject;
 }
+
+export function toCamelCase(input: string): string {
+  const words: string[] = input.split(" ");
+  return words.map((word, index) =>
+    index === 0 ?
+      word.toLowerCase() :
+      word.toLowerCase().replace(/^./, word.charAt(0).toUpperCase())
+  ).join("");
 }
