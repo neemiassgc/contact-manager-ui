@@ -30,26 +30,22 @@ export function getCountryCodes() {
   return getter<CountryCode[]>("/country-codes.json");
 }
 
-async function getter<T>(url: string, options?: object): Promise<T> {
-  const response = await fetch(url, options);
-
-  await checkForError(response);
-
-  return response.json();
+async function getter<T>(url: string): Promise<T> {
+  return (await requester(url, "GET")).json();
 }
 
 export async function deleteContact(contactId: string): Promise<void> {
   requester(getUrl("/api/contacts/"+contactId), "DELETE");
 }
 
-export async function patcher(url: string, body: object): Promise<void> {
-  requester(url, "PATCH", body);
+export async function patcher(contactId: string, body: object): Promise<void> {
+  requester(getUrl("/api/contacts/"+contactId), "PATCH", body);
 }
 
-async function requester(url: string, method: "POST" | "PATCH" | "DELETE", body?: object): Promise<void> {
+async function requester(url: string, method: "POST" | "PATCH" | "DELETE" | "GET", body?: object): Promise<Response> {
   const options: RequestInit = { method }
 
-  if (method !== "DELETE") {
+  if (["PATCH", "POST"].includes(method)) {
     options.headers = { ["Content-Type"]: "application/json" };
     options.body = JSON.stringify(body);
   }
@@ -57,6 +53,8 @@ async function requester(url: string, method: "POST" | "PATCH" | "DELETE", body?
   const response = await fetch(url, options);
 
   await checkForError(response);
+
+  return response;
 }
 
 async function checkForError(response: Response): Promise<void> {
