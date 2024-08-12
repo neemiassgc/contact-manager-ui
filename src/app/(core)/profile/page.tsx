@@ -11,12 +11,13 @@ import DomainIcon from '@mui/icons-material/Domain';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
-import { formatAddress, locateCountryFlag, toKeys } from "../../lib/misc";
+import { formatAddress, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
 import { Contact, AddressType, Run, StringType, ModalType } from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
 import { Modal, SelectCountry, SplitButton } from "../components";
+import { patcher } from "@/app/lib/net";
 
 export default function Page() {
   const selectedContact: Contact = getSelectedContact() as Contact;
@@ -154,7 +155,19 @@ function ListCard(props: {
   content: StringType | AddressType
 }) {
   const [open, setOpen] = useState(false);
-  const [currentModalTitle, setCurrentModalTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
+
+  const deleteItem = () => {
+    setLoading(true);
+    patcher(
+      (getSelectedContact() as Contact).id,
+      {
+        [toCamelCase(props.cardTitle)]: removeProperty(props.content, selectedItem)
+      }
+    )
+      .finally(() => setOpen(false))
+  }
 
   return (
     <>
@@ -179,11 +192,12 @@ function ListCard(props: {
                   <ListItem disableGutters
                     className="border-x-2"
                     sx={bg("surface")}
-                    key={key}
+                    key={index}
                     secondaryAction={
                       <IconButton onClick={() => {
                         setOpen(true);
-                        setCurrentModalTitle(typeof props.content[key] === "string" ? props.content[key] : "this address")
+                        setLoading(false);
+                        setSelectedItem(key);
                       }}>
                         <ClearIcon sx={text("on-surface")}/>
                       </IconButton>
@@ -207,7 +221,7 @@ function ListCard(props: {
                     </ListItemButton>
                   </ListItem>
                   {
-                    index !== list.length - 1 && <Divider variant="middle"/> 
+                    index !== list.length - 1 && <Divider key={index} variant="middle"/> 
                   }
                 </>
               )
@@ -217,11 +231,13 @@ function ListCard(props: {
       </Box>
       <Modal
         mini
-        isLoading={false}
+        isLoading={loading}
         open={open}
-        title={"Delete '"+currentModalTitle+"'?"}
+        title={"Delete '"+selectedItem+"'?"}
         handleClose={() => setOpen(false)}
-        handleAccept={() => {}}
+        handleAccept={() => {
+          deleteItem();
+        }}
       />
     </>
   )
