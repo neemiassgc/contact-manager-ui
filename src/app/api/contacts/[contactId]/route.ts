@@ -17,12 +17,13 @@ export async function PATCH(request: Request, { params }: { params: { contactId:
     const settings: object = {
       method: "PATCH",
       headers: {
-        contentType: "application/json"
+        ["Content-Type"]: "application/json"
       },
-      body: request.body
+      body: request.body,
+      duplex: "half"
     }
     const fetchRequest = await authorizedFetch(resourceServerUri+params.contactId, settings);
-    return new NextResponse(request.body, { status: fetchRequest.status });
+    return new NextResponse(fetchRequest.body, { status: fetchRequest.status });
   });
 }
 
