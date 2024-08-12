@@ -1,4 +1,4 @@
-import { Address, Contact, ErrorType, ShortContact, ViolationError } from "./types";
+import { Address, AddressType, Contact, ErrorType, ShortContact, StringType, ViolationError } from "./types";
 
 export function toKeys(input: object): string[] {
   const keys: string[] = [];
@@ -97,4 +97,12 @@ export function getFlagEmoji(countryCode: string): string {
 
 export function formatPhoneValue(oldValue: string, newValue: string): string {
   return /\D+/.test(newValue) ? oldValue : newValue;
+}
+
+export function removeProperty(object: StringType | AddressType, propertyName: string): object {
+  const outputObject: StringType | AddressType = {};
+  for (const key of toKeys(object))
+    if (key !== propertyName) outputObject[key] = object[key];
+  return outputObject;
+}
 }
