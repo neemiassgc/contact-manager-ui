@@ -35,11 +35,11 @@ async function getter<T>(url: string): Promise<T> {
 }
 
 export async function deleteContact(contactId: string): Promise<void> {
-  requester(getUrl("/api/contacts/"+contactId), "DELETE");
+  await requester(getUrl("/api/contacts/"+contactId), "DELETE");
 }
 
 export async function patcher(contactId: string, body: object): Promise<void> {
-  requester(getUrl("/api/contacts/"+contactId), "PATCH", body);
+  await requester(getUrl("/api/contacts/"+contactId), "PATCH", body);
 }
 
 async function requester(url: string, method: "POST" | "PATCH" | "DELETE" | "GET", body?: object): Promise<Response> {
