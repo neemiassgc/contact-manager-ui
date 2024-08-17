@@ -18,9 +18,10 @@ import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
 import { Modal, SelectCountry, SplitButton } from "../components";
 import { patcher } from "@/app/lib/net";
+import { useSelectedContact } from "@/app/lib/hooks";
 
 export default function Page() {
-  const selectedContact: Contact = getSelectedContact() as Contact;
+  const { contact: selectedContact, reload } = useSelectedContact();
 
   return (
     <Box className="w-full sm:w-9/12 md:w-10/12 xl:w-8/12 mx-auto mt-10 mb-5">
@@ -28,13 +29,18 @@ export default function Page() {
         <Link href="/">Home</Link>
         <Typography>Profile</Typography>
       </Breadcrumbs>
-      <Header contactName={selectedContact.name}/>
-      <Body contact={selectedContact}/>
+      {
+        !selectedContact ? "Waiting...." :
+        <>
+          <Header contactName={selectedContact.name}/>
+          <Body contact={selectedContact} reload={reload}/>
+        </> 
+      }
     </Box>
   )
 }
 
-function Header(props: {contactName: string}) {
+function Header(props: {contactName?: string}) {
   const [editing, setEditing] = useState(false);
 
   return (
@@ -45,9 +51,9 @@ function Header(props: {contactName: string}) {
           ...paint(bg("primary"), text("on-primary"))
         }}
         src="/flag.svg"
-      >{props.contactName[0]}</Avatar>
+      >{props?.contactName ? props.contactName[0] : ""}</Avatar>
       <Box className="ml-5 mt-1">
-        <span style={paint(text("on-surface"))}>{props.contactName}</span>
+        <span style={paint(text("on-surface"))}>{props?.contactName}</span>
         <Tooltip title="Edit Contact Name" arrow>
           <IconButton onClick={() => setEditing(true)}>
             <EditNoteRoundedIcon sx={paint(text("on-surface"))} fontSize="medium"/>
@@ -74,7 +80,7 @@ function Header(props: {contactName: string}) {
   )
 }
 
-function Body(props: { contact: Contact }) {
+function Body(props: { contact: Contact, reload: (newContact: Contact) => void }) {
   const [modal, setModal] = useState({ phoneModal: false, emailModal: false, addressModal: false })
 
   const openModal: (prop: string) => Run = prop =>
@@ -107,6 +113,7 @@ function Body(props: { contact: Contact }) {
             titleIcon={<PhoneIcon className="mr-2"/>}
             cardTitle="Phone Numbers"
             content={props.contact.phoneNumbers}
+            reload={props.reload}
           />
           <PhoneNumberPromptModal
             isLoading={false}
@@ -121,6 +128,7 @@ function Body(props: { contact: Contact }) {
             titleIcon={<AlternateEmailIcon className="mr-2"/>}
             cardTitle="Emails"
             content={props.contact.emails}
+            reload={props.reload}
           />
           <EmailPromptModal
             isLoading={false}
@@ -136,6 +144,7 @@ function Body(props: { contact: Contact }) {
           titleIcon={<DomainIcon className="mr-2"/>}
           cardTitle="Addresses"
           content={props.contact.addresses}
+          reload={props.reload}
         />
         <AddressPromptModal
           isLoading={false}
@@ -152,7 +161,8 @@ function Body(props: { contact: Contact }) {
 function ListCard(props: {
   titleIcon: React.ReactElement,
   cardTitle: string,
-  content: StringType | AddressType
+  content: StringType | AddressType,
+  reload: (newContact: Contact) => void
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -166,7 +176,8 @@ function ListCard(props: {
         [toCamelCase(props.cardTitle)]: removeProperty(props.content, selectedItem)
       }
     )
-      .finally(() => setOpen(false))
+    .then(contact => props.reload(contact))
+    .finally(() => setOpen(false))
   }
 
   return (
@@ -235,9 +246,7 @@ function ListCard(props: {
         open={open}
         title={"Delete '"+selectedItem+"'?"}
         handleClose={() => setOpen(false)}
-        handleAccept={() => {
-          deleteItem();
-        }}
+        handleAccept={deleteItem}
       />
     </>
   )

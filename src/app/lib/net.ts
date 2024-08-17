@@ -38,8 +38,8 @@ export async function deleteContact(contactId: string): Promise<void> {
   await requester(getUrl("/api/contacts/"+contactId), "DELETE");
 }
 
-export async function patcher(contactId: string, body: object): Promise<void> {
-  await requester(getUrl("/api/contacts/"+contactId), "PATCH", body);
+export async function patcher(contactId: string, body: object): Promise<Contact> {
+  return await (await requester(getUrl("/api/contacts/"+contactId), "PATCH", body)).json();
 }
 
 async function requester(url: string, method: "POST" | "PATCH" | "DELETE" | "GET", body?: object): Promise<Response> {
