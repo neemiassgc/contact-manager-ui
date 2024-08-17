@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchAllContacts } from "./net"
 import { Contact, ErrorType } from "./types";
-import { getLocalContacts, saveLocalContacts } from "./storage";
+import { getLocalContacts, getSelectedContact, saveLocalContacts, setSelectedContact } from "./storage";
 import { loginIfTokenIsExpired } from "./misc";
 
 export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoading: boolean, reload: () => void } {
@@ -35,4 +35,22 @@ export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoadin
   useEffect(load, []);
   
   return {data, error, isLoading, reload: load};
+}
+
+export function useSelectedContact() {
+  const [contact, setContact] = useState<Contact | null>(null);
+
+  const load = (newContact?: Contact) => {
+    if (newContact) {
+      setContact(newContact);
+      setSelectedContact(newContact);
+      return;
+    }
+
+    setContact(getSelectedContact());
+  }
+
+  useEffect(load, []);
+
+  return { contact, reload: load };
 }
