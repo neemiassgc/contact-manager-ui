@@ -11,14 +11,15 @@ import DomainIcon from '@mui/icons-material/Domain';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
-import { formatAddress, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
+import { convertNetworkErrorMessage, formatAddress, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
 import { Contact, AddressType, Run, StringType, ModalType } from "../../lib/types";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
 import { Modal, SelectCountry, SplitButton } from "../components";
 import { patcher } from "@/app/lib/net";
 import { useSelectedContact } from "@/app/lib/hooks";
+import AlertContext from "@/app/lib/AlertContext";
 
 export default function Page() {
   const { contact: selectedContact, reload } = useSelectedContact();
@@ -167,6 +168,7 @@ function ListCard(props: {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
+  const showAlert = useContext(AlertContext);
 
   const deleteItem = () => {
     setLoading(true);
@@ -176,7 +178,11 @@ function ListCard(props: {
         [toCamelCase(props.cardTitle)]: removeProperty(props.content, selectedItem)
       }
     )
-    .then(contact => props.reload(contact))
+    .then(contact => {
+      showAlert(`'${selectedItem}' was successfully deleted!`);
+      props.reload(contact)
+    })
+    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
     .finally(() => setOpen(false))
   }
 
