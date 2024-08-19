@@ -1,3 +1,4 @@
+import { getContactById } from "./misc";
 import { Contact } from "./types"
 
 export function saveLocalContacts(contacts: Contact[]) {
@@ -15,13 +16,15 @@ export function clearLocalContacts(): void {
 }
 
 export function getSelectedContact(): Contact | null {
-	const selectedContact: string | null = localStorage.getItem("selectedContact");
-	if (selectedContact) return JSON.parse(selectedContact);
+	const selectedContactId: string | null = localStorage.getItem("selectedContact");
+	const localContacts = getLocalContacts();
+	if (selectedContactId && localContacts)
+		return getContactById(localContacts, selectedContactId);
 	return null;
 }
 
-export function setSelectedContact(contact: Contact) {
-  localStorage.setItem("selectedContact", JSON.stringify(contact));
+export function setSelectedContact(contactId: string): void {
+  localStorage.setItem("selectedContact", contactId);
 }
 
 export function addUnseenContactName(contactName: string) {
