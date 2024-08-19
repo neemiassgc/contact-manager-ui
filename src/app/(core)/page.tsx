@@ -234,7 +234,7 @@ function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: S
                   </IconButton>
                 }>
                   <ListItemButton onClick={() => {
-                    setSelectedContact(contact);
+                    setSelectedContact(contact.id);
                     removeUnseenContactName(contact.name);
                     router.push("/profile")
                   }}>

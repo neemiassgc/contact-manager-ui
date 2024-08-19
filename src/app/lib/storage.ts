@@ -1,4 +1,4 @@
-import { getContactById } from "./misc";
+import { getContactById, updateContactInList } from "./misc";
 import { Contact } from "./types"
 
 export function saveLocalContacts(contacts: Contact[]) {
@@ -54,4 +54,12 @@ function setUnseenContactNames(unseenContactNames: string[]) {
 
 function removeItemFromArray(array: string[], item: string) {
 	return array.filter(value => value !== item);
+}
+
+export function updateLocalContact(contact: Contact): void {
+	const localContacts = getLocalContacts();
+	if (localContacts) {
+		const updatedContactList = updateContactInList(localContacts, contact);
+		if (updatedContactList) saveLocalContacts(updatedContactList);
+	}
 }
