@@ -1,37 +1,31 @@
 "use client"
 import {
   InputAdornment, Box, Pagination,
-  IconButton, Dialog, DialogTitle, Typography, DialogActions,
-  DialogContent, TextField, Divider, CircularProgress,
-  Snackbar, Alert,
+  IconButton, TextField, Divider,
 } from '@mui/material';
 import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import {
   addUnseenContactName, clearLocalContacts, getAllUnseenContactNames,
   removeUnseenContactName, setSelectedContact
 } from '../lib/storage';
-import { Contact, Run, ShortContact, ViolationError, Severity, ShowAlertFunc } from "../lib/types"
+import { Contact, Run, ShortContact, ViolationError } from "../lib/types"
 import { useRouter } from "next/navigation"
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { paint, bg, border, text, textFieldTheme } from '../lib/colors';
 import { convertNetworkErrorMessage, filterByName, formatPhoneValue, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
 import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Modal, SelectCountry } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
+import AlertContext from '../lib/AlertContext';
 
 export default function Home() {
   const { user } = useUser();
   const { data, error, isLoading, reload } = useAllContacts();
-  const [snack, setSnack] = useState<{ open: boolean, severity: Severity, msg: string}>({
-    open: false, severity: "success", msg: "success"
-  });
 
   useEffect(() => {
     if (error) {
@@ -41,34 +35,20 @@ export default function Home() {
     }
   }, [error, user, reload]);
 
-  const hideAlert = () => setSnack({ ...snack, open: false });
-
-  const showAlert: ShowAlertFunc = (msg, severity = "success") => setSnack({ open: true, severity, msg });
-
   return (
     <>
       <main className="mt-16 w-full p-1">
         {
           (error && isUserNotFound(error)) || isLoading ? <ContactBoardLoading/>
           : error ? <ErrorScreen label={error.message}/> :
-          <ContactListBoard showAlert={showAlert} reloadContacts={reload} contacts={data as Contact[]}/>
+          <ContactListBoard reloadContacts={reload} contacts={data as Contact[]}/>
         }
-        <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "right"} }
-          open={snack.open}
-          autoHideDuration={5000}
-          onClose={hideAlert}
-        >
-        <Alert onClose={hideAlert} className="w-full" variant="filled" severity={snack.severity}>
-          {snack.msg}
-        </Alert>
-      </Snackbar>
       </main>
     </>
   );
 }
 
-function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, showAlert: ShowAlertFunc }) {
+function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run }) {
   const [searchText, setSearchText] = useState("");
   
   const filteredContacts: Contact[] = filterByName(props.contacts, searchText);
@@ -80,7 +60,6 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, sho
   return (
     <Box className="p-6 w-full sm:w-9/12 md:w-8/12 lg:w-1/2 xl:w-5/12 mx-auto border rounded-xl" sx={bg("surface-container-high")}>
       <ContactListHeader
-        showAlert={props.showAlert}
         reloadContacts={props.reloadContacts}
         textFieldOnChange={handleSearchText}
         textFieldValue={searchText}
@@ -89,7 +68,7 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run, sho
         filteredContacts.length > 0 ?
         <PageableContactList
           reloadContacts={props.reloadContacts}
-          showAlert={props.showAlert}
+
           contacts={filteredContacts}
         /> :
         <>
@@ -108,7 +87,6 @@ function ContactListHeader(props: {
   textFieldValue: string,
   textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   reloadContacts: Run,
-  showAlert: ShowAlertFunc
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -150,7 +128,6 @@ function ContactListHeader(props: {
       </Box>
       <ContactCreationModal
         reloadContacts={props.reloadContacts}
-        showAlert={props.showAlert}
         open={openModal}
         handleClose={() => setOpenModal(false)}
       />
@@ -158,7 +135,7 @@ function ContactListHeader(props: {
   )
 }
 
-function PageableContactList(props: { contacts: Contact[], reloadContacts: Run, showAlert: ShowAlertFunc }) {
+function PageableContactList(props: { contacts: Contact[], reloadContacts: Run }) {
   const [page, setPage] = useState(1);
 
   const handlePagination: (event: React.ChangeEvent<unknown>, value: number) => void = (_, value) => {
@@ -172,7 +149,6 @@ function PageableContactList(props: { contacts: Contact[], reloadContacts: Run, 
     <>
       <ContactList
         reloadContacts={props.reloadContacts}
-        showAlert={props.showAlert}
         data={getPaginatedData(countPerPage, page, props.contacts)}
       />
       {
@@ -196,10 +172,11 @@ function PageableContactList(props: { contacts: Contact[], reloadContacts: Run, 
   )
 }
 
-function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: ShowAlertFunc}) {
+function ContactList(props: { data: Contact[], reloadContacts: Run}) {
   const router = useRouter();
   const [consentModal, setConsentModal] = useState({loading: false, open: false});
   const [contactData, setContactData] = useState({ name: "", id: ""});
+  const showAlert = useContext(AlertContext);
 
   const unseenContactNames: string[] = getAllUnseenContactNames();
 
@@ -210,10 +187,10 @@ function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: S
         setConsentModal({loading: false, open: false});
         clearLocalContacts();
         props.reloadContacts();
-        props.showAlert("Contact deleted successfully!");
+        showAlert("Contact deleted successfully!");
       })
       .catch(error => {
-        props.showAlert(convertNetworkErrorMessage(error.message), "error");
+        showAlert(convertNetworkErrorMessage(error.message), "error");
       })
       .finally(() => setConsentModal({open: false, loading: false}));
   }
@@ -274,7 +251,6 @@ function ContactList(props: { data: Contact[], reloadContacts: Run, showAlert: S
 function ContactCreationModal(props: {
   open: boolean,
   handleClose: Run,
-  showAlert: ShowAlertFunc,
   reloadContacts: Run
 }) {
   const [textFieldData, setTextFieldData] = useState<ShortContact & {countryCode: string}>(
@@ -282,6 +258,8 @@ function ContactCreationModal(props: {
   )
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
+  const showAlert = useContext(AlertContext);
+
 
   const setName = (event: ChangeEvent<HTMLInputElement>) =>
     setTextFieldData({...textFieldData, name: event.target.value});
@@ -307,7 +285,7 @@ function ContactCreationModal(props: {
     .then(() => {
       closeAndReset();
       clearLocalContacts()
-      props.showAlert("Successfully created!");
+      showAlert("Successfully created!");
       addUnseenContactName(textFieldData.name);
       props.reloadContacts();
     })
@@ -316,7 +294,7 @@ function ContactCreationModal(props: {
         setError(error);
         return;
       }
-      props.showAlert(convertNetworkErrorMessage(error.message), "error");
+      showAlert(convertNetworkErrorMessage(error.message), "error");
       closeAndReset();
     })
     .finally(() => setIsLoading(false));

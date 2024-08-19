@@ -1,5 +1,5 @@
 import { UserProvider } from "@auth0/nextjs-auth0/client";
-import { ScreenLoading } from "./components"
+import { NotifiablePage, ScreenLoading } from "./components"
 
 export default function Layout({
   children,
@@ -8,7 +8,9 @@ export default function Layout({
 }>) {
   return (
     <UserProvider>
-      <ScreenLoading>{children}</ScreenLoading>
+      <ScreenLoading>
+        <NotifiablePage>{children}</NotifiablePage>
+      </ScreenLoading>
     </UserProvider>
   )
 }

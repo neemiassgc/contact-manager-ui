@@ -3,7 +3,8 @@ import {
   Avatar, Badge, Box, Button, ButtonGroup,
   ClickAwayListener, Divider, FormControl, Grow, IconButton, InputLabel, MenuItem,
   MenuList, Paper, Popper, Skeleton, Tooltip, Typography, Select,
-  Dialog, DialogTitle, DialogContent, DialogActions
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  Snackbar, Alert
 } from "@mui/material";
 import { bg, border, ColorRole, paint, text } from "../lib/colors";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
@@ -18,8 +19,9 @@ import { CircularProgress } from "@mui/material";
 import { getFlagEmoji, iterator } from "../lib/misc";
 import { clearLocalContacts, removeAllUnseenContactNames } from "../lib/storage";
 import { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
-import { CountryCode, ModalType, Run } from "../lib/types";
+import { CountryCode, ModalType, Run, Severity, ShowAlertFunc } from "../lib/types";
 import { getCountryCodes } from "../lib/net";
+import AlertContext from "../lib/AlertContext";
 
 export function Loading({ color = "primary" }: { color?: "warning" | "primary" }) {
   return <CircularProgress color={color} className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
@@ -119,6 +121,32 @@ export function ScreenLoading({ children }: { children: React.ReactNode }) {
         </>
       }
     </>
+  )
+}
+
+export function NotifiablePage({ children }: { children: React.ReactNode }) {
+  const [snack, setSnack] = useState<{ open: boolean, severity: Severity, msg: string}>({
+    open: false, severity: "success", msg: "success"
+  });
+
+  const hideAlert = () => setSnack({ ...snack, open: false });
+
+  const showAlert: ShowAlertFunc = (msg, severity = "success") => setSnack({ open: true, severity, msg });
+
+  return (
+    <AlertContext.Provider value={showAlert}>
+      {children}
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "right"} }
+        open={snack.open}
+        autoHideDuration={5000}
+        onClose={hideAlert}
+      >
+        <Alert onClose={hideAlert} className="w-full" variant="filled" severity={snack.severity}>
+          {snack.msg}
+        </Alert>
+      </Snackbar>
+    </AlertContext.Provider>
   )
 }
 
