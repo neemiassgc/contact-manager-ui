@@ -114,3 +114,13 @@ export function toCamelCase(input: string): string {
       word.toLowerCase().replace(/^./, word.charAt(0).toUpperCase())
   ).join("");
 }
+
+export function getContactById(contactList: Contact[], contactId: string): Contact | null {
+  return contactList.find(c => c.id === contactId) ?? null;
+}
+
+export function updateContactInList(contactList: Contact[], contact: Contact): Contact[] | null {
+  const contactPosition: number = contactList.findIndex(c => c.id === contact.id);
+  if (contactPosition !== -1) return contactList.with(contactPosition, contact);
+  return null;
+}
