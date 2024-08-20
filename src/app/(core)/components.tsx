@@ -344,7 +344,7 @@ export function Modal({ mini = false, ...props }: ModalType & { children?: React
         </>
       }
       <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
-        <Box className="w-full flex justify-center gap-3">
+        <Box className="w-full flex justify-center gap-3 overflow-hidden">
           {
             props.isLoading ? <CircularProgress size="3rem"/> :
             <>

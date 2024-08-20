@@ -33,7 +33,7 @@ export default function Page() {
       {
         !selectedContact ? "Waiting...." :
         <>
-          <Header contactName={selectedContact.name}/>
+          <Header contact={selectedContact} reload={reload}/>
           <Body contact={selectedContact} reload={reload}/>
         </> 
       }
@@ -41,8 +41,25 @@ export default function Page() {
   )
 }
 
-function Header(props: {contactName?: string}) {
-  const [editing, setEditing] = useState(false);
+function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
+  const [open, setOpen] = useState(false);
+  const [textFieldValue, setTextFieldValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const showAlert = useContext(AlertContext);
+
+  const updateContactName = () => {
+    setIsLoading(true);
+    patcher(props.contact.id, { name: textFieldValue})
+      .then(updatedContact => {
+        showAlert("Contact name was updated successfully!");
+        props.reload(updatedContact);
+      })
+      .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
+      .finally(() => {
+        setOpen(false)
+        setTextFieldValue("");
+      })
+  }
 
   return (
     <Box className="w-full flex flex-col justify-center items-center">
@@ -52,24 +69,30 @@ function Header(props: {contactName?: string}) {
           ...paint(bg("primary"), text("on-primary"))
         }}
         src="/flag.svg"
-      >{props?.contactName ? props.contactName[0] : ""}</Avatar>
+      >{props.contact.name[0]}</Avatar>
       <Box className="ml-5 mt-1">
-        <span style={paint(text("on-surface"))}>{props?.contactName}</span>
+        <span style={paint(text("on-surface"))}>{props.contact.name}</span>
         <Tooltip title="Edit Contact Name" arrow>
-          <IconButton onClick={() => setEditing(true)}>
+          <IconButton onClick={() => {
+            setOpen(true);
+            setIsLoading(false);
+          }}>
             <EditNoteRoundedIcon sx={paint(text("on-surface"))} fontSize="medium"/>
           </IconButton>
         </Tooltip>
       </Box>
       <Modal
-        isLoading={false}
-        open={editing}
+        isLoading={isLoading}
+        open={open}
         title="Edit the name of the contact"
-        handleClose={() => setEditing(false)}
-        handleAccept={()=>{}}
+        handleClose={() => setOpen(false)}
+        handleAccept={updateContactName}
       >
          <TextField
           {...textFieldTheme}
+          value={textFieldValue}
+          disabled={isLoading}
+          onChange={event => setTextFieldValue(event.target.value)}
           className="w-full"
           label="New name"
           placeholder="New name"
