@@ -288,9 +288,8 @@ export function DefaultButton({ title, onClick, colorVariant = "primary", childr
   )
 }
 
-export function SelectCountry(props: { onChange: (value: string) => void, className?: string, styles: any }) {
+export function SelectCountry(props: { value: string, onChange: (value: string) => void, className?: string, styles: any }) {
   const [data, setData] = useState<CountryCode[]>([]);
-  const [value, setValue] = useState("+1");
 
   useEffect(() => {
     getCountryCodes()
@@ -303,13 +302,10 @@ export function SelectCountry(props: { onChange: (value: string) => void, classN
       <Select
         sx={text("tertiary")}
         labelId="input-label"
-        value={value}
-        onChange={event => {
-          setValue(event.target.value);
-          props.onChange(event.target.value);
-        }}
+        value={props.value}
+        onChange={event => props.onChange(event.target.value)}
         label="Country"
-        renderValue={_ => value}
+        renderValue={_ => props.value}
       >
         {
           data.sort((a, b) => a.name.localeCompare(b.name)).map((countryCode, key) =>

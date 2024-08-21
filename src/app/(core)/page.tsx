@@ -344,6 +344,7 @@ function ContactCreationModal(props: {
       <Box className="w-full pt-1 flex gap-2">
         <SelectCountry
           className="basis-24"
+          value={textFieldData.countryCode}
           onChange={value => setTextFieldData({...textFieldData, countryCode: value})}
           styles={textFieldTheme}
         />
