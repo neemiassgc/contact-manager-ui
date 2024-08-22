@@ -288,7 +288,14 @@ export function DefaultButton({ title, onClick, colorVariant = "primary", childr
   )
 }
 
-export function SelectCountry(props: { value: string, onChange: (value: string) => void, className?: string, styles: any }) {
+export function SelectCountry({disabled = false, ...props}: {
+  value: string,
+  onChange: (value: string) => void,
+  className?: string,
+  styles: any,
+  disabled?: boolean
+
+}) {
   const [data, setData] = useState<CountryCode[]>([]);
 
   useEffect(() => {
@@ -300,6 +307,7 @@ export function SelectCountry(props: { value: string, onChange: (value: string) 
     <FormControl {...props.styles} className={props.className} size="small">
       <InputLabel id="input-label">country</InputLabel>
       <Select
+        disabled={disabled}
         sx={text("tertiary")}
         labelId="input-label"
         value={props.value}

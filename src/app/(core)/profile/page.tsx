@@ -337,8 +337,10 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           size="small"
           variant="outlined"
           className="basis-full sm:basis-3/12 flex-auto"
+          disabled={isLoading}
         />
         <SelectCountry
+          disabled={isLoading}
           value={fields.countryCode}
           className="basis-24"
           onChange={value => setFields({...fields, countryCode: value})}
@@ -353,6 +355,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           placeholder="phone"
           size="small"
           variant="outlined"
+          disabled={isLoading}
         />
       </Box>
     </Modal>
@@ -393,6 +396,7 @@ function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact,
           fieldNames.map((field, key) => 
             <TextField
               {...textFieldTheme}
+              disabled={isLoading}
               key={key}
               variant="outlined"
               size="small"
