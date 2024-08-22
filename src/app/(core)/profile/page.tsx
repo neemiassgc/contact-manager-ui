@@ -155,11 +155,11 @@ function Body(props: { contact: Contact, reload: (newContact: Contact) => void }
             reload={props.reload}
           />
           <EmailPromptModal
-            isLoading={false}
+            key={modal.phoneModal+""}
+            contact={props.contact}
+            reload={props.reload}
             open={modal.emailModal}
-            title={"Create New Email"}
-            handleAccept={() => {}}
-            handleClose={closeModal("emailModal")}
+            onClose={closeModal("emailModal")}
           />
         </Box>
       </Box>
@@ -359,16 +359,48 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
   )
 }
 
-function EmailPromptModal(props: ModalType) {
+function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
+  const [email, setEmail] = useState<StringType>({label: "", value: ""});
+  const [isLoading, setIsLoading] = useState(false);
+  const showAlert = useContext(AlertContext);
+
+  const createNewEmail = () => {
+    setIsLoading(true);
+    patcher(props.contact.id, {
+        emails: {
+          ...props.contact.emails,
+          [email.label]: email.value
+        }
+    })
+    .then(updatedContact => {
+      showAlert("Email added successfully!");
+      props.reload(updatedContact);
+    })
+    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
+    .finally(() => props.onClose())
+  }
 
   const fieldNames: string[] = ["label", "value"];
-  
   return (
-    <Modal {...props}>
+    <Modal
+      handleAccept={createNewEmail}
+      handleClose={props.onClose}
+      title="Create New Email"
+      open={props.open}
+      isLoading={isLoading}>
       <Box className="flex flex-col gap-2 w-full p-1 h-full">
         {
-          fieldNames.map((value, key) => 
-            <TextField key={key} {...textFieldTheme} variant="outlined" size="small" label={value} placeholder={value}/>
+          fieldNames.map((field, key) => 
+            <TextField
+              {...textFieldTheme}
+              key={key}
+              variant="outlined"
+              size="small"
+              label={field}
+              placeholder={field}
+              value={email[field]}
+              onChange={event => setEmail({...email, [field]: event.target.value})}
+            />
           )
         }
       </Box>
