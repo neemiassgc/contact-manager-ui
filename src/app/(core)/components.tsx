@@ -298,13 +298,13 @@ export function SelectCountry(props: { value: string, onChange: (value: string) 
 
   return (
     <FormControl {...props.styles} className={props.className} size="small">
-      <InputLabel id="input-label">Country</InputLabel>
+      <InputLabel id="input-label">country</InputLabel>
       <Select
         sx={text("tertiary")}
         labelId="input-label"
         value={props.value}
         onChange={event => props.onChange(event.target.value)}
-        label="Country"
+        label="country"
         renderValue={_ => props.value}
       >
         {

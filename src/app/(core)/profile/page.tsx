@@ -140,11 +140,11 @@ function Body(props: { contact: Contact, reload: (newContact: Contact) => void }
             reload={props.reload}
           />
           <PhoneNumberPromptModal
-            isLoading={false}
+            key={modal.phoneModal+""}
+            contact={props.contact}
+            reload={props.reload}
             open={modal.phoneModal}
-            title={"Create New Phone Number"}
-            handleAccept={() => {}}
-            handleClose={closeModal("phoneModal")}
+            onClose={closeModal("phoneModal")}
           />
         </Box>
         <Box className="flex-1 rounded-xl border">
@@ -297,12 +297,41 @@ function AddressPromptModal(props: ModalType) {
   )
 }
 
-function PhoneNumberPromptModal(props: ModalType) {
+function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
+  const [fields, setFields] = useState(
+    { phoneLabel: "", phoneValue: "", countryCode: "" }
+  )
+  const [isLoading, setIsLoading] = useState(false);
+  const showAlert = useContext(AlertContext);
+
+  const createNewPhoneNumber = () => {
+    setIsLoading(true);
+    patcher(props.contact.id, {
+      phoneNumbers: {
+        ...props.contact.phoneNumbers,
+        [fields.phoneLabel]: fields.countryCode + fields.phoneValue
+      }
+    })
+    .then(updatedContact => {
+      showAlert("Phone number added successfully!");
+      props.reload(updatedContact);
+    })
+    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
+    .finally(() => props.onClose())
+  }
+
   return (
-    <Modal {...props}>
+    <Modal title="Create New Phone Number"
+      isLoading={isLoading}
+      open={props.open}
+      handleClose={props.onClose}
+      handleAccept={createNewPhoneNumber}
+    >
       <Box className="flex gap-2 mb-1 flex-wrap">
         <TextField
           {...textFieldTheme}
+          value={fields.phoneLabel}
+          onChange={event => setFields({...fields, phoneLabel: event.target.value})}
           label="phone label"
           placeholder="phone label"
           size="small"
@@ -310,12 +339,15 @@ function PhoneNumberPromptModal(props: ModalType) {
           className="basis-full sm:basis-3/12 flex-auto"
         />
         <SelectCountry
+          value={fields.countryCode}
           className="basis-24"
-          onChange={() => {}}
+          onChange={value => setFields({...fields, countryCode: value})}
           styles={textFieldTheme}
         />
         <TextField
           {...textFieldTheme}
+          value={fields.phoneValue}
+          onChange={event => setFields({...fields, phoneValue: event.target.value})}
           className="basis-1/2 flex-grow"
           label="phone"
           placeholder="phone"
