@@ -171,11 +171,11 @@ function Body(props: { contact: Contact, reload: (newContact: Contact) => void }
           reload={props.reload}
         />
         <AddressPromptModal
-          isLoading={false}
+          key={modal.addressModal+""}
+          reload={props.reload}
+          contact={props.contact}
           open={modal.addressModal}
-          title={"Create New Address"}
-          handleAccept={() => {}}
-          handleClose={closeModal("addressModal")}
+          onClose={closeModal("addressModal")}
         />
       </Box>
     </Box>
@@ -281,17 +281,53 @@ function ListCard(props: {
   )
 }
 
-function AddressPromptModal(props: ModalType) {
-  const fieldNames: string[] = ["street", "country", "city", "state", "zipcode"];
+function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
+  const [fields, setFields] = useState<StringType>({
+    label: "", street: "", country: "", city: "", state: "", zipcode: ""
+  })
+  const [isLoading, setIsLoading] = useState(false);
+  const showAlert = useContext(AlertContext);
+
+  const createNewAddress = () => {
+    setIsLoading(true);
+    patcher(props.contact.id, {
+      addresses: {
+        ...props.contact.addresses,
+        [fields.label]: {...fields, label: undefined}
+      }
+    })
+    .then(updatedContact => {
+      showAlert("Address added successfully!");
+      props.reload(updatedContact);
+    })
+    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
+    .finally(() => props.onClose())
+  }
+
+  const fieldNames: string[] = ["label", "street", "country", "city", "state", "zipcode"];
   return (
-    <Modal {...props}>
+    <Modal
+      title="Create New Address"
+      isLoading={isLoading}
+      open={props.open}
+      handleClose={props.onClose}
+      handleAccept={createNewAddress}
+    >
       <Box className="flex flex-col gap-2 w-full p-1 h-full">
-        <>
-          {
-            fieldNames.map((fieldName: string, index: number) =>
-              <TextField {...textFieldTheme}  key={index} variant="outlined" size="small" label={fieldName} placeholder={fieldName}/>)
-          }
-        </>
+        {
+          fieldNames.map((fieldName: string, index: number) =>
+            <TextField
+              {...textFieldTheme} 
+              disabled={isLoading}
+              key={index}
+              variant="outlined"
+              size="small"
+              label={fieldName}
+              placeholder={fieldName}
+              value={fields[fieldName]}
+              onChange={event => setFields({...fields, [fieldName]: event.target.value})}
+            />)
+        }
       </Box>
     </Modal>
   )
