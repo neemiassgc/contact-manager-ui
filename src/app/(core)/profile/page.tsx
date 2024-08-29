@@ -18,7 +18,7 @@ import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
 import { Modal, SelectCountry, SplitButton } from "../components";
 import { patcher } from "@/app/lib/net";
-import { useSelectedContact } from "@/app/lib/hooks";
+import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 import AlertContext from "@/app/lib/AlertContext";
 
 export default function Page() {
@@ -139,13 +139,15 @@ function Body(props: { contact: Contact, reload: (newContact: Contact) => void }
             content={props.contact.phoneNumbers}
             reload={props.reload}
           />
-          <PhoneNumberPromptModal
-            key={modal.phoneModal+""}
-            contact={props.contact}
-            reload={props.reload}
-            open={modal.phoneModal}
-            onClose={closeModal("phoneModal")}
-          />
+          {
+            modal.phoneModal &&
+            <PhoneNumberPromptModal
+              contact={props.contact}
+              reload={props.reload}
+              open={true}
+              onClose={closeModal("phoneModal")}
+            />
+          }
         </Box>
         <Box className="flex-1 rounded-xl border">
           <ListCard
@@ -154,13 +156,15 @@ function Body(props: { contact: Contact, reload: (newContact: Contact) => void }
             content={props.contact.emails}
             reload={props.reload}
           />
-          <EmailPromptModal
-            key={modal.phoneModal+""}
-            contact={props.contact}
-            reload={props.reload}
-            open={modal.emailModal}
-            onClose={closeModal("emailModal")}
-          />
+          {
+            modal.emailModal &&
+            <EmailPromptModal
+              contact={props.contact}
+              reload={props.reload}
+              open={true}
+              onClose={closeModal("emailModal")}
+            />
+          }
         </Box>
       </Box>
       <Box className="w-full md:w-5/6 mx-auto mt-10 rounded-xl border">
@@ -170,13 +174,15 @@ function Body(props: { contact: Contact, reload: (newContact: Contact) => void }
           content={props.contact.addresses}
           reload={props.reload}
         />
-        <AddressPromptModal
-          key={modal.addressModal+""}
-          reload={props.reload}
-          contact={props.contact}
-          open={modal.addressModal}
-          onClose={closeModal("addressModal")}
-        />
+        {
+          modal.addressModal &&
+          <AddressPromptModal
+            reload={props.reload}
+            contact={props.contact}
+            open={true}
+            onClose={closeModal("addressModal")}
+          />
+        }
       </Box>
     </Box>
   )
@@ -189,25 +195,8 @@ function ListCard(props: {
   reload: (newContact: Contact) => void
 }) {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
-  const showAlert = useContext(AlertContext);
-
-  const deleteItem = () => {
-    setLoading(true);
-    patcher(
-      (getSelectedContact() as Contact).id,
-      {
-        [toCamelCase(props.cardTitle)]: removeProperty(props.content, selectedItem)
-      }
-    )
-    .then(contact => {
-      showAlert(`'${selectedItem}' was successfully deleted!`);
-      props.reload(contact)
-    })
-    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
-    .finally(() => setOpen(false))
-  }
+  const {isLoading, modify, stopLoading} = useContactModifier(props.reload, () => setOpen(false));
 
   return (
     <>
@@ -236,7 +225,7 @@ function ListCard(props: {
                     secondaryAction={
                       <IconButton onClick={() => {
                         setOpen(true);
-                        setLoading(false);
+                        stopLoading();
                         setSelectedItem(key);
                       }}>
                         <ClearIcon sx={text("on-surface")}/>
@@ -271,11 +260,15 @@ function ListCard(props: {
       </Box>
       <Modal
         mini
-        isLoading={loading}
+        isLoading={isLoading}
         open={open}
         title={"Delete '"+selectedItem+"'?"}
         handleClose={() => setOpen(false)}
-        handleAccept={deleteItem}
+        handleAccept={
+          modify((getSelectedContact() as Contact).id, {
+            [toCamelCase(props.cardTitle)]: removeProperty(props.content, selectedItem)
+          }, `'${selectedItem}' was successfully deleted!`)
+        }
       />
     </>
   )
@@ -285,24 +278,7 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
   const [fields, setFields] = useState<StringType>({
     label: "", street: "", country: "", city: "", state: "", zipcode: ""
   })
-  const [isLoading, setIsLoading] = useState(false);
-  const showAlert = useContext(AlertContext);
-
-  const createNewAddress = () => {
-    setIsLoading(true);
-    patcher(props.contact.id, {
-      addresses: {
-        ...props.contact.addresses,
-        [fields.label]: {...fields, label: undefined}
-      }
-    })
-    .then(updatedContact => {
-      showAlert("Address added successfully!");
-      props.reload(updatedContact);
-    })
-    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
-    .finally(() => props.onClose())
-  }
+  const {isLoading, modify} = useContactModifier(props.reload, props.onClose);
 
   const fieldNames: string[] = ["label", "street", "country", "city", "state", "zipcode"];
   return (
@@ -311,7 +287,14 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
       isLoading={isLoading}
       open={props.open}
       handleClose={props.onClose}
-      handleAccept={createNewAddress}
+      handleAccept={
+        modify(props.contact.id, {
+          addresses: {
+            ...props.contact.addresses,
+            [fields.label]: {...fields, label: undefined}
+          }
+        }, "Address added successfully!")
+      }
     >
       <Box className="flex flex-col gap-2 w-full p-1 h-full">
         {
@@ -337,31 +320,21 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
   const [fields, setFields] = useState(
     { phoneLabel: "", phoneValue: "", countryCode: "" }
   )
-  const [isLoading, setIsLoading] = useState(false);
-  const showAlert = useContext(AlertContext);
-
-  const createNewPhoneNumber = () => {
-    setIsLoading(true);
-    patcher(props.contact.id, {
-      phoneNumbers: {
-        ...props.contact.phoneNumbers,
-        [fields.phoneLabel]: fields.countryCode + fields.phoneValue
-      }
-    })
-    .then(updatedContact => {
-      showAlert("Phone number added successfully!");
-      props.reload(updatedContact);
-    })
-    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
-    .finally(() => props.onClose())
-  }
+  const {isLoading, modify} = useContactModifier(props.reload, props.onClose);
 
   return (
     <Modal title="Create New Phone Number"
       isLoading={isLoading}
       open={props.open}
       handleClose={props.onClose}
-      handleAccept={createNewPhoneNumber}
+      handleAccept={
+        modify(props.contact.id, {
+          phoneNumbers: {
+            ...props.contact.phoneNumbers,
+            [fields.phoneLabel]: fields.countryCode + fields.phoneValue
+          }
+        }, "Phone number added successfully!")
+      }
     >
       <Box className="flex gap-2 mb-1 flex-wrap">
         <TextField
@@ -400,29 +373,19 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
 
 function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
   const [email, setEmail] = useState<StringType>({label: "", value: ""});
-  const [isLoading, setIsLoading] = useState(false);
-  const showAlert = useContext(AlertContext);
-
-  const createNewEmail = () => {
-    setIsLoading(true);
-    patcher(props.contact.id, {
-        emails: {
-          ...props.contact.emails,
-          [email.label]: email.value
-        }
-    })
-    .then(updatedContact => {
-      showAlert("Email added successfully!");
-      props.reload(updatedContact);
-    })
-    .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
-    .finally(() => props.onClose())
-  }
+  const {isLoading, modify} = useContactModifier(props.reload, props.onClose);
 
   const fieldNames: string[] = ["label", "value"];
   return (
     <Modal
-      handleAccept={createNewEmail}
+      handleAccept={
+        modify(props.contact.id, {
+          emails: {
+            ...props.contact.emails,
+            [email.label]: email.value
+          }
+        }, "Email added successfully!")
+      }
       handleClose={props.onClose}
       title="Create New Email"
       open={props.open}

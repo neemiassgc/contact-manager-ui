@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { fetchAllContacts } from "./net"
-import { Contact, ErrorType } from "./types";
+import { useContext, useEffect, useState } from "react";
+import { fetchAllContacts, patcher } from "./net"
+import { Contact, ErrorType, Run } from "./types";
 import { getLocalContacts, getSelectedContact, saveLocalContacts, setSelectedContact, updateLocalContact } from "./storage";
-import { loginIfTokenIsExpired } from "./misc";
+import { convertNetworkErrorMessage, loginIfTokenIsExpired } from "./misc";
+import AlertContext from "./AlertContext";
 
 export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoading: boolean, reload: () => void } {
   const [data, setData] = useState<Contact[]>([]);
@@ -53,4 +54,25 @@ export function useSelectedContact() {
   useEffect(load, []);
 
   return { contact, reload: load };
+}
+
+export function useContactModifier(reload: (newContact: Contact) => void, onClose: Run) {
+  const [isLoading, setIsLoading] = useState(false);
+  const showAlert = useContext(AlertContext);
+  
+  const modify: (contactId: string, body: object, successMsg: string) => Run =
+  (contactId, body, successMsg) => {
+    return () => {
+      setIsLoading(true);
+      patcher(contactId, body)
+      .then(updatedContact => {
+        showAlert(successMsg);
+        reload(updatedContact);
+      })
+      .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
+      .finally(onClose)
+    }
+  }
+
+  return {isLoading, stopLoading: () => setIsLoading(false), modify};
 }
