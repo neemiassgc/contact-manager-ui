@@ -223,6 +223,7 @@ function ListCard(props: {
                     sx={bg("surface")}
                     key={index}
                     secondaryAction={
+                      props.cardTitle === "Phone Numbers" && list.length === 1 ? null :
                       <IconButton onClick={() => {
                         setOpen(true);
                         stopLoading();
