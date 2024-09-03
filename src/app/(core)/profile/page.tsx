@@ -16,7 +16,7 @@ import { Contact, AddressType, Run, StringType, ModalType } from "../../lib/type
 import { useContext, useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
-import { Modal, SelectCountry, SplitButton } from "../components";
+import { Footer, Modal, SelectCountry, SplitButton } from "../components";
 import { patcher } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 import AlertContext from "@/app/lib/AlertContext";
@@ -25,19 +25,22 @@ export default function Page() {
   const { contact: selectedContact, reload } = useSelectedContact();
 
   return (
-    <Box className="w-full sm:w-9/12 md:w-10/12 xl:w-8/12 mx-auto mt-10 mb-5">
-      <Breadcrumbs sx={paint(text("on-surface"))}>
-        <Link href="/">Home</Link>
-        <Typography>Profile</Typography>
-      </Breadcrumbs>
-      {
-        !selectedContact ? "Waiting...." :
-        <>
-          <Header contact={selectedContact} reload={reload}/>
-          <Body contact={selectedContact} reload={reload}/>
-        </> 
-      }
-    </Box>
+    <>
+      <Box className="w-full sm:w-9/12 md:w-10/12 xl:w-8/12 mx-auto mt-10 mb-5">
+        <Breadcrumbs sx={paint(text("on-surface"))}>
+          <Link href="/">Home</Link>
+          <Typography>Profile</Typography>
+        </Breadcrumbs>
+        {
+          !selectedContact ? "Waiting...." :
+          <>
+            <Header contact={selectedContact} reload={reload}/>
+            <Body contact={selectedContact} reload={reload}/>
+          </> 
+        }
+      </Box>
+      <Footer/>
+    </>
   )
 }
 

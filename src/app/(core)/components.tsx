@@ -22,6 +22,7 @@ import { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { CountryCode, ModalType, Run, Severity, ShowAlertFunc } from "../lib/types";
 import { getCountryCodes } from "../lib/net";
 import AlertContext from "../lib/AlertContext";
+import Link from "next/link";
 
 export function Loading({ color = "primary" }: { color?: "warning" | "primary" }) {
   return <CircularProgress color={color} className="absolute inset-1/2" sx={{ marginLeft: "-70px", marginTop: "-70px" }} size="7rem"/>
@@ -122,6 +123,18 @@ export function ScreenLoading({ children }: { children: React.ReactNode }) {
       }
     </>
   )
+}
+
+export function Footer({home = false}: {home?: boolean}) {
+  return (
+    <div
+      style={paint(bg("surface-container"), text("on-surface"), border("outline-variant"))}
+      className={"bg-gray-500 py-3 absolute w-full border-t mt-5 "+(home ? "bottom-0" : "")}>
+      <Typography className="text-center">{"Created by "}
+        <Link href="https://github.com/neemiassgc">neemiassgc</Link>
+      </Typography>
+    </div>
+  );
 }
 
 export function NotifiablePage({ children }: { children: React.ReactNode }) {
