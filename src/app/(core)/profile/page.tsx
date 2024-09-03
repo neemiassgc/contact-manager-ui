@@ -14,15 +14,17 @@ import Link from "next/link";
 import { convertNetworkErrorMessage, formatAddress, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
 import { Contact, AddressType, Run, StringType, ModalType } from "../../lib/types";
 import { useContext, useState } from "react";
-import { getSelectedContact } from "../../lib/storage";
+import { getSelectedContact, setSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
-import { Footer, Modal, SelectCountry, SplitButton } from "../components";
+import { Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
 import { patcher } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 import AlertContext from "@/app/lib/AlertContext";
 
 export default function Page() {
   const { contact: selectedContact, reload } = useSelectedContact();
+
+  if (!selectedContact) return <Loading/>
 
   return (
     <>
@@ -31,13 +33,8 @@ export default function Page() {
           <Link href="/">Home</Link>
           <Typography>Profile</Typography>
         </Breadcrumbs>
-        {
-          !selectedContact ? "Waiting...." :
-          <>
-            <Header contact={selectedContact} reload={reload}/>
-            <Body contact={selectedContact} reload={reload}/>
-          </> 
-        }
+        <Header contact={selectedContact} reload={reload}/>
+        <Body contact={selectedContact} reload={reload}/>
       </Box>
       <Footer/>
     </>
