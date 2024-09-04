@@ -301,13 +301,13 @@ export function DefaultButton({ title, onClick, colorVariant = "primary", childr
   )
 }
 
-export function SelectCountry({disabled = false, ...props}: {
+export function SelectCountry({disabled = false, variant = "dial_code", ...props}: {
   value: string,
   onChange: (value: string) => void,
   className?: string,
   styles: any,
-  disabled?: boolean
-
+  disabled?: boolean,
+  variant?: "dial_code" | "name"
 }) {
   const [data, setData] = useState<CountryCode[]>([]);
 
@@ -330,7 +330,7 @@ export function SelectCountry({disabled = false, ...props}: {
       >
         {
           data.sort((a, b) => a.name.localeCompare(b.name)).map((countryCode, key) =>
-            <MenuItem sx={text("tertiary")} key={key} value={countryCode.dial_code}>
+            <MenuItem sx={text("tertiary")} key={key} value={countryCode[variant]}>
               {countryCode.name} {getFlagEmoji(countryCode.code)} {countryCode.dial_code}
             </MenuItem>
           )
