@@ -222,8 +222,8 @@ export function LogoutButton() {
   )
 }
 
-export function CustomDivider() {
-  return <Divider variant="middle" sx={bg("outline-variant")}/>;
+export function CustomDivider({variant = "middle"}: { variant?: "inset" | "middle" | "fullWidth"}) {
+  return <Divider variant={variant} sx={bg("outline-variant")}/>;
 }
 
 export function SplitButton({ options }: { options: { title: string, onClick: Run }[] }) {
