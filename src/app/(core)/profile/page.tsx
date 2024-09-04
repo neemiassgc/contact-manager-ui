@@ -16,7 +16,7 @@ import { Contact, AddressType, Run, StringType, ModalType } from "../../lib/type
 import { useContext, useState } from "react";
 import { getSelectedContact, setSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
-import { Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
+import { CustomDivider, Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
 import { patcher } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 import AlertContext from "@/app/lib/AlertContext";
@@ -281,7 +281,6 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
   })
   const {isLoading, modify} = useContactModifier(props.reload, props.onClose);
 
-  const fieldNames: string[] = ["label", "street", "country", "city", "state", "zipcode"];
   return (
     <Modal
       title="Create New Address"
@@ -297,24 +296,78 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
         }, "Address added successfully!")
       }
     >
-      <Box className="flex flex-col gap-2 w-full p-1 h-full">
+      <Box className="flex flex-col gap-3 w-full p-1 h-full">
+        <TextField
+          {...textFieldTheme} 
+          disabled={isLoading}
+          variant="outlined"
+          size="small"
+          label={"Label"}
+          placeholder={"Label"}
+          value={fields["Label"]}
+          onChange={event => setFields({...fields, "label": event.target.value})}
+        />
+        <CustomDivider variant="fullWidth"/>
         {
-          fieldNames.map((fieldName: string, index: number) =>
-            <TextField
-              {...textFieldTheme} 
-              disabled={isLoading}
-              key={index}
-              variant="outlined"
-              size="small"
-              label={fieldName}
-              placeholder={fieldName}
-              value={fields[fieldName]}
-              onChange={event => setFields({...fields, [fieldName]: event.target.value})}
-            />)
+          fields.country === "" ?
+          <SelectCountry
+            variant="name"
+            value={fields.country}
+            className="basis-24"
+            onChange={value => setFields({...fields, country: value})}
+            styles={textFieldTheme}
+          /> : fields.country === "Brazil" ?
+          <BrazilAddressForm fields={fields} setFields={setFields} isLoading={isLoading}/> :
+          <DefaultAddressForm fields={fields} setFields={setFields} isLoading={isLoading}/>
         }
       </Box>
     </Modal>
   )
+}
+
+function BrazilAddressForm(props: { fields: StringType, setFields: (fields: StringType) => void, isLoading: boolean}) {
+  const [township, setTownship] = useState<StringType>({ cidade: "", bairro: ""});
+
+  const fieldNames: StringType = {
+    "País": "country", "CEP": "zipcode", "Endereço": "street",
+    "Estado": "state", "Cidade": "city", "Bairro": "city"
+  };
+  return toKeys(fieldNames).map((fieldName, index) =>
+    <TextField
+      {...textFieldTheme} 
+      disabled={fieldName === "País"}
+      key={index}
+      variant="outlined"
+      size="small"
+      label={fieldName}
+      placeholder={fieldName}
+      value={["Cidade", "Bairro"].includes(fieldName) ? township[fieldName.toLowerCase()] : props.fields[fieldNames[fieldName]]}
+      onChange={event => {
+        if (["Cidade", "Bairro"].includes(fieldName)) {
+          setTownship({...township, [fieldName.toLowerCase()]: event.target.value});
+          props.setFields({...props.fields, "city": `${township.cidade}; ${township.bairro}`})
+          return;
+        }
+        props.setFields({...props.fields, [fieldNames[fieldName]]: event.target.value})
+      }}
+    />)
+}
+
+function DefaultAddressForm(props: { fields: StringType, setFields: (fields: StringType) => void, isLoading: boolean}) {
+  const fieldNames: string[] = [ "Country", "Street", "City", "State", "Zipcode"];
+
+  return fieldNames.map((fieldName: string, index: number) =>
+    <TextField
+      {...textFieldTheme} 
+      disabled={props.isLoading || fieldName === "Country"}
+      key={index}
+      variant="outlined"
+      size="small"
+      label={fieldName}
+      placeholder={fieldName}
+      value={props.fields[fieldName.toLowerCase()]}
+      onChange={event => props.setFields({...props.fields, [fieldName]: event.target.value})}
+    />)
 }
 
 function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
