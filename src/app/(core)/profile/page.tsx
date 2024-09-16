@@ -17,7 +17,7 @@ import { useContext, useState } from "react";
 import { getSelectedContact, setSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
 import { CustomDivider, Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
-import { patcher } from "@/app/lib/net";
+import { getAddressByCEP, patcher } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 import AlertContext from "@/app/lib/AlertContext";
 
@@ -328,6 +328,20 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
 function BrazilAddressForm(props: { fields: StringType, setFields: (fields: StringType) => void, isLoading: boolean}) {
   const [township, setTownship] = useState<StringType>({ cidade: "", bairro: ""});
 
+  const fillByCEP = (cep: string) => {
+    getAddressByCEP(cep)
+    .then(info => {
+      props.setFields({
+        ...props.fields,
+        state: info["estado"],
+        street: info["logradouro"],
+        city: info["localidade"]+"; "+info["bairro"],
+        zipcode: cep
+      });
+      setTownship({cidade: info["localidade"], bairro: info["bairro"]});
+    });
+  }
+
   const fieldNames: StringType = {
     "País": "country", "CEP": "zipcode", "Endereço": "street",
     "Estado": "state", "Cidade": "city", "Bairro": "city"
@@ -335,20 +349,28 @@ function BrazilAddressForm(props: { fields: StringType, setFields: (fields: Stri
   return toKeys(fieldNames).map((fieldName, index) =>
     <TextField
       {...textFieldTheme} 
-      disabled={fieldName === "País"}
+      disabled={fieldName === "País" || (fieldName === "CEP" && props.fields.zipcode.length === 8) || props.isLoading}
       key={index}
       variant="outlined"
       size="small"
       label={fieldName}
       placeholder={fieldName}
       value={["Cidade", "Bairro"].includes(fieldName) ? township[fieldName.toLowerCase()] : props.fields[fieldNames[fieldName]]}
-      onChange={event => {
+      onChange={({ target: { value }}) => {
+        if (fieldName === "CEP") {
+          if (value.length > 8) return;
+          if (value.length === 8) {
+            fillByCEP(value);
+            return;
+          }
+        }
+
         if (["Cidade", "Bairro"].includes(fieldName)) {
-          setTownship({...township, [fieldName.toLowerCase()]: event.target.value});
+          setTownship({...township, [fieldName.toLowerCase()]: value});
           props.setFields({...props.fields, "city": `${township.cidade}; ${township.bairro}`})
           return;
         }
-        props.setFields({...props.fields, [fieldNames[fieldName]]: event.target.value})
+        props.setFields({...props.fields, [fieldNames[fieldName]]: value})
       }}
     />)
 }
