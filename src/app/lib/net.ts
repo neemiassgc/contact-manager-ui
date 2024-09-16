@@ -1,3 +1,4 @@
+import { request } from "http";
 import { isApplicationJson, validateContact } from "./misc";
 import { Contact, CountryCode, ErrorType, ShortContact } from "./types";
 
@@ -40,6 +41,10 @@ export async function deleteContact(contactId: string): Promise<void> {
 
 export async function patcher(contactId: string, body: object): Promise<Contact> {
   return await (await requester(getUrl("/api/contacts/"+contactId), "PATCH", body)).json();
+}
+
+export async function getAddressByCEP(cep: string) {
+  return (await requester(`https://viacep.com.br/ws/${cep}/json`, "GET")).json();
 }
 
 async function requester(url: string, method: "POST" | "PATCH" | "DELETE" | "GET", body?: object): Promise<Response> {
