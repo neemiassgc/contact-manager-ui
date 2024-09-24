@@ -261,13 +261,8 @@ function ContactCreationModal(props: {
   const [error, setError] = useState<Error | undefined>(undefined);
   const showAlert = useContext(AlertContext);
 
-
-  const setName = (event: ChangeEvent<HTMLInputElement>) =>
-    setTextFieldData({...textFieldData, name: event.target.value});
-  const setPhoneLabel = (event: ChangeEvent<HTMLInputElement>) =>
-    setTextFieldData({...textFieldData, phoneLabel: event.target.value});
-  const setPhoneValue = (event: ChangeEvent<HTMLInputElement>) =>
-    setTextFieldData({...textFieldData, phoneValue: formatPhoneValue(textFieldData.phoneValue, event.target.value)});
+  const setTextField = (field: string) => ({ target: { value }}: ChangeEvent<HTMLInputElement>) =>
+      setTextFieldData({...textFieldData, [field]: field === "phoneValue" ? formatPhoneValue(textFieldData.phoneValue, value) : value});
 
   const extractErrorHelperText = (fieldName: string) => {
     if (error instanceof ViolationError)
@@ -319,8 +314,8 @@ function ContactCreationModal(props: {
         <TextField
           disabled={isLoading}
           value={textFieldData.name}
-          onChange={setName}
-          error={isNotUndefined(error) && extractErrorHelperText("name").length > 0}
+          onChange={setTextField("name")}
+          error={isNotUndefined(error) && !!extractErrorHelperText("name")}
           helperText={extractErrorHelperText("name")[0]}
           {...textFieldTheme}
           className="w-full"
@@ -332,8 +327,8 @@ function ContactCreationModal(props: {
         <TextField
           disabled={isLoading}
           value={textFieldData.phoneLabel}
-          onChange={setPhoneLabel}
-          error={isNotUndefined(error) && extractErrorHelperText("phoneLabel").length > 0}
+          onChange={setTextField("phoneLabel")}
+          error={isNotUndefined(error) && !!extractErrorHelperText("phoneLabel")}
           helperText={extractErrorHelperText("phoneLabel")[0]}
           {...textFieldTheme}
           label="phone label"
@@ -351,9 +346,9 @@ function ContactCreationModal(props: {
         />
         <TextField
           disabled={isLoading}
-          onChange={setPhoneValue}
+          onChange={setTextField("phoneValue")}
           value={textFieldData.phoneValue}
-          error={isNotUndefined(error) && extractErrorHelperText("phoneValue").length > 0}
+          error={isNotUndefined(error) && !!extractErrorHelperText("phoneValue")}
           helperText={extractErrorHelperText("phoneValue")[0]}
           {...textFieldTheme}
           className="flex-1"
