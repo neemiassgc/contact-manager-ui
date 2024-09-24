@@ -342,7 +342,7 @@ export function SelectCountry({disabled = false, variant = "dial_code", ...props
 
 export function Modal({ mini = false, ...props }: ModalType & { children?: ReactNode, mini?: boolean }) {
   return (
-    <Dialog open={props.open}>
+    <Dialog open={props.open} maxWidth="xl">
       <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Typography sx={{color: "inherit"}} className="text-center">
           {
@@ -354,7 +354,7 @@ export function Modal({ mini = false, ...props }: ModalType & { children?: React
       {
         !mini &&
         <>
-          <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
+          <DialogContent className="w-96" sx={paint(bg("surface-container-low"), text("on-surface"))}>
             {props.children}
           </DialogContent>
           <CustomDivider/>
