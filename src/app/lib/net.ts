@@ -1,5 +1,5 @@
 import { isApplicationJson } from "./misc";
-import { Contact, CountryCode, ErrorType, ShortContact } from "./types";
+import { Contact, CountryCode, ErrorType, ShortContact, ViolationError } from "./types";
 
 export function createNewUser(username: string) {
   return poster(getUrl("/api/users"), { username });
@@ -16,8 +16,8 @@ export async function createNewContact(contact: ShortContact) {
   return poster(getUrl("/api/contacts"), body);
 }
 
-async function poster(url: string, body: object): Promise<void> {
-  requester(url, "POST", body);
+async function poster(url: string, body: object) {
+  await requester(url, "POST", body);
 }
 
 export function fetchAllContacts() {
@@ -62,10 +62,14 @@ async function requester(url: string, method: "POST" | "PATCH" | "DELETE" | "GET
 async function checkForError(response: Response): Promise<void> {
   if (!response.ok) {
     if (
-      response.headers.has("Content-Type") &&
-      isApplicationJson(response.headers.get("Content-Type") as string)
+      response.headers.has("content-type") &&
+      isApplicationJson(response.headers.get("content-type") as string)
     ) {
-      throw new ErrorType(await response.json(), response.status);
+      const responseBody: object = await response.json();
+      if ("fieldViolations" in responseBody) {
+        throw new ViolationError(JSON.stringify(responseBody));
+      }
+      throw new ErrorType(JSON.stringify(responseBody), response.status);
     }
     else throw new ErrorType(await response.text(), response.status);
   }

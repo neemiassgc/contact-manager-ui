@@ -23,7 +23,7 @@ export async function PATCH(request: Request, { params }: { params: { contactId:
       duplex: "half"
     }
     const fetchRequest = await authorizedFetch(resourceServerUri+params.contactId, settings);
-    return new NextResponse(fetchRequest.body, { status: fetchRequest.status });
+    return new NextResponse(fetchRequest.body, { status: fetchRequest.status, headers: fetchRequest.headers });
   });
 }
 

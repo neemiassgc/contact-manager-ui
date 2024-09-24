@@ -265,8 +265,10 @@ function ContactCreationModal(props: {
       setTextFieldData({...textFieldData, [field]: field === "phoneValue" ? formatPhoneValue(textFieldData.phoneValue, value) : value});
 
   const extractErrorHelperText = (fieldName: string) => {
-    if (error instanceof ViolationError)
-      return (JSON.parse(error.message) as ShortContact)[fieldName];
+    if (error instanceof ViolationError) {
+      const value = JSON.parse(error.message).fieldViolations[fieldName];
+      return value ? value[0] : "";
+    }
     else return "";
   }
 
@@ -316,7 +318,7 @@ function ContactCreationModal(props: {
           value={textFieldData.name}
           onChange={setTextField("name")}
           error={isNotUndefined(error) && !!extractErrorHelperText("name")}
-          helperText={extractErrorHelperText("name")[0]}
+          helperText={extractErrorHelperText("name")}
           {...textFieldTheme}
           className="w-full"
           label="contact name"
@@ -329,7 +331,7 @@ function ContactCreationModal(props: {
           value={textFieldData.phoneLabel}
           onChange={setTextField("phoneLabel")}
           error={isNotUndefined(error) && !!extractErrorHelperText("phoneLabel")}
-          helperText={extractErrorHelperText("phoneLabel")[0]}
+          helperText={extractErrorHelperText("phoneLabel")}
           {...textFieldTheme}
           label="phone label"
           placeholder="phone label"
@@ -348,8 +350,8 @@ function ContactCreationModal(props: {
           disabled={isLoading}
           onChange={setTextField("phoneValue")}
           value={textFieldData.phoneValue}
-          error={isNotUndefined(error) && !!extractErrorHelperText("phoneValue")}
-          helperText={extractErrorHelperText("phoneValue")[0]}
+          error={isNotUndefined(error) && !!extractErrorHelperText("phone")}
+          helperText={extractErrorHelperText("phone")}
           {...textFieldTheme}
           className="flex-1"
           label="phone"

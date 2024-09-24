@@ -23,6 +23,6 @@ export async function POST(request: Request) {
       }
     }
     const fetchRequest = await authorizedFetch(resourceServerUri, settings);
-    return new NextResponse(fetchRequest.body, { status: fetchRequest.status });
+    return new NextResponse(fetchRequest.body, { status: fetchRequest.status, headers: fetchRequest.headers });
   });
 }

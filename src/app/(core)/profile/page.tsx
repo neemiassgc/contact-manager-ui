@@ -279,7 +279,7 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
   const [fields, setFields] = useState<StringType>({
     label: "", street: "", country: "", city: "", state: "", zipcode: ""
   })
-  const {isLoading, modify} = useContactModifier(props.reload, props.onClose);
+  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
 
   return (
     <Modal
@@ -317,23 +317,38 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
             onChange={value => setFields({...fields, country: value})}
             styles={textFieldTheme}
           /> : fields.country === "Brazil" ?
-          <BrazilAddressForm fields={fields} setFields={setFields} isLoading={isLoading}/> :
-          <DefaultAddressForm fields={fields} setFields={setFields} isLoading={isLoading}/>
+          <BrazilAddressForm
+            fields={fields}
+            setFields={setFields}
+            isLoading={isLoading}
+            error={error}
+            extractErrorMessage={extractErrorMessage}
+          /> :
+          <DefaultAddressForm
+            fields={fields}
+            setFields={setFields}
+            isLoading={isLoading}
+            error={error}
+            extractErrorMessage={extractErrorMessage}
+          />
         }
       </Box>
     </Modal>
   )
 }
 
-function BrazilAddressForm(props: { fields: StringType, setFields: (fields: StringType | ((fields: StringType) => StringType)) => void, isLoading: boolean}) {
+function BrazilAddressForm(props: {
+  fields: StringType, setFields: (fields: StringType | ((fields: StringType) => StringType)) => void,
+  isLoading: boolean, error: Error | undefined, extractErrorMessage: (field: string) => string
+}) {
   const [township, setTownship] = useState<StringType>({ cidade: "", bairro: ""});
-  const [helperText, setHelperText] = useState<StringType>({zipcode: ""})
+  const [cepHelperText, setCepHelperText] = useState("");
 
   const fillByCEP = (cep: string) => {
     getAddressByCEP(cep)
     .then(data => {
       if ("erro" in data) {
-        setHelperText({...helperText, zipcode: "CEP not found!"});
+        setCepHelperText("CEP not found!");
         return;
       }
 
@@ -346,7 +361,7 @@ function BrazilAddressForm(props: { fields: StringType, setFields: (fields: Stri
 
       setTownship({cidade: data["localidade"], bairro: data["bairro"]});
     })
-    .catch(_ => setHelperText({...helperText, zipcode: "CEP is invalid!"}));
+    .catch(_ => setCepHelperText("CEP is invalid!"));
   }
 
   const fieldNames: StringType = {
@@ -356,10 +371,10 @@ function BrazilAddressForm(props: { fields: StringType, setFields: (fields: Stri
   return toKeys(fieldNames).map((fieldName, index) =>
     <TextField
       {...textFieldTheme} 
-      disabled={fieldName === "País" || (fieldName === "CEP" && props.fields.zipcode.length === 8 && !helperText.zipcode) || props.isLoading}
+      disabled={fieldName === "País" || (fieldName === "CEP" && props.fields.zipcode.length === 8 && !cepHelperText) || props.isLoading}
       key={index}
-      error={fieldName === "CEP" && helperText[fieldNames[fieldName]].length > 1}
-      helperText={helperText[fieldNames[fieldName]]}
+      error={(fieldName === "CEP" && cepHelperText.length > 1) || !!props.error}
+      helperText={fieldName === "CEP" ? cepHelperText : props.extractErrorMessage(fieldNames[fieldName])}
       variant="outlined"
       size="small"
       label={fieldName}
@@ -381,25 +396,30 @@ function BrazilAddressForm(props: { fields: StringType, setFields: (fields: Stri
           return;
         }
         props.setFields({...props.fields, [fieldNames[fieldName]]: value});
-        setHelperText({...helperText, [fieldNames[fieldName]]: ""});
+        setCepHelperText("");
       }}
     />)
 }
 
-function DefaultAddressForm(props: { fields: StringType, setFields: (fields: StringType) => void, isLoading: boolean}) {
+function DefaultAddressForm(props: {
+  fields: StringType, setFields: (fields: StringType) => void, isLoading: boolean,
+  error: Error | undefined, extractErrorMessage: (field: string) => string
+}) {
   const fieldNames: string[] = [ "Country", "Street", "City", "State", "Zipcode"];
 
   return fieldNames.map((fieldName: string, index: number) =>
     <TextField
       {...textFieldTheme} 
-      disabled={props.isLoading || fieldName === "Country"}
+      disabled={props.isLoading || fieldName === "Country" || props.isLoading}
+      error={!!props.error}
+      helperText={props.extractErrorMessage(fieldName.toLowerCase())}
       key={index}
       variant="outlined"
       size="small"
       label={fieldName}
       placeholder={fieldName}
       value={props.fields[fieldName.toLowerCase()]}
-      onChange={event => props.setFields({...props.fields, [fieldName]: event.target.value})}
+      onChange={event => props.setFields({...props.fields, [fieldName.toLocaleLowerCase()]: event.target.value})}
     />)
 }
 
@@ -407,7 +427,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
   const [fields, setFields] = useState(
     { phoneLabel: "", phoneValue: "", countryCode: "" }
   )
-  const {isLoading, modify} = useContactModifier(props.reload, props.onClose);
+  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
 
   return (
     <Modal title="Create New Phone Number"
@@ -452,6 +472,8 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           size="small"
           variant="outlined"
           disabled={isLoading}
+          error={!!error}
+          helperText={extractErrorMessage("phone")}
         />
       </Box>
     </Modal>
@@ -460,7 +482,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
 
 function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
   const [email, setEmail] = useState<StringType>({label: "", value: ""});
-  const {isLoading, modify} = useContactModifier(props.reload, props.onClose);
+  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
 
   const fieldNames: string[] = ["label", "value"];
   return (
@@ -490,6 +512,8 @@ function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact,
               placeholder={field}
               value={email[field]}
               onChange={event => setEmail({...email, [field]: event.target.value})}
+              error={!!error}
+              helperText={extractErrorMessage("email")}
             />
           )
         }
