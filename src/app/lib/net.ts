@@ -1,5 +1,4 @@
-import { request } from "http";
-import { isApplicationJson, validateContact } from "./misc";
+import { isApplicationJson } from "./misc";
 import { Contact, CountryCode, ErrorType, ShortContact } from "./types";
 
 export function createNewUser(username: string) {
@@ -7,8 +6,6 @@ export function createNewUser(username: string) {
 }
 
 export async function createNewContact(contact: ShortContact) {
-  validateContact(contact);
-
   const body: object = {
     name: contact.name,
     phoneNumbers: {
