@@ -425,7 +425,7 @@ function DefaultAddressForm(props: {
 
 function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
   const [fields, setFields] = useState(
-    { phoneLabel: "", phoneValue: "", countryCode: "" }
+    { phoneLabel: "", phoneValue: "", countryCode: "+55" }
   )
   const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
 
