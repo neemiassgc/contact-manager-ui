@@ -330,8 +330,8 @@ function ContactCreationModal(props: {
           disabled={isLoading}
           value={textFieldData.phoneLabel}
           onChange={setTextField("phoneLabel")}
-          error={isNotUndefined(error) && !!extractErrorHelperText("phoneLabel")}
-          helperText={extractErrorHelperText("phoneLabel")}
+          error={isNotUndefined(error) && !!extractErrorHelperText("label")}
+          helperText={extractErrorHelperText("label")}
           {...textFieldTheme}
           label="phone label"
           placeholder="phone label"

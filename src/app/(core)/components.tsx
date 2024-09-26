@@ -340,7 +340,8 @@ export function SelectCountry({disabled = false, variant = "dial_code", ...props
   )
 }
 
-export function Modal({ mini = false, ...props }: ModalType & { children?: ReactNode, mini?: boolean }) {
+export function Modal({ mini = false, acceptButtonDisabled = false, ...props }:
+  ModalType & { children?: ReactNode, mini?: boolean, acceptButtonDisabled?: boolean }) {
   return (
     <Dialog open={props.open} maxWidth="xl">
       <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
@@ -365,7 +366,7 @@ export function Modal({ mini = false, ...props }: ModalType & { children?: React
           {
             props.isLoading ? <CircularProgress size="3rem"/> :
             <>
-              <IconButton sx={paint(text("primary"))} onClick={props.handleAccept} size="small">
+              <IconButton disabled={acceptButtonDisabled} sx={paint(text("primary"))} onClick={props.handleAccept} size="small">
                 <CheckCircleIcon fontSize="large"/>
               </IconButton>
               <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>

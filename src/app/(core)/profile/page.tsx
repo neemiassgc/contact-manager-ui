@@ -43,23 +43,8 @@ export default function Page() {
 
 function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
   const [open, setOpen] = useState(false);
-  const [textFieldValue, setTextFieldValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const showAlert = useContext(AlertContext);
-
-  const updateContactName = () => {
-    setIsLoading(true);
-    patcher(props.contact.id, { name: textFieldValue})
-      .then(updatedContact => {
-        showAlert("Contact name was updated successfully!");
-        props.reload(updatedContact);
-      })
-      .catch(reason => showAlert(convertNetworkErrorMessage(reason.message), "error"))
-      .finally(() => {
-        setOpen(false)
-        setTextFieldValue("");
-      })
-  }
+  const [textFieldValue, setTextFieldValue] = useState("")
+  const {isLoading, modify, error, extractErrorMessage, stopLoading} = useContactModifier(props.reload, () => setOpen(false));
 
   return (
     <Box className="w-full flex flex-col justify-center items-center">
@@ -75,7 +60,6 @@ function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
         <Tooltip title="Edit Contact Name" arrow>
           <IconButton onClick={() => {
             setOpen(true);
-            setIsLoading(false);
           }}>
             <EditNoteRoundedIcon sx={paint(text("on-surface"))} fontSize="medium"/>
           </IconButton>
@@ -86,7 +70,7 @@ function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
         open={open}
         title="Edit the name of the contact"
         handleClose={() => setOpen(false)}
-        handleAccept={updateContactName}
+        handleAccept={modify(props.contact.id, { name: textFieldValue }, "Contact name has been updated successfully!")}
       >
          <TextField
           {...textFieldTheme}
@@ -98,6 +82,8 @@ function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
           placeholder="New name"
           size="small"
           variant="outlined"
+          error={!!error}
+          helperText={extractErrorMessage("name")}
         />
       </Modal>
     </Box>
@@ -285,6 +271,7 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
     <Modal
       title="Create New Address"
       isLoading={isLoading}
+      acceptButtonDisabled={fields.country === ""}
       open={props.open}
       handleClose={props.onClose}
       handleAccept={
@@ -306,6 +293,8 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
           placeholder={"Label"}
           value={fields["Label"]}
           onChange={event => setFields({...fields, "label": event.target.value})}
+          error={!!error}
+          helperText={extractErrorMessage("label")}
         />
         <CustomDivider variant="fullWidth"/>
         {
@@ -454,6 +443,8 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           variant="outlined"
           className="basis-full sm:basis-3/12 flex-auto"
           disabled={isLoading}
+          error={!!error}
+          helperText={extractErrorMessage("label")}
         />
         <SelectCountry
           disabled={isLoading}
@@ -481,17 +472,17 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
 }
 
 function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
-  const [email, setEmail] = useState<StringType>({label: "", value: ""});
+  const [email, setEmail] = useState<StringType>({label: "", email: ""});
   const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
 
-  const fieldNames: string[] = ["label", "value"];
+  const fieldNames: string[] = ["label", "email"];
   return (
     <Modal
       handleAccept={
         modify(props.contact.id, {
           emails: {
             ...props.contact.emails,
-            [email.label]: email.value
+            [email.label]: email.email
           }
         }, "Email added successfully!")
       }
@@ -513,7 +504,7 @@ function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact,
               value={email[field]}
               onChange={event => setEmail({...email, [field]: event.target.value})}
               error={!!error}
-              helperText={extractErrorMessage("email")}
+              helperText={extractErrorMessage(field)}
             />
           )
         }
