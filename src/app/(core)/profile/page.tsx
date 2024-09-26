@@ -11,15 +11,14 @@ import DomainIcon from '@mui/icons-material/Domain';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
-import { convertNetworkErrorMessage, formatAddress, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
-import { Contact, AddressType, Run, StringType, ModalType } from "../../lib/types";
-import { useContext, useState } from "react";
-import { getSelectedContact, setSelectedContact } from "../../lib/storage";
+import { formatAddress, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
+import { Contact, AddressType, Run, StringType} from "../../lib/types";
+import { useState } from "react";
+import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
 import { CustomDivider, Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
-import { getAddressByCEP, patcher } from "@/app/lib/net";
+import { getAddressByCEP } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
-import AlertContext from "@/app/lib/AlertContext";
 
 export default function Page() {
   const { contact: selectedContact, reload } = useSelectedContact();
@@ -82,7 +81,7 @@ function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
           placeholder="New name"
           size="small"
           variant="outlined"
-          error={!!error}
+          error={!!error && !!extractErrorMessage("name")}
           helperText={extractErrorMessage("name")}
         />
       </Modal>
@@ -293,7 +292,7 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
           placeholder={"Label"}
           value={fields["Label"]}
           onChange={event => setFields({...fields, "label": event.target.value})}
-          error={!!error}
+          error={!!error && !!extractErrorMessage("label")}
           helperText={extractErrorMessage("label")}
         />
         <CustomDivider variant="fullWidth"/>
@@ -362,7 +361,7 @@ function BrazilAddressForm(props: {
       {...textFieldTheme} 
       disabled={fieldName === "País" || (fieldName === "CEP" && props.fields.zipcode.length === 8 && !cepHelperText) || props.isLoading}
       key={index}
-      error={(fieldName === "CEP" && cepHelperText.length > 1) || !!props.error}
+      error={(fieldName === "CEP" && cepHelperText.length > 1) || (!!props.error && !!props.extractErrorMessage(fieldNames[fieldName]))}
       helperText={fieldName === "CEP" ? cepHelperText : props.extractErrorMessage(fieldNames[fieldName])}
       variant="outlined"
       size="small"
@@ -400,7 +399,7 @@ function DefaultAddressForm(props: {
     <TextField
       {...textFieldTheme} 
       disabled={props.isLoading || fieldName === "Country" || props.isLoading}
-      error={!!props.error}
+      error={!!props.error && !!props.extractErrorMessage(fieldName.toLowerCase())}
       helperText={props.extractErrorMessage(fieldName.toLowerCase())}
       key={index}
       variant="outlined"
@@ -443,7 +442,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           variant="outlined"
           className="basis-full sm:basis-3/12 flex-auto"
           disabled={isLoading}
-          error={!!error}
+          error={!!error && !!extractErrorMessage("label")}
           helperText={extractErrorMessage("label")}
         />
         <SelectCountry
@@ -463,7 +462,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           size="small"
           variant="outlined"
           disabled={isLoading}
-          error={!!error}
+          error={!!error && !!extractErrorMessage("phone")}
           helperText={extractErrorMessage("phone")}
         />
       </Box>
@@ -503,7 +502,7 @@ function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact,
               placeholder={field}
               value={email[field]}
               onChange={event => setEmail({...email, [field]: event.target.value})}
-              error={!!error}
+              error={!!error && !!extractErrorMessage(field)}
               helperText={extractErrorMessage(field)}
             />
           )
