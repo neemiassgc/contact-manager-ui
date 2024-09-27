@@ -342,8 +342,8 @@ export function SelectCountry({disabled = false, variant = "dial_code", ...props
 
 export function Modal({ mini = false, acceptButtonDisabled = false, ...props }:
   ModalType & { children?: ReactNode, mini?: boolean, acceptButtonDisabled?: boolean }) {
-  return (
-    <Dialog open={props.open} maxWidth="xl">
+  return props.open && (
+    <Dialog open={true} maxWidth="xl">
       <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Typography sx={{color: "inherit"}} className="text-center">
           {

@@ -185,7 +185,6 @@ function ContactList(props: { data: Contact[], reloadContacts: Run}) {
     setConsentModal({...consentModal, loading: true})
     deleteContact(contactData.id)
       .then(() => {
-        setConsentModal({loading: false, open: false});
         clearLocalContacts();
         props.reloadContacts();
         showAlert("Contact deleted successfully!");
@@ -266,7 +265,7 @@ function ContactCreationModal(props: {
 
   const extractErrorHelperText = (fieldName: string) => {
     if (error instanceof ViolationError) {
-      const value = JSON.parse(error.message).fieldViolations[fieldName];
+      const value = JSON.parse(error.message)?.fieldViolations[fieldName];
       return value ? value[0] : "";
     }
     else return "";

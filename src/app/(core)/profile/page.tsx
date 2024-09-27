@@ -11,7 +11,7 @@ import DomainIcon from '@mui/icons-material/Domain';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
-import { formatAddress, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
+import { formatAddress, formatPhoneValue, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
 import { Contact, AddressType, Run, StringType} from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
@@ -43,7 +43,7 @@ export default function Page() {
 function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
   const [open, setOpen] = useState(false);
   const [textFieldValue, setTextFieldValue] = useState("")
-  const {isLoading, modify, error, extractErrorMessage, stopLoading} = useContactModifier(props.reload, () => setOpen(false));
+  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, () => setOpen(false));
 
   return (
     <Box className="w-full flex flex-col justify-center items-center">
@@ -181,7 +181,7 @@ function ListCard(props: {
 }) {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
-  const {isLoading, modify, stopLoading} = useContactModifier(props.reload, () => setOpen(false));
+  const {isLoading, modify} = useContactModifier(props.reload, () => setOpen(false));
 
   return (
     <>
@@ -211,7 +211,6 @@ function ListCard(props: {
                       props.cardTitle === "Phone Numbers" && list.length === 1 ? null :
                       <IconButton onClick={() => {
                         setOpen(true);
-                        stopLoading();
                         setSelectedItem(key);
                       }}>
                         <ClearIcon sx={text("on-surface")}/>
@@ -455,7 +454,9 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
         <TextField
           {...textFieldTheme}
           value={fields.phoneValue}
-          onChange={event => setFields({...fields, phoneValue: event.target.value})}
+          onChange={({ target: { value }}) => {
+            setFields({...fields, phoneValue: formatPhoneValue(fields.phoneValue, value)})
+          }}
           className="basis-1/2 flex-grow"
           label="phone"
           placeholder="phone"
@@ -491,7 +492,7 @@ function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact,
       isLoading={isLoading}>
       <Box className="flex flex-col gap-2 w-full p-1 h-full">
         {
-          fieldNames.map((field, key) => 
+          fieldNames.map((field, key) =>
             <TextField
               {...textFieldTheme}
               disabled={isLoading}

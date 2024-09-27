@@ -60,8 +60,6 @@ export function useContactModifier(reload: (newContact: Contact) => void, onClos
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
   const showAlert = useContext(AlertContext);
-  
-  const stopLoading = () => setIsLoading(false);
 
   const extractErrorMessage = (field: string) => {
     if (!error) return "";
@@ -86,9 +84,9 @@ export function useContactModifier(reload: (newContact: Contact) => void, onClos
         }
         showAlert(convertNetworkErrorMessage(reason.message), "error")
       })
-      .finally(stopLoading)
+      .finally(() => setIsLoading(false))
     }
   }
 
-  return {isLoading, stopLoading, modify, error, extractErrorMessage};
+  return {isLoading, modify, error, extractErrorMessage};
 }
