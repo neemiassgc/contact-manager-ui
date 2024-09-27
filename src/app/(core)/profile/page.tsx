@@ -11,7 +11,7 @@ import DomainIcon from '@mui/icons-material/Domain';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
-import { formatAddress, formatPhoneValue, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
+import { formatAddress, formatPhoneValue, isEmpty, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
 import { Contact, AddressType, Run, StringType} from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
@@ -185,13 +185,13 @@ function ListCard(props: {
 
   return (
     <>
-      <Box className="w-full p-9 rounded-2xl" sx={paint(bg("surface-container-high"))}>
+      <Box className="w-full p-6 rounded-2xl" sx={paint(bg("surface-container-high"))}>
         <List
           className="rounded-b-xl border-b-2"
           sx={paint(bg("surface"), text("on-surface"), bg("surface-container-high"))}
           subheader={
           <ListSubheader
-            component="div" className="rounded-t-xl text-center"
+            component="div" className={"text-center "+`rounded${isEmpty(props.content) ? "" : "-t"}-xl `}
             sx={paint(bg("secondary"), text("on-secondary"))}>
             <Box className="flex-shrink mr-2">
               {props.titleIcon}
@@ -300,7 +300,6 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
           <SelectCountry
             variant="name"
             value={fields.country}
-            className="basis-24"
             onChange={value => setFields({...fields, country: value})}
             styles={textFieldTheme}
           /> : fields.country === "Brazil" ?

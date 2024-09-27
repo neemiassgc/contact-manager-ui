@@ -100,3 +100,7 @@ export function updateContactInList(contactList: Contact[], contact: Contact): C
   if (contactPosition !== -1) return contactList.with(contactPosition, contact);
   return null;
 }
+
+export function isEmpty(obj: Object): boolean {
+  return toKeys(obj).length === 0;
+}

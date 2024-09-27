@@ -131,7 +131,7 @@ export function Footer({home = false}: {home?: boolean}) {
       style={paint(bg("surface-container"), text("on-surface"), border("outline-variant"))}
       className={"bg-gray-500 py-3 absolute w-full border-t mt-5 "+(home ? "bottom-0" : "")}>
       <Typography className="text-center">{"Created by "}
-        <Link href="https://github.com/neemiassgc">neemiassgc</Link>
+        <Link href="https://github.com/neemiassgc" className="text-blue-900">neemiassgc</Link>
       </Typography>
     </div>
   );
@@ -288,7 +288,7 @@ export function DefaultButton({ title, onClick, colorVariant = "primary", childr
     <Button
       onClick={onClick}
       variant="contained"
-      className={"w-fit capitalize "+className}
+      className={"w-fit "+className}
       size="medium"
       sx={{
         ...styles, "&:hover": styles,
