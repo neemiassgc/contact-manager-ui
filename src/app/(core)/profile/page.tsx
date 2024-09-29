@@ -52,7 +52,7 @@ function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
           width: 100, height: 100, fontSize: 50,
           ...paint(bg("primary"), text("on-primary"))
         }}
-        src="/flag.svg"
+        src="https://api.dicebear.com/9.x/fun-emoji/svg"
       >{props.contact.name[0]}</Avatar>
       <Box className="ml-5 mt-1">
         <span style={paint(text("on-surface"))}>{props.contact.name}</span>

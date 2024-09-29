@@ -167,6 +167,7 @@ export function BadgedAvatar({ badged, letter }: { badged: boolean, letter: stri
    return (
     <Badge invisible={!badged} color='secondary' badgeContent=" " variant='dot'>
       <Avatar
+        src="https://api.dicebear.com/9.x/fun-emoji/svg"
         sx={
           badged
           ? paint(bg("tertiary"), text("on-tertiary"))
