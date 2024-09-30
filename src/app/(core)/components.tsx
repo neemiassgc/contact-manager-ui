@@ -116,21 +116,13 @@ export function ScreenLoading({ children }: { children: React.ReactNode }) {
       {
         error ? <ErrorScreen label={error.name}/> :
         !user || isLoading ? <Loading/> :
-        <Container>
+        <div className="w-screen min-h-screen flex flex-col gap-6">
           <Header name={user.name as string} picture={user.picture as string}/>
           <div className="flex-grow">{children}</div>
           <Footer/>
-        </Container>
+        </div>
       }
     </>
-  )
-}
-
-function Container({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="w-screen min-h-screen flex flex-col gap-6">
-      {children}
-    </div>
   )
 }
 
@@ -373,15 +365,25 @@ export function Modal({ mini = false, acceptButtonDisabled = false, ...props }:
       }
       <DialogActions sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Box className="w-full flex justify-center gap-3 overflow-hidden">
-          {
-            props.isLoading ? <CircularProgress size="3rem"/> :
             <>
-              <IconButton disabled={acceptButtonDisabled} sx={paint(text("primary"))} onClick={props.handleAccept} size="small">
+              <IconButton disabled={acceptButtonDisabled || props.isLoading} sx={paint(text("primary"))} onClick={props.handleAccept} size="small">
                 <CheckCircleIcon fontSize="large"/>
+               { 
+                props.isLoading &&
+                <CircularProgress
+                  thickness={4}
+                  size={36}
+                  color="success"
+                  sx={{
+                    position: 'absolute',
+                    top: 5,
+                    left: 5,
+                    zIndex: 1,
+                  }}
+                />}
               </IconButton>
-              <IconButton sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
+              <IconButton disabled={props.isLoading} sx={paint(text("error"))} onClick={props.handleClose} size="small"><HighlightOffIcon fontSize="large"/></IconButton>
             </>
-          } 
         </Box>
       </DialogActions>
     </Dialog>
