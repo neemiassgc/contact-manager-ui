@@ -116,20 +116,29 @@ export function ScreenLoading({ children }: { children: React.ReactNode }) {
       {
         error ? <ErrorScreen label={error.name}/> :
         !user || isLoading ? <Loading/> :
-        <>
+        <Container>
           <Header name={user.name as string} picture={user.picture as string}/>
-          {children}
-        </>
+          <div className="flex-grow">{children}</div>
+          <Footer/>
+        </Container>
       }
     </>
+  )
+}
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="w-screen min-h-screen flex flex-col gap-6">
+      {children}
+    </div>
   )
 }
 
 export function Footer({home = false}: {home?: boolean}) {
   return (
     <div
-      style={paint(bg("surface-container"), text("on-surface"), border("outline-variant"))}
-      className={"bg-gray-500 py-3 absolute w-full border-t mt-5 "+(home ? "bottom-0" : "")}>
+      style={paint(text("on-surface"), border("outline-variant"))}
+      className="py-3 w-full border-t h-fit">
       <Typography className="text-center">{"Created by "}
         <Link href="https://github.com/neemiassgc" className="text-blue-900">neemiassgc</Link>
       </Typography>

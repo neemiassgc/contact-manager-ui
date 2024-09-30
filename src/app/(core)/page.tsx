@@ -18,7 +18,7 @@ import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { paint, bg, border, text, textFieldTheme } from '../lib/colors';
 import { convertNetworkErrorMessage, filterByName, formatPhoneValue, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Footer, Modal, SelectCountry } from './components';
+import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Modal, SelectCountry } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 import AlertContext from '../lib/AlertContext';
@@ -37,14 +37,13 @@ export default function Home() {
 
   return (
     <>
-      <main className="mt-16 w-full p-1">
+      <main className="w-full p-1">
         {
           (error && isUserNotFound(error)) || isLoading ? <ContactBoardLoading/>
           : error ? <ErrorScreen label={error.message}/> :
           <ContactListBoard reloadContacts={reload} contacts={data as Contact[]}/>
         }
       </main>
-      <Footer home/>
     </>
   );
 }

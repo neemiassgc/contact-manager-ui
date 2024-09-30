@@ -27,7 +27,7 @@ export default function Page() {
 
   return (
     <>
-      <Box className="w-full sm:w-9/12 md:w-10/12 xl:w-8/12 mx-auto mt-10 mb-5">
+      <Box className="w-full sm:w-9/12 md:w-10/12 xl:w-8/12 mx-auto">
         <Breadcrumbs sx={paint(text("on-surface"))}>
           <Link href="/">Home</Link>
           <Typography>Profile</Typography>
@@ -35,7 +35,6 @@ export default function Page() {
         <Header contact={selectedContact} reload={reload}/>
         <Body contact={selectedContact} reload={reload}/>
       </Box>
-      <Footer/>
     </>
   )
 }
