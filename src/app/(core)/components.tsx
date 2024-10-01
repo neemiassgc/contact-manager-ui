@@ -164,18 +164,17 @@ export function NotifiablePage({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function BadgedAvatar({ badged, letter }: { badged: boolean, letter: string }) {
+export function BadgedAvatar({ badged = false, avatarSeed, sx }: { badged?: boolean, avatarSeed: string, sx?: object }) {
    return (
     <Badge invisible={!badged} color='secondary' badgeContent=" " variant='dot'>
       <Avatar
-        src="https://api.dicebear.com/9.x/fun-emoji/svg"
+        src={`https://api.dicebear.com/9.x/shapes/svg?seed=${avatarSeed}&backgroundType=gradientLinear`}
         sx={
-          badged
+          sx ? sx : badged
           ? paint(bg("tertiary"), text("on-tertiary"))
           : paint(bg("secondary"), text("on-secondary"))
         }
       >
-        {letter}
       </Avatar>
     </Badge>
   )

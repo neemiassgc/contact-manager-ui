@@ -16,7 +16,7 @@ import { Contact, AddressType, Run, StringType} from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
-import { CustomDivider, Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
+import { BadgedAvatar, CustomDivider, Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
 import { getAddressByCEP } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 
@@ -46,13 +46,13 @@ function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
 
   return (
     <Box className="w-full flex flex-col justify-center items-center">
-      <Avatar
+      <BadgedAvatar
         sx={{
           width: 100, height: 100, fontSize: 50,
           ...paint(bg("primary"), text("on-primary"))
         }}
-        src="https://api.dicebear.com/9.x/fun-emoji/svg"
-      >{props.contact.name[0]}</Avatar>
+        avatarSeed={props.contact.name}
+      />
       <Box className="ml-5 mt-1">
         <span style={paint(text("on-surface"))}>{props.contact.name}</span>
         <Tooltip title="Edit Contact Name" arrow>

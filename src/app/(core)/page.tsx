@@ -216,8 +216,8 @@ function ContactList(props: { data: Contact[], reloadContacts: Run}) {
                   }}>
                     <ListItemAvatar>
                       <BadgedAvatar
+                        avatarSeed={contact.name}
                         badged={unseenContactNames.includes(contact.name)}
-                        letter={contact.name[0].toUpperCase()}
                       />
                     </ListItemAvatar>
                     <ListItemText
