@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { fetchAllContacts, patcher } from "./net"
-import { Contact, ErrorType, Run, ViolationError } from "./types";
+import { Contact, ErrorType, Run, StringType, ViolationError } from "./types";
 import { getLocalContacts, getSelectedContact, saveLocalContacts, setSelectedContact, updateLocalContact } from "./storage";
-import { convertNetworkErrorMessage, loginIfTokenIsExpired } from "./misc";
+import { convertNetworkErrorMessage, loginIfTokenIsExpired, toKeys } from "./misc";
 import AlertContext from "./AlertContext";
 
 export function useAllContacts(): { data: Contact[], error?: ErrorType, isLoading: boolean, reload: () => void } {
@@ -88,5 +88,5 @@ export function useContactModifier(reload: (newContact: Contact) => void, onClos
     }
   }
 
-  return {isLoading, modify, error, extractErrorMessage};
+  return {isLoading, modify, error, setError, extractErrorMessage};
 }

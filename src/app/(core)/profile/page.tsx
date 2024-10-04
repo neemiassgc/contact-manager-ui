@@ -12,7 +12,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
 import { formatAddress, formatPhoneValue, isEmpty, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
-import { Contact, AddressType, Run, StringType} from "../../lib/types";
+import { Contact, AddressType, Run, StringType, ViolationError} from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
@@ -471,18 +471,28 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
 
 function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
   const [email, setEmail] = useState<StringType>({label: "", email: ""});
-  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
+  const {isLoading, modify, error, setError, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
 
   const fieldNames: string[] = ["label", "email"];
   return (
     <Modal
       handleAccept={
-        modify(props.contact.id, {
-          emails: {
-            ...props.contact.emails,
-            [email.label]: email.email
+        () => {
+          if (toKeys(props.contact.emails).includes(email.label)) {
+            setError(new ViolationError(JSON.stringify({
+              fieldViolations: {
+                label: ["This email label is already exist"]
+              }
+            })))
+            return;
           }
-        }, "Email added successfully!")
+          modify(props.contact.id, {
+            emails: {
+              ...props.contact.emails,
+              [email.label]: email.email
+            }
+          }, "Email added successfully!")();
+        }
       }
       handleClose={props.onClose}
       title="Create New Email"
