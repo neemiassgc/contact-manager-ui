@@ -1,4 +1,4 @@
-import { Address, AddressType, Contact, ErrorType, ShortContact, StringType, ViolationError } from "./types";
+import { Address, AddressType, Contact, ErrorType, StringType, ViolationError } from "./types";
 
 export function toKeys(input: object): string[] {
   const keys: string[] = [];
@@ -6,9 +6,9 @@ export function toKeys(input: object): string[] {
   return keys;
 }
 
-export function getPaginatedData(size: number, page: number, contacts: Contact[]): Contact[] {
-  const viewStart: number = size * page - size;
-  return contacts.slice(viewStart === 0 ? 0 : viewStart, size * page);
+export function sliceContacts(pageSize: number, page: number, contacts: Contact[]): Contact[] {
+  const viewStart: number = pageSize * page - pageSize;
+  return contacts.slice(viewStart === 0 ? 0 : viewStart, pageSize * page);
 }
 
 export function filterByName(contacts: Contact[], text: string) {
@@ -103,4 +103,15 @@ export function updateContactInList(contactList: Contact[], contact: Contact): C
 
 export function isEmpty(obj: Object): boolean {
   return toKeys(obj).length === 0;
+}
+
+export function isNotTheLastItem(list: any[], index: number): boolean {
+  return index !== list.length - 1;
+}
+
+export function extractHelperTextFromError(fieldName: string, error: Error | undefined): string | undefined {
+  if (error instanceof ViolationError) {
+    const violationList = error.toObject().fieldViolations[fieldName]
+    return violationList && violationList[0];
+  }
 }
