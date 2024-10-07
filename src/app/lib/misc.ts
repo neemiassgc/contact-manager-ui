@@ -1,4 +1,4 @@
-import { Address, AddressType, Contact, ErrorType, StringType, ViolationError } from "./types";
+import { Address, IndexedAddress, Contact, ErrorType, IndexedString, ViolationError } from "./types";
 
 export function toKeys(input: object): string[] {
   const keys: string[] = [];
@@ -75,8 +75,8 @@ export function formatPhoneValue(oldValue: string, newValue: string): string {
   return /\D+/.test(newValue) ? oldValue : newValue;
 }
 
-export function removeProperty(object: StringType | AddressType, propertyName: string): object {
-  const outputObject: StringType | AddressType = {};
+export function removeProperty(object: IndexedString | IndexedAddress, propertyName: string): object {
+  const outputObject: IndexedString | IndexedAddress = {};
   for (const key of toKeys(object))
     if (key !== propertyName) outputObject[key] = object[key];
   return outputObject;
@@ -111,7 +111,7 @@ export function isNotTheLastItem(list: any[], index: number): boolean {
 
 export function extractHelperTextFromError(fieldName: string, error: Error | undefined): string | undefined {
   if (error instanceof ViolationError) {
-    const violationList = error.toObject().fieldViolations[fieldName]
+    const violationList = error.getContentAsFieldViolations().fieldViolations[fieldName]
     return violationList && violationList[0];
   }
 }

@@ -10,13 +10,18 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 import {
   addUnseenContactName, clearLocalContacts, getAllUnseenContactNames,
-  removeUnseenContactName, setSelectedContact
+  removeUnseenContactName, setSelectedLocalContact
 } from '../lib/storage';
-import { Contact, Run, ShortContact, ViolationError } from "../lib/types"
+import { Contact, Run, ShortContact } from "../lib/types"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { paint, bg, border, text, textFieldTheme } from '../lib/colors';
-import { convertNetworkErrorMessage, filterByName, formatPhoneValue, getPaginatedData, isNotUndefined, isUserNotFound, isViolationError } from '../lib/misc';
+import {
+  convertNetworkErrorMessage, filterByName, formatPhoneValue, sliceContacts,
+  isNotUndefined, isUserNotFound, isViolationError,
+  isNotTheLastItem,
+  extractHelperTextFromError
+} from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
 import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Modal, SelectCountry } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
@@ -68,7 +73,6 @@ function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run }) {
         filteredContacts.length > 0 ?
         <PageableContactList
           reloadContacts={props.reloadContacts}
-
           contacts={filteredContacts}
         /> :
         <>
@@ -149,7 +153,7 @@ function PageableContactList(props: { contacts: Contact[], reloadContacts: Run }
     <>
       <ContactList
         reloadContacts={props.reloadContacts}
-        data={getPaginatedData(countPerPage, page, props.contacts)}
+        contacts={sliceContacts(countPerPage, page, props.contacts)}
       />
       {
         props.contacts.length > countPerPage &&
@@ -172,17 +176,17 @@ function PageableContactList(props: { contacts: Contact[], reloadContacts: Run }
   )
 }
 
-function ContactList(props: { data: Contact[], reloadContacts: Run}) {
+function ContactList(props: { contacts: Contact[], reloadContacts: Run}) {
   const router = useRouter();
   const [consentModal, setConsentModal] = useState({loading: false, open: false});
-  const [contactData, setContactData] = useState({ name: "", id: ""});
+  const [selectedContact, setSelectedContact] = useState({ name: "", id: ""});
   const showAlert = useContext(AlertContext);
 
   const unseenContactNames: string[] = getAllUnseenContactNames();
 
   const removeContact = () => {
     setConsentModal({...consentModal, loading: true})
-    deleteContact(contactData.id)
+    deleteContact(selectedContact.id)
       .then(() => {
         clearLocalContacts();
         props.reloadContacts();
@@ -198,19 +202,19 @@ function ContactList(props: { data: Contact[], reloadContacts: Run}) {
     <>
       <Box className="w-full rounded-xl border" sx={paint(bg("surface"), text("on-surface"), border("outline-variant"))}>
         {
-          props.data.map((contact, index, list) => {
+          props.contacts.map((contact, index, list) => {
             return (
               <>
                 <ListItem key={index} secondaryAction={
                   <IconButton onClick={() => {
                     setConsentModal({loading: false, open: true});
-                    setContactData({ name: contact.name, id: contact.id });
+                    setSelectedContact({ name: contact.name, id: contact.id });
                   }}>
                     <DeleteForeverIcon sx={text("on-surface")}/>
                   </IconButton>
                 }>
                   <ListItemButton onClick={() => {
-                    setSelectedContact(contact.id);
+                    setSelectedLocalContact(contact.id);
                     removeUnseenContactName(contact.name);
                     router.push("/profile")
                   }}>
@@ -228,7 +232,7 @@ function ContactList(props: { data: Contact[], reloadContacts: Run}) {
                   </ListItemButton>
                 </ListItem>
                 {
-                  index !== list.length - 1 && <Divider variant="middle"/> 
+                  isNotTheLastItem(list, index) && <Divider variant="middle"/> 
                 }
               </>
             )
@@ -239,7 +243,7 @@ function ContactList(props: { data: Contact[], reloadContacts: Run}) {
         mini
         isLoading={consentModal.loading}
         open={consentModal.open}
-        title={"Delete "+contactData.name+"?"}
+        title={"Delete "+selectedContact.name+"?"}
         handleClose={() => setConsentModal({loading: false, open: false})}
         handleAccept={removeContact}
       />
@@ -261,14 +265,6 @@ function ContactCreationModal(props: {
 
   const setTextField = (field: string) => ({ target: { value }}: ChangeEvent<HTMLInputElement>) =>
       setTextFieldData({...textFieldData, [field]: field === "phoneValue" ? formatPhoneValue(textFieldData.phoneValue, value) : value});
-
-  const extractErrorHelperText = (fieldName: string) => {
-    if (error instanceof ViolationError) {
-      const value = JSON.parse(error.message)?.fieldViolations[fieldName];
-      return value ? value[0] : "";
-    }
-    else return "";
-  }
 
   const addNewContact = () => {
     setError(undefined);
@@ -315,8 +311,8 @@ function ContactCreationModal(props: {
           disabled={isLoading}
           value={textFieldData.name}
           onChange={setTextField("name")}
-          error={isNotUndefined(error) && !!extractErrorHelperText("name")}
-          helperText={extractErrorHelperText("name")}
+          error={isNotUndefined(error) && !!extractHelperTextFromError("name", error)}
+          helperText={extractHelperTextFromError("name", error)}
           {...textFieldTheme}
           className="w-full"
           label="contact name"
@@ -328,8 +324,8 @@ function ContactCreationModal(props: {
           disabled={isLoading}
           value={textFieldData.phoneLabel}
           onChange={setTextField("phoneLabel")}
-          error={isNotUndefined(error) && !!extractErrorHelperText("label")}
-          helperText={extractErrorHelperText("label")}
+          error={isNotUndefined(error) && !!extractHelperTextFromError("label", error)}
+          helperText={extractHelperTextFromError("label", error)}
           {...textFieldTheme}
           label="phone label"
           placeholder="phone label"
@@ -348,8 +344,8 @@ function ContactCreationModal(props: {
           disabled={isLoading}
           onChange={setTextField("phoneValue")}
           value={textFieldData.phoneValue}
-          error={isNotUndefined(error) && !!extractErrorHelperText("phone")}
-          helperText={extractErrorHelperText("phone")}
+          error={isNotUndefined(error) && !!extractHelperTextFromError("phone", error)}
+          helperText={extractHelperTextFromError("phone", error)}
           {...textFieldTheme}
           className="flex-1"
           label="phone"

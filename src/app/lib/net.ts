@@ -67,7 +67,7 @@ async function checkForError(response: Response): Promise<void> {
     ) {
       const responseBody: object = await response.json();
       if ("fieldViolations" in responseBody) {
-        throw new ViolationError(JSON.stringify(responseBody));
+        throw new ViolationError(responseBody);
       }
       throw new ErrorType(JSON.stringify(responseBody), response.status);
     }

@@ -11,12 +11,16 @@ import DomainIcon from '@mui/icons-material/Domain';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
-import { formatAddress, formatPhoneValue, isEmpty, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
-import { Contact, IndexedAddress, Run, IndexedString, ViolationError} from "../../lib/types";
+import {
+  formatAddress, formatPhoneValue, isEmpty, locateCountryFlag,
+  removeProperty, toCamelCase, toKeys, extractHelperTextFromError,
+  isTheLastElement
+} from "../../lib/misc";
+import { Contact, IndexedAddress, Run, IndexedString, ViolationError, Address} from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
-import { BadgedAvatar, CustomDivider, Footer, Loading, Modal, SelectCountry, SplitButton } from "../components";
+import { BadgedAvatar, CustomDivider, Loading, Modal, SelectCountry, SplitButton } from "../components";
 import { getAddressByCEP } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 
@@ -42,7 +46,7 @@ export default function Page() {
 function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
   const [open, setOpen] = useState(false);
   const [textFieldValue, setTextFieldValue] = useState("")
-  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, () => setOpen(false));
+  const {isLoading, modify, error} = useContactModifier(props.reload, () => setOpen(false));
 
   return (
     <Box className="w-full flex flex-col justify-center items-center">
@@ -80,8 +84,8 @@ function Header(props: {contact: Contact, reload: (contact: Contact) => void}) {
           placeholder="New name"
           size="small"
           variant="outlined"
-          error={!!error && !!extractErrorMessage("name")}
-          helperText={extractErrorMessage("name")}
+          error={!!error && !!extractHelperTextFromError("name", error)}
+          helperText={extractHelperTextFromError("name", error)}
         />
       </Modal>
     </Box>
@@ -182,6 +186,19 @@ function ListCard(props: {
   const [selectedItem, setSelectedItem] = useState("");
   const {isLoading, modify} = useContactModifier(props.reload, () => setOpen(false));
 
+  const countryFlagAvatar: (arg: string | Address) => React.ReactElement | undefined = arg => {
+    if (typeof arg === "object") {
+      const address = arg as Address;
+      return (
+        <ListItemAvatar>
+          <Avatar src={locateCountryFlag(address.country)}>
+            {address.country[0]}
+          </Avatar>
+        </ListItemAvatar>
+      )
+    }
+  }
+
   return (
     <>
       <Box className="w-full p-6 rounded-2xl" sx={paint(bg("surface-container-high"))}>
@@ -217,24 +234,18 @@ function ListCard(props: {
                     }
                   >
                     <ListItemButton>
-                      {
-                        typeof props.content[key] === "object" &&
-                        <ListItemAvatar>
-                          <Avatar src={locateCountryFlag(props.content[key].country)}>
-                            {props.content[key].country[0]}
-                          </Avatar>
-                        </ListItemAvatar>
-                      }
+                      {countryFlagAvatar(props.content[key])}
                       <ListItemText
                         primary={
-                          typeof props.content[key] === "object" ? formatAddress(props.content[key]) : props.content[key]
+                          typeof props.content[key] === "object" ?
+                          formatAddress(props.content[key] as Address) : props.content[key]
                         }
                         secondary={key}
                       />
                     </ListItemButton>
                   </ListItem>
                   {
-                    index !== list.length - 1 && <Divider key={index} variant="middle"/> 
+                    isTheLastElement(index, list) && <Divider key={index} variant="middle"/> 
                   }
                 </>
               )
@@ -262,7 +273,7 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
   const [fields, setFields] = useState<IndexedString>({
     label: "", street: "", country: "", city: "", state: "", zipcode: ""
   })
-  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
+  const {isLoading, modify, error} = useContactModifier(props.reload, props.onClose);
 
   return (
     <Modal
@@ -290,8 +301,8 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
           placeholder={"Label"}
           value={fields["Label"]}
           onChange={event => setFields({...fields, "label": event.target.value})}
-          error={!!error && !!extractErrorMessage("label")}
-          helperText={extractErrorMessage("label")}
+          error={!!error && !!extractHelperTextFromError("label", error)}
+          helperText={extractHelperTextFromError("label", error)}
         />
         <CustomDivider variant="fullWidth"/>
         {
@@ -307,14 +318,12 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
             setFields={setFields}
             isLoading={isLoading}
             error={error}
-            extractErrorMessage={extractErrorMessage}
           /> :
           <DefaultAddressForm
             fields={fields}
             setFields={setFields}
             isLoading={isLoading}
             error={error}
-            extractErrorMessage={extractErrorMessage}
           />
         }
       </Box>
@@ -324,7 +333,7 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
 
 function BrazilAddressForm(props: {
   fields: IndexedString, setFields: (fields: IndexedString | ((fields: IndexedString) => IndexedString)) => void,
-  isLoading: boolean, error: Error | undefined, extractErrorMessage: (field: string) => string
+  isLoading: boolean, error: Error | undefined
 }) {
   const [township, setTownship] = useState<IndexedString>({ cidade: "", bairro: ""});
   const [cepHelperText, setCepHelperText] = useState("");
@@ -358,8 +367,8 @@ function BrazilAddressForm(props: {
       {...textFieldTheme} 
       disabled={fieldName === "País" || (fieldName === "CEP" && props.fields.zipcode.length === 8 && !cepHelperText) || props.isLoading}
       key={index}
-      error={(fieldName === "CEP" && cepHelperText.length > 1) || (!!props.error && !!props.extractErrorMessage(fieldNames[fieldName]))}
-      helperText={fieldName === "CEP" ? cepHelperText : props.extractErrorMessage(fieldNames[fieldName])}
+      error={(fieldName === "CEP" && cepHelperText.length > 1) || (!!props.error && !!extractHelperTextFromError(fieldNames[fieldName], props.error))}
+      helperText={fieldName === "CEP" ? cepHelperText : extractHelperTextFromError(fieldNames[fieldName], props.error)}
       variant="outlined"
       size="small"
       label={fieldName}
@@ -388,7 +397,7 @@ function BrazilAddressForm(props: {
 
 function DefaultAddressForm(props: {
   fields: IndexedString, setFields: (fields: IndexedString) => void, isLoading: boolean,
-  error: Error | undefined, extractErrorMessage: (field: string) => string
+  error: Error | undefined
 }) {
   const fieldNames: string[] = [ "Country", "Street", "City", "State", "Zipcode"];
 
@@ -396,8 +405,8 @@ function DefaultAddressForm(props: {
     <TextField
       {...textFieldTheme} 
       disabled={props.isLoading || fieldName === "Country" || props.isLoading}
-      error={!!props.error && !!props.extractErrorMessage(fieldName.toLowerCase())}
-      helperText={props.extractErrorMessage(fieldName.toLowerCase())}
+      error={!!props.error && !!extractHelperTextFromError(fieldName.toLowerCase(), props.error)}
+      helperText={extractHelperTextFromError(fieldName.toLowerCase(), props.error)}
       key={index}
       variant="outlined"
       size="small"
@@ -412,7 +421,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
   const [fields, setFields] = useState(
     { phoneLabel: "", phoneValue: "", countryCode: "+55" }
   )
-  const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
+  const {isLoading, modify, error} = useContactModifier(props.reload, props.onClose);
 
   return (
     <Modal title="Create New Phone Number"
@@ -439,8 +448,8 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           variant="outlined"
           className="basis-full sm:basis-3/12 flex-auto"
           disabled={isLoading}
-          error={!!error && !!extractErrorMessage("label")}
-          helperText={extractErrorMessage("label")}
+          error={!!error && !!extractHelperTextFromError("label", error)}
+          helperText={extractHelperTextFromError("label", error)}
         />
         <SelectCountry
           disabled={isLoading}
@@ -461,8 +470,8 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           size="small"
           variant="outlined"
           disabled={isLoading}
-          error={!!error && !!extractErrorMessage("phone")}
-          helperText={extractErrorMessage("phone")}
+          error={!!error && !!extractHelperTextFromError("phone", error)}
+          helperText={extractHelperTextFromError("phone", error)}
         />
       </Box>
     </Modal>
@@ -471,7 +480,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
 
 function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
   const [email, setEmail] = useState<IndexedString>({label: "", email: ""});
-  const {isLoading, modify, error, setError, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
+  const {isLoading, modify, error, setError} = useContactModifier(props.reload, props.onClose);
 
   const fieldNames: string[] = ["label", "email"];
   return (
@@ -479,11 +488,11 @@ function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact,
       handleAccept={
         () => {
           if (toKeys(props.contact.emails).includes(email.label)) {
-            setError(new ViolationError(JSON.stringify({
+            setError(new ViolationError({
               fieldViolations: {
                 label: ["This email label is already exist"]
               }
-            })))
+            }))
             return;
           }
           modify(props.contact.id, {
@@ -511,8 +520,8 @@ function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact,
               placeholder={field}
               value={email[field]}
               onChange={event => setEmail({...email, [field]: event.target.value})}
-              error={!!error && !!extractErrorMessage(field)}
-              helperText={extractErrorMessage(field)}
+              error={!!error && !!extractHelperTextFromError(field, error)}
+              helperText={extractHelperTextFromError(field, error)}
             />
           )
         }

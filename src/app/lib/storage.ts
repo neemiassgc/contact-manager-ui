@@ -23,7 +23,7 @@ export function getSelectedContact(): Contact | null {
 	return null;
 }
 
-export function setSelectedContact(contactId: string): void {
+export function setSelectedLocalContact(contactId: string): void {
   localStorage.setItem("selectedContact", contactId);
 }
 
