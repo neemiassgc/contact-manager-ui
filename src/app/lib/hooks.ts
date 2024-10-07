@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { fetchAllContacts, patcher } from "./net"
-import { Contact, ErrorType, Run, StringType, ViolationError } from "./types";
+import { Contact, ErrorType, Run, ViolationError } from "./types";
 import { getLocalContacts, getSelectedContact, saveLocalContacts, setSelectedContact, updateLocalContact } from "./storage";
 import { convertNetworkErrorMessage, loginIfTokenIsExpired, toKeys } from "./misc";
 import AlertContext from "./AlertContext";

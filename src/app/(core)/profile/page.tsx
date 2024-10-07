@@ -12,7 +12,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
 import { formatAddress, formatPhoneValue, isEmpty, locateCountryFlag, removeProperty, toCamelCase, toKeys } from "../../lib/misc";
-import { Contact, AddressType, Run, StringType, ViolationError} from "../../lib/types";
+import { Contact, IndexedAddress, Run, IndexedString, ViolationError} from "../../lib/types";
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
@@ -175,7 +175,7 @@ function Body(props: { contact: Contact, reload: (newContact: Contact) => void }
 function ListCard(props: {
   titleIcon: React.ReactElement,
   cardTitle: string,
-  content: StringType | AddressType,
+  content: IndexedString | IndexedAddress,
   reload: (newContact: Contact) => void
 }) {
   const [open, setOpen] = useState(false);
@@ -259,7 +259,7 @@ function ListCard(props: {
 }
 
 function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
-  const [fields, setFields] = useState<StringType>({
+  const [fields, setFields] = useState<IndexedString>({
     label: "", street: "", country: "", city: "", state: "", zipcode: ""
   })
   const {isLoading, modify, error, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
@@ -323,10 +323,10 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
 }
 
 function BrazilAddressForm(props: {
-  fields: StringType, setFields: (fields: StringType | ((fields: StringType) => StringType)) => void,
+  fields: IndexedString, setFields: (fields: IndexedString | ((fields: IndexedString) => IndexedString)) => void,
   isLoading: boolean, error: Error | undefined, extractErrorMessage: (field: string) => string
 }) {
-  const [township, setTownship] = useState<StringType>({ cidade: "", bairro: ""});
+  const [township, setTownship] = useState<IndexedString>({ cidade: "", bairro: ""});
   const [cepHelperText, setCepHelperText] = useState("");
 
   const fillByCEP = (cep: string) => {
@@ -349,7 +349,7 @@ function BrazilAddressForm(props: {
     .catch(_ => setCepHelperText("CEP is invalid!"));
   }
 
-  const fieldNames: StringType = {
+  const fieldNames: IndexedString = {
     "País": "country", "CEP": "zipcode", "Endereço": "street",
     "Estado": "state", "Cidade": "city", "Bairro": "city"
   };
@@ -387,7 +387,7 @@ function BrazilAddressForm(props: {
 }
 
 function DefaultAddressForm(props: {
-  fields: StringType, setFields: (fields: StringType) => void, isLoading: boolean,
+  fields: IndexedString, setFields: (fields: IndexedString) => void, isLoading: boolean,
   error: Error | undefined, extractErrorMessage: (field: string) => string
 }) {
   const fieldNames: string[] = [ "Country", "Street", "City", "State", "Zipcode"];
@@ -470,7 +470,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
 }
 
 function EmailPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
-  const [email, setEmail] = useState<StringType>({label: "", email: ""});
+  const [email, setEmail] = useState<IndexedString>({label: "", email: ""});
   const {isLoading, modify, error, setError, extractErrorMessage} = useContactModifier(props.reload, props.onClose);
 
   const fieldNames: string[] = ["label", "email"];

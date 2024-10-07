@@ -7,20 +7,20 @@ export interface Address {
   zipcode: string
 }
 
-export interface StringType {
+export interface IndexedString {
   [propName: string]: string
 }
 
-export interface AddressType {
+export interface IndexedAddress {
 	[propName: string]: Address
 }
 
 export interface Contact {
   id: string,
   name: string,
-  phoneNumbers: StringType,
-  addresses: AddressType,
-  emails: StringType
+  phoneNumbers: IndexedString,
+  addresses: IndexedAddress,
+  emails: IndexedString
 }
 
 export class ErrorType extends Error {
