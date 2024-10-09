@@ -82,7 +82,7 @@ export function ErrorScreen({ label }: { label: string }) {
 
 export function Header({ name, picture }: { name: string, picture: string}) {
   return (
-    <header className="w-full text-right p-3 flex justify-between items-center border-b"
+    <header className="w-full text-right p-3 flex-col sm:flex-row flex justify-between items-center border-b gap-3 sm:gap-0"
       style={paint(bg("surface-container"), text("on-surface"), border("outline-variant"))}
     >
       <Box className="ml-1 sm:ml-5">
@@ -344,7 +344,7 @@ export function SelectCountry({disabled = false, variant = "dial_code", ...props
 export function Modal({ mini = false, acceptButtonDisabled = false, ...props }:
   ModalType & { children?: ReactNode, mini?: boolean, acceptButtonDisabled?: boolean }) {
   return props.open && (
-    <Dialog open={true} maxWidth="xl">
+    <Dialog open={true} maxWidth="sm">
       <DialogTitle sx={paint(bg("surface-container-low"), text("on-surface"))}>
         <Typography sx={{color: "inherit"}} className="text-center">
           {
@@ -356,7 +356,7 @@ export function Modal({ mini = false, acceptButtonDisabled = false, ...props }:
       {
         !mini &&
         <>
-          <DialogContent className="w-96" sx={paint(bg("surface-container-low"), text("on-surface"))}>
+          <DialogContent sx={paint(bg("surface-container-low"), text("on-surface"))}>
             {props.children}
           </DialogContent>
           <CustomDivider/>

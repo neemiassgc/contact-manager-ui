@@ -31,7 +31,7 @@ export default function Page() {
 
   return (
     <>
-      <Box className="w-full sm:w-9/12 md:w-10/12 xl:w-8/12 mx-auto">
+      <Box className="w-full px-2 sm:px-0 sm:w-9/12 md:w-10/12 xl:w-8/12 mx-auto">
         <Breadcrumbs sx={paint(text("on-surface"))}>
           <Link href="/">Home</Link>
           <Typography>Profile</Typography>
@@ -207,7 +207,7 @@ function ListCard(props: {
           sx={paint(bg("surface"), text("on-surface"), bg("surface-container-high"))}
           subheader={
           <ListSubheader
-            component="div" className={"text-center "+`rounded${isEmpty(props.content) ? "" : "-t"}-xl `}
+            component="div" className={"text-center "+`rounded${isEmpty(props.content) ? "-" : "-t-"}xl `}
             sx={paint(bg("secondary"), text("on-secondary"))}>
             <Box className="flex-shrink mr-2">
               {props.titleIcon}
@@ -238,7 +238,7 @@ function ListCard(props: {
                       <ListItemText
                         primary={
                           typeof props.content[key] === "object" ?
-                          formatAddress(props.content[key] as Address) : props.content[key]
+                          formatAddress(props.content[key] as Address) : props.content[key] as string
                         }
                         secondary={key}
                       />
