@@ -20,7 +20,7 @@ import { Contact, IndexedAddress, Run, IndexedString, ViolationError, Address} f
 import { useState } from "react";
 import { getSelectedContact } from "../../lib/storage";
 import { bg, text, paint, textFieldTheme } from "../../lib/colors";
-import { BadgedAvatar, CustomDivider, Loading, Modal, SelectCountry, SplitButton } from "../components";
+import { BadgedAvatar, CountryInteractiveSelector, CustomDivider, Loading, Modal, SplitButton } from "../components";
 import { getAddressByCEP } from "@/app/lib/net";
 import { useContactModifier, useSelectedContact } from "@/app/lib/hooks";
 
@@ -275,6 +275,7 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
     label: "", street: "", country: "", city: "", state: "", zipcode: ""
   })
   const {isLoading, modify, error} = useContactModifier(props.reload, props.onClose);
+  console.log(fields.country);
 
   return (
     <Modal
@@ -308,11 +309,9 @@ function AddressPromptModal(props: {open: boolean, onClose: Run, contact: Contac
         <CustomDivider variant="fullWidth"/>
         {
           fields.country === "" ?
-          <SelectCountry
-            variant="name"
-            value={fields.country}
-            onChange={value => setFields({...fields, country: value})}
+          <CountryInteractiveSelector
             styles={textFieldTheme}
+            setValue={value => setFields({...fields, country: value ?? ""})}
           /> : fields.country === "Brazil" ?
           <BrazilAddressForm
             fields={fields}

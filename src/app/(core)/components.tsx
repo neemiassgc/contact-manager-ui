@@ -4,7 +4,7 @@ import {
   ClickAwayListener, Divider, FormControl, Grow, IconButton, InputLabel, MenuItem,
   MenuList, Paper, Popper, Skeleton, Tooltip, Typography, Select,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Snackbar, Alert
+  Snackbar, Alert, Autocomplete, TextField
 } from "@mui/material";
 import { bg, border, ColorRole, paint, text } from "../lib/colors";
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
@@ -302,13 +302,10 @@ export function DefaultButton({ title, onClick, colorVariant = "primary", childr
   )
 }
 
-export function SelectCountry({disabled = false, variant = "dial_code", ...props}: {
-  value: string,
-  onChange: (value: string) => void,
-  className?: string,
+export function CountryInteractiveSelector({disabled = false, ...props}: {
+  setValue: (value: string | null) => void,
   styles: any,
   disabled?: boolean,
-  variant?: "dial_code" | "name"
 }) {
   const [data, setData] = useState<CountryCode[]>([]);
 
@@ -318,26 +315,14 @@ export function SelectCountry({disabled = false, variant = "dial_code", ...props
   }, [])
 
   return (
-    <FormControl {...props.styles} className={props.className} size="small">
-      <InputLabel id="input-label">country</InputLabel>
-      <Select
-        disabled={disabled}
-        sx={text("tertiary")}
-        labelId="input-label"
-        value={props.value}
-        onChange={event => props.onChange(event.target.value)}
-        label="country"
-        renderValue={_ => props.value}
-      >
-        {
-          data.sort((a, b) => a.name.localeCompare(b.name)).map((countryCode, key) =>
-            <MenuItem sx={text("tertiary")} key={key} value={countryCode[variant]}>
-              {countryCode.name} {getFlagEmoji(countryCode.code)} {countryCode.dial_code}
-            </MenuItem>
-          )
-        }
-      </Select>
-    </FormControl>
+    <Autocomplete
+      autoComplete
+      autoHighlight
+      onChange={(_, newValue) => props.setValue(newValue?.name ?? null)}
+      options={data}
+      renderInput={(params) => <TextField {...params} label="Country" size="small" variant="outlined" />}
+      getOptionLabel={country => `${country.name} ${getFlagEmoji(country.code)}`}
+    />
   )
 }
 
