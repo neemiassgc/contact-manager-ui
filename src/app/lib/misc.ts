@@ -71,8 +71,11 @@ export function getFlagEmoji(countryCode: string): string {
   );
 }
 
-export function formatPhoneValue(oldValue: string, newValue: string): string {
-  return /\D+/.test(newValue) ? oldValue : newValue;
+export function phoneValueTransformer(oldValue: string, newValue: string): string {
+  console.log(`oldLength: ${oldValue.length}, newValue: ${newValue.length}`)
+  if (oldValue.length < newValue.length)
+    return /^\d|\+$/.test(newValue[newValue.length - 1]) ? newValue : oldValue;
+  return newValue;
 }
 
 export function removeProperty(object: IndexedString | IndexedAddress, propertyName: string): object {

@@ -12,7 +12,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import Link from "next/link";
 import {
-  formatAddress, formatPhoneValue, isEmpty, locateCountryFlag,
+  formatAddress, phoneValueTransformer, isEmpty, locateCountryFlag,
   removeProperty, toCamelCase, toKeys, extractHelperTextFromError,
   isTheLastElement
 } from "../../lib/misc";
@@ -219,7 +219,7 @@ function ListCard(props: {
             toKeys(props.content).map((key, index, list) => {
               return (
                 <>
-                  <ListItem disableGutters
+                  <ListItem disableGutters disablePadding
                     className="border-x-2"
                     sx={bg("surface")}
                     key={index}
@@ -236,6 +236,7 @@ function ListCard(props: {
                     <ListItemButton>
                       {countryFlagAvatar(props.content[key])}
                       <ListItemText
+                        className="overflow-scroll"
                         primary={
                           typeof props.content[key] === "object" ?
                           formatAddress(props.content[key] as Address) : props.content[key] as string
@@ -418,9 +419,7 @@ function DefaultAddressForm(props: {
 }
 
 function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Contact, reload: (newContact: Contact) => void}) {
-  const [fields, setFields] = useState(
-    { phoneLabel: "", phoneValue: "", countryCode: "+55" }
-  )
+  const [fields, setFields] = useState({ phoneLabel: "", phoneValue: "" })
   const {isLoading, modify, error} = useContactModifier(props.reload, props.onClose);
 
   return (
@@ -432,7 +431,7 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
         modify(props.contact.id, {
           phoneNumbers: {
             ...props.contact.phoneNumbers,
-            [fields.phoneLabel]: fields.countryCode + fields.phoneValue
+            [fields.phoneLabel]: fields.phoneValue
           }
         }, "Phone number added successfully!")
       }
@@ -451,22 +450,15 @@ function PhoneNumberPromptModal(props: {open: boolean, onClose: Run, contact: Co
           error={!!error && !!extractHelperTextFromError("label", error)}
           helperText={extractHelperTextFromError("label", error)}
         />
-        <SelectCountry
-          disabled={isLoading}
-          value={fields.countryCode}
-          className="basis-24"
-          onChange={value => setFields({...fields, countryCode: value})}
-          styles={textFieldTheme}
-        />
         <TextField
           {...textFieldTheme}
           value={fields.phoneValue}
           onChange={({ target: { value }}) => {
-            setFields({...fields, phoneValue: formatPhoneValue(fields.phoneValue, value)})
+            setFields({...fields, phoneValue: phoneValueTransformer(fields.phoneValue, value)})
           }}
           className="basis-1/2 flex-grow"
           label="phone"
-          placeholder="phone"
+          placeholder="+xxxxxxxxxx"
           size="small"
           variant="outlined"
           disabled={isLoading}

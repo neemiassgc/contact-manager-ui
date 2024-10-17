@@ -17,13 +17,12 @@ import { useRouter } from "next/navigation"
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { paint, bg, border, text, textFieldTheme } from '../lib/colors';
 import {
-  convertNetworkErrorMessage, filterByName, formatPhoneValue, sliceContacts,
+  convertNetworkErrorMessage, filterByName, phoneValueTransformer, sliceContacts,
   isNotUndefined, isUserNotFound, isViolationError,
-  isNotTheLastItem,
-  extractHelperTextFromError
+  isNotTheLastItem, extractHelperTextFromError
 } from '../lib/misc';
 import { useAllContacts } from '../lib/hooks';
-import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Modal, SelectCountry } from './components';
+import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Modal } from './components';
 import { createNewContact, createNewUser, deleteContact } from '../lib/net';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 import AlertContext from '../lib/AlertContext';
@@ -256,15 +255,15 @@ function ContactCreationModal(props: {
   handleClose: Run,
   reloadContacts: Run
 }) {
-  const [textFieldData, setTextFieldData] = useState<ShortContact & {countryCode: string}>(
-    { name: "", phoneLabel: "", phoneValue: "", countryCode: "+1"}
+  const [textFieldData, setTextFieldData] = useState<ShortContact>(
+    { name: "", phoneLabel: "", phoneValue: ""}
   )
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
   const showAlert = useContext(AlertContext);
 
   const setTextField = (field: string) => ({ target: { value }}: ChangeEvent<HTMLInputElement>) =>
-      setTextFieldData({...textFieldData, [field]: field === "phoneValue" ? formatPhoneValue(textFieldData.phoneValue, value) : value});
+      setTextFieldData({...textFieldData, [field]: field === "phoneValue" ? phoneValueTransformer(textFieldData.phoneValue, value) : value});
 
   const addNewContact = () => {
     setError(undefined);
@@ -272,7 +271,7 @@ function ContactCreationModal(props: {
     createNewContact({
       name: textFieldData.name,
       phoneLabel: textFieldData.phoneLabel,
-      phoneValue: textFieldData.countryCode + textFieldData.phoneValue
+      phoneValue: textFieldData.phoneValue
     })
     .then(() => {
       closeAndReset();
@@ -300,13 +299,12 @@ function ContactCreationModal(props: {
       name: "",
       phoneLabel: "",
       phoneValue: "",
-      countryCode: "+1",
     });
   };
 
   return (
     <Modal title="Create new contact" open={props.open} isLoading={isLoading} handleAccept={addNewContact} handleClose={closeAndReset}>
-      <Box className="w-full flex gap-2 mb-1">
+      <Box className="w-full flex gap-2 mb-2">
         <TextField
           disabled={isLoading}
           value={textFieldData.name}
@@ -333,27 +331,19 @@ function ContactCreationModal(props: {
           variant="outlined"
         />
       </Box>
-      <Box className="w-full pt-1 flex gap-2">
-        <SelectCountry
-          className="basis-24"
-          value={textFieldData.countryCode}
-          onChange={value => setTextFieldData({...textFieldData, countryCode: value})}
-          styles={textFieldTheme}
-        />
-        <TextField
-          disabled={isLoading}
-          onChange={setTextField("phoneValue")}
-          value={textFieldData.phoneValue}
-          error={isNotUndefined(error) && !!extractHelperTextFromError("phone", error)}
-          helperText={extractHelperTextFromError("phone", error)}
-          {...textFieldTheme}
-          className="flex-1"
-          label="phone"
-          placeholder="phone"
-          size="small"
-          variant="outlined"
-        />
-      </Box>
+      <TextField
+        disabled={isLoading}
+        onChange={setTextField("phoneValue")}
+        value={textFieldData.phoneValue}
+        error={isNotUndefined(error) && !!extractHelperTextFromError("phone", error)}
+        helperText={extractHelperTextFromError("phone", error)}
+        {...textFieldTheme}
+        className="w-full"
+        label="phone"
+        placeholder="+xxxxxxxxxxx"
+        size="small"
+        variant="outlined"
+      />
     </Modal>
   )
 }
