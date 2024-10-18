@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { authorizedFetch, safe } from "../contacts/misc";
 
-const resourceServerUri: string = "http://localhost:8080/api/users"
+const resourceServerUri: string = process.env.RESOURCE_SERVE+"/api/users"
 
 export async function POST(request: Request) {
   return safe(async () => {
