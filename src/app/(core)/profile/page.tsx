@@ -207,7 +207,7 @@ function ListCard(props: {
           sx={paint(bg("surface"), text("on-surface"), bg("surface-container-high"))}
           subheader={
           <ListSubheader
-            component="div" className={"text-center "+`rounded${isEmpty(props.content) ? "-" : "-t-"}xl `}
+            component="div" className={"text-center "+`${isEmpty(props.content) ? "rounded-xl" : "rounded-t-xl"}`}
             sx={paint(bg("secondary"), text("on-secondary"))}>
             <Box className="flex-shrink mr-2">
               {props.titleIcon}
