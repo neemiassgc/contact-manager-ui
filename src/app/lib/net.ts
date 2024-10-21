@@ -75,6 +75,10 @@ async function checkForError(response: Response): Promise<void> {
   }
 }
 
+export async function warmup(): Promise<void> {
+  await requester(process.env.NEXT_PUBLIC_RESOURCE_SERVER+"/warmup", "GET");
+}
+
 function getUrl(path: string): string {
   return window.location.origin + path;
 }

@@ -20,7 +20,7 @@ import { getFlagEmoji, iterator } from "../lib/misc";
 import { clearLocalContacts, removeAllUnseenContactNames } from "../lib/storage";
 import { ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { CountryCode, ModalType, Run, Severity, ShowAlertFunc } from "../lib/types";
-import { getCountryCodes } from "../lib/net";
+import { getCountryCodes, warmup } from "../lib/net";
 import AlertContext from "../lib/AlertContext";
 import Link from "next/link";
 
@@ -104,10 +104,14 @@ export function Header({ name, picture }: { name: string, picture: string}) {
 export function ScreenLoading({ children }: { children: React.ReactNode }) {
   const { user, error, isLoading } = useUser();
 
+  useEffect(() => {
+    warmup()
+  }, [])
+
   if ((!user && !isLoading)) {
-    window.location.assign("/api/auth/login");
     removeAllUnseenContactNames();
     clearLocalContacts();
+    window.location.assign("/api/auth/login");
     return <Loading color="warning"/>
   }
 
