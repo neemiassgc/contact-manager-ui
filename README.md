@@ -1,4 +1,4 @@
-[README in en-US :us:](https://github.com/neemiassgc/contact-manager-ui/blob/main/README_en-US)
+[README in en-US :us:](https://github.com/neemiassgc/contact-manager-ui/blob/main/README_en-US.md)
 ## Contact Manager UI
 Uma interface Web para interagir com a API do projeto [Contact Manager API](https://github.com/neemiassgc/contacts-manager-api) que tem como finalidade gerenciar contatos
 
