@@ -2,10 +2,10 @@
 
 import React from "react";
 import * as SubframeCore from "@subframe/core";
-import { SidebarRailWithIcons } from "../components/SidebarRailWithIcons";
-import { Tooltip } from "../components/Tooltip";
-import { IconButton } from "../components/IconButton";
-import { Avatar } from "../components/Avatar";
+import { SidebarRailWithIcons } from "@/subframe/components/SidebarRailWithIcons";
+import { Tooltip } from "@/subframe/components/Tooltip";
+import { IconButton } from "@/subframe/components/IconButton";
+import { Avatar } from "@/subframe/components/Avatar";
 
 interface DefaultPageLayoutRootProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -78,3 +78,5 @@ const DefaultPageLayoutRoot = React.forwardRef<
     </div>
   );
 });
+
+export default DefaultPageLayoutRoot;
