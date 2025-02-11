@@ -6,6 +6,7 @@ import { SidebarRailWithIcons } from "@/subframe/components/SidebarRailWithIcons
 import { Tooltip } from "@/subframe/components/Tooltip";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Avatar } from "@/subframe/components/Avatar";
+import Image from "next/image";
 
 interface DefaultPageLayoutRootProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -32,9 +33,11 @@ const DefaultPageLayoutRoot = React.forwardRef<
       <SidebarRailWithIcons
         header={
           <div className="flex flex-col items-center justify-center gap-2 px-1 py-1">
-            <img
-              className="h-6 w-6 flex-none object-cover"
+            <Image
+              width={24} height={24}
+              className="flex-none object-cover"
               src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
+              alt="project logo"
             />
           </div>
         }
