@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import * as SubframeCore from "@subframe/core";
 import { SidebarRailWithIcons } from "@/subframe/components/SidebarRailWithIcons";
 import { Tooltip } from "@/subframe/components/Tooltip";
@@ -21,6 +21,8 @@ const DefaultPageLayoutRoot = React.forwardRef<
   { children, className, ...otherProps }: DefaultPageLayoutRootProps,
   ref
 ) {
+  const [loading, setLoading] = useState(false);
+
   return (
     <div
       className={SubframeCore.twClassNames(
@@ -47,8 +49,14 @@ const DefaultPageLayoutRoot = React.forwardRef<
               <SubframeCore.Tooltip.Root>
                 <SubframeCore.Tooltip.Trigger asChild={true}>
                   <IconButton
-                    variant="neutral-secondary"
+                    variant="brand-secondary"
                     icon="FeatherLogOut"
+                    loading={loading}
+                    disabled={loading}
+                    onClick={() => {
+                      setLoading(true);
+                      window.location.assign("/api/auth/logout");
+                    }}
                   />
                 </SubframeCore.Tooltip.Trigger>
                 <SubframeCore.Tooltip.Portal>
@@ -58,7 +66,7 @@ const DefaultPageLayoutRoot = React.forwardRef<
                     sideOffset={4}
                     asChild={true}
                   >
-                    <Tooltip>Log out</Tooltip>
+                    <Tooltip>{loading ? "Leaving..." : "Log Out"}</Tooltip>
                   </SubframeCore.Tooltip.Content>
                 </SubframeCore.Tooltip.Portal>
               </SubframeCore.Tooltip.Root>
