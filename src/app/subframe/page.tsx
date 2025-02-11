@@ -199,4 +199,20 @@ function BreadcrumbsBox() {
       </Breadcrumbs>
     </div>
   )
+function InformativeFeedback({ loading = false, text = "Loading...", icon }: {
+  loading?: boolean, text?: string, icon?: ReactNode
+}) {
+  return (
+    <div className="flex w-full flex-col items-center px-1 py-1">
+      {
+        loading ? <Loader /> : icon ?? (
+          <SubframeCore.Icon
+            className="text-body font-body text-default-font"
+            name="FeatherAlertTriangle"
+          />
+        )
+      }
+      <span className="text-body font-body text-default-font">{text}</span>
+    </div>
+  )
 }
