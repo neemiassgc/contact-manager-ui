@@ -99,7 +99,7 @@ function Page() {
             </div>
           </div>
           <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
-            © Subframe 2024
+            © 2025 Created by <span className="underline">Neemias Santos</span>
           </span>
         </div>
       </div>
