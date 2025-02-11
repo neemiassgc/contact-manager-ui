@@ -14,18 +14,11 @@ import PageLayout from "../../subframe/layouts/PageLayout";
 import { useFetch } from "./hooks";
 import { Contact } from "../lib/types";
 
-function TableList() {
+function Page() {
   return (
     <PageLayout>
       <div className="container max-w-none flex h-full w-full flex-col items-start">
-        <div className="flex w-full items-center gap-4 px-4 py-4">
-          <Breadcrumbs>
-            <div className="flex items-center gap-2">
-              <Breadcrumbs.Divider />
-              <Breadcrumbs.Item>Home</Breadcrumbs.Item>
-            </div>
-          </Breadcrumbs>
-        </div>
+        <BreadcrumbsBox/>
         <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
           <div className="flex w-full flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <span className="w-full text-heading-3 font-heading-3 text-default-font">
@@ -195,4 +188,15 @@ function TableList() {
   );
 }
 
-export default TableList;
+function BreadcrumbsBox() {
+  return (
+    <div className="flex w-full items-center gap-4 px-4 py-4">
+      <Breadcrumbs>
+        <div className="flex items-center gap-2">
+          <Breadcrumbs.Divider />
+          <Breadcrumbs.Item>Home</Breadcrumbs.Item>
+        </div>
+      </Breadcrumbs>
+    </div>
+  )
+}
