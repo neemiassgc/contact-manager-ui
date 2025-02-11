@@ -77,87 +77,7 @@ function Page() {
                 </div>
               </div>
             </div>
-            <div className="flex w-full flex-col items-start gap-6 overflow-hidden overflow-x-auto">
-              <Table
-                header={
-                  <Table.HeaderRow>
-                    <Table.HeaderCell>Name</Table.HeaderCell>
-                    <Table.HeaderCell>Phone</Table.HeaderCell>
-                    <Table.HeaderCell>Email</Table.HeaderCell>
-                    <Table.HeaderCell>Birth</Table.HeaderCell>
-                    <Table.HeaderCell>Address</Table.HeaderCell>
-                    <Table.HeaderCell />
-                  </Table.HeaderRow>
-                }
-              >
-                <Table.Row>
-                  <Table.Cell>
-                    <div className="flex items-center gap-2">
-                      <Avatar
-                        size="small"
-                        image="https://res.cloudinary.com/subframe/image/upload/v1711417513/shared/kwut7rhuyivweg8tmyzl.jpg"
-                        square={true}
-                      >
-                      </Avatar>
-                      <span className="whitespace-nowrap text-body-bold font-body-bold text-default-font">
-                        John Doe
-                      </span>
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="whitespace-nowrap text-body font-body text-neutral-500">
-                      (43) 18374-3841
-                    </span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="whitespace-nowrap text-body font-body text-neutral-500">
-                      johndoe@gmail.com
-                    </span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="whitespace-nowrap text-body font-body text-neutral-500">
-                      09/08/1991
-                    </span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <span className="whitespace-nowrap text-body font-body text-neutral-500">
-                      Ribeirão Preto - São Paulo - Brazil
-                    </span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <div className="flex grow shrink-0 basis-0 items-center justify-end">
-                      <SubframeCore.DropdownMenu.Root>
-                        <SubframeCore.DropdownMenu.Trigger asChild={true}>
-                          <IconButton
-                            icon="FeatherMoreHorizontal"
-                            onClick={(
-                              event: React.MouseEvent<HTMLButtonElement>
-                            ) => {}}
-                          />
-                        </SubframeCore.DropdownMenu.Trigger>
-                        <SubframeCore.DropdownMenu.Portal>
-                          <SubframeCore.DropdownMenu.Content
-                            side="bottom"
-                            align="end"
-                            sideOffset={4}
-                            asChild={true}
-                          >
-                            <DropdownMenu>
-                              <DropdownMenu.DropdownItem icon="FeatherEdit2">
-                                Edit
-                              </DropdownMenu.DropdownItem>
-                              <DropdownMenu.DropdownItem icon="FeatherTrash">
-                                Delete
-                              </DropdownMenu.DropdownItem>
-                            </DropdownMenu>
-                          </SubframeCore.DropdownMenu.Content>
-                        </SubframeCore.DropdownMenu.Portal>
-                      </SubframeCore.DropdownMenu.Root>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              </Table>
-            </div>
+            <TableContainer/>
             <div className="flex w-full items-center justify-center gap-4">
               <span className="grow shrink-0 basis-0 text-body font-body text-subtext-color">
                 Showing 1 – 4 of 8
@@ -199,6 +119,113 @@ function BreadcrumbsBox() {
       </Breadcrumbs>
     </div>
   )
+}
+
+function TableContainer() {
+  const { data, loading, error } = useFetch("/api/contacts");
+
+  return loading || error ? <InformativeFeedback loading={loading} text={error ?? undefined} />
+    : <TableContent content={data as Contact[]}/>;
+}
+
+function TableContent(props: {content: Contact[]}) {
+  return (
+    <div className="flex w-full flex-col items-start gap-6 overflow-hidden overflow-x-auto">
+      <Table
+        header={
+          <Table.HeaderRow>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Phone</Table.HeaderCell>
+            <Table.HeaderCell>Email</Table.HeaderCell>
+            <Table.HeaderCell>Birth</Table.HeaderCell>
+            <Table.HeaderCell>Address</Table.HeaderCell>
+            <Table.HeaderCell />
+          </Table.HeaderRow>
+        }
+      >
+        {
+          props.content.map((contact, index) =>
+            <ContactRow
+              key={index}
+              name={contact.name}
+              phone={Object.values(contact.phoneNumbers)[0]}
+              email={Object.values(contact.emails)[0]}
+              birth="09/08/1991"
+              address={Object.values(contact.addresses)[0].city}
+            />
+          )
+        }
+      </Table>
+    </div>
+  )
+}
+
+function ContactRow(props: {
+  name: string,
+  phone: string,
+  email: string,
+  birth: string,
+  address: string
+}) {
+  return (
+    <Table.Row>
+      <Table.Cell>
+        <div className="flex items-center gap-2">
+          <Avatar
+            size="small"
+            image={`https://api.dicebear.com/9.x/shapes/svg?seed=${props.name}&backgroundType=gradientLinear`}
+            square={true}
+          >
+          </Avatar>
+          <span className="whitespace-nowrap text-body-bold font-body-bold text-default-font">
+            {props.name}
+          </span>
+        </div>
+      </Table.Cell>
+      {
+        Object.values(props).slice(1).map((value, index) =>
+          <Table.Cell key={index}>
+            <span className="whitespace-nowrap text-body font-body text-neutral-500">
+              {value}
+            </span>
+          </Table.Cell>
+        )
+      }
+      <Table.Cell>
+        <div className="flex grow shrink-0 basis-0 items-center justify-end">
+          <SubframeCore.DropdownMenu.Root>
+            <SubframeCore.DropdownMenu.Trigger asChild={true}>
+              <IconButton
+                icon="FeatherMoreHorizontal"
+                onClick={(
+                  event: React.MouseEvent<HTMLButtonElement>
+                ) => {}}
+              />
+            </SubframeCore.DropdownMenu.Trigger>
+            <SubframeCore.DropdownMenu.Portal>
+              <SubframeCore.DropdownMenu.Content
+                side="bottom"
+                align="end"
+                sideOffset={4}
+                asChild={true}
+              >
+                <DropdownMenu>
+                  <DropdownMenu.DropdownItem icon="FeatherEdit2">
+                    Edit
+                  </DropdownMenu.DropdownItem>
+                  <DropdownMenu.DropdownItem icon="FeatherTrash">
+                    Delete
+                  </DropdownMenu.DropdownItem>
+                </DropdownMenu>
+              </SubframeCore.DropdownMenu.Content>
+            </SubframeCore.DropdownMenu.Portal>
+          </SubframeCore.DropdownMenu.Root>
+        </div>
+      </Table.Cell>
+    </Table.Row>
+  )
+}
+
 function InformativeFeedback({ loading = false, text = "Loading...", icon }: {
   loading?: boolean, text?: string, icon?: ReactNode
 }) {
@@ -216,3 +243,5 @@ function InformativeFeedback({ loading = false, text = "Loading...", icon }: {
     </div>
   )
 }
+
+export default Page;
