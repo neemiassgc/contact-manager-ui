@@ -36,9 +36,9 @@ const DefaultPageLayoutRoot = React.forwardRef<
         header={
           <div className="flex flex-col items-center justify-center gap-2 px-1 py-1">
             <Image
-              width={24} height={24}
+              width={32} height={32}
               className="flex-none object-cover"
-              src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
+              src="/logo.svg"
               alt="project logo"
             />
           </div>
