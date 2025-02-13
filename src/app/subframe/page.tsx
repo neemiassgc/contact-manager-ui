@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { Breadcrumbs } from "../../subframe/components/Breadcrumbs";
 import { DropdownMenu } from "../../subframe/components/DropdownMenu";
 import { TextField } from "../../subframe/components/TextField";
@@ -13,6 +13,7 @@ import * as SubframeCore from "@subframe/core";
 import PageLayout from "../../subframe/layouts/PageLayout";
 import { useFetch } from "./hooks";
 import { Contact } from "../lib/types";
+import { useRouter } from "next/navigation";
 
 function Page() {
   return (
@@ -147,6 +148,7 @@ function TableContent(props: {content: Contact[]}) {
           props.content.map((contact, index) =>
             <ContactRow
               key={index}
+              id={contact.id}
               name={contact.name}
               phone={Object.values(contact.phoneNumbers)[0]}
               email={Object.values(contact.emails)[0]}
@@ -161,12 +163,16 @@ function TableContent(props: {content: Contact[]}) {
 }
 
 function ContactRow(props: {
+  id: string,
   name: string,
   phone: string,
   email: string,
   birth: string,
   address: string
 }) {
+  const [editLoading, setEditLoading] = useState(false);
+  const nextRouter = useRouter();
+
   return (
     <Table.Row>
       <Table.Cell>
@@ -183,7 +189,7 @@ function ContactRow(props: {
         </div>
       </Table.Cell>
       {
-        Object.values(props).slice(1).map((value, index) =>
+        Object.values(props).slice(2).map((value, index) =>
           <Table.Cell key={index}>
             <span className="whitespace-nowrap text-body font-body text-neutral-500">
               {value}
@@ -192,36 +198,40 @@ function ContactRow(props: {
         )
       }
       <Table.Cell>
-        <div className="flex grow shrink-0 basis-0 items-center justify-end">
-          <SubframeCore.DropdownMenu.Root>
-            <SubframeCore.DropdownMenu.Trigger asChild={true}>
-              <IconButton
-                icon="FeatherMoreHorizontal"
-                onClick={(
-                  event: React.MouseEvent<HTMLButtonElement>
-                ) => {}}
-              />
-            </SubframeCore.DropdownMenu.Trigger>
-            <SubframeCore.DropdownMenu.Portal>
-              <SubframeCore.DropdownMenu.Content
-                side="bottom"
-                align="end"
-                sideOffset={4}
-                asChild={true}
-              >
-                <DropdownMenu>
-                  <DropdownMenu.DropdownItem icon="FeatherEdit2">
-                    Edit
-                  </DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon="FeatherTrash">
-                    Delete
-                  </DropdownMenu.DropdownItem>
-                </DropdownMenu>
-              </SubframeCore.DropdownMenu.Content>
-            </SubframeCore.DropdownMenu.Portal>
-          </SubframeCore.DropdownMenu.Root>
-        </div>
+        <IconButton
+          loading={editLoading}
+          variant="brand-secondary"
+          icon="FeatherEdit"
+          onClick={() => {
+            setEditLoading(true);
+            nextRouter.push("/subframe/profile/"+props.id);
+          }}
+        />
+        <SubframeCore.DropdownMenu.Root>
+          <SubframeCore.DropdownMenu.Trigger asChild={true}>
+            <IconButton
+              variant="destructive-secondary"
+              icon="FeatherTrash"
+              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+            />
+          </SubframeCore.DropdownMenu.Trigger>
+          <SubframeCore.DropdownMenu.Portal>
+            <SubframeCore.DropdownMenu.Content
+              side="bottom"
+              align="end"
+              sideOffset={4}
+              asChild={true}
+            >
+              <DropdownMenu>
+                <DropdownMenu.DropdownItem icon="FeatherCheck">
+                  Confirm
+                </DropdownMenu.DropdownItem>
+              </DropdownMenu>
+            </SubframeCore.DropdownMenu.Content>
+          </SubframeCore.DropdownMenu.Portal>
+        </SubframeCore.DropdownMenu.Root>
       </Table.Cell>
+
     </Table.Row>
   )
 }
