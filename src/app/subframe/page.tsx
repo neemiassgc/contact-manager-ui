@@ -14,6 +14,7 @@ import PageLayout from "../../subframe/layouts/PageLayout";
 import { useFetch } from "./hooks";
 import { Contact } from "../lib/types";
 import { useRouter } from "next/navigation";
+import { DeleteWithConfirmation } from "./profile/[id]/components";
 
 function Page() {
   return (
@@ -207,29 +208,7 @@ function ContactRow(props: {
             nextRouter.push("/subframe/profile/"+props.id);
           }}
         />
-        <SubframeCore.DropdownMenu.Root>
-          <SubframeCore.DropdownMenu.Trigger asChild={true}>
-            <IconButton
-              variant="destructive-secondary"
-              icon="FeatherTrash"
-              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-            />
-          </SubframeCore.DropdownMenu.Trigger>
-          <SubframeCore.DropdownMenu.Portal>
-            <SubframeCore.DropdownMenu.Content
-              side="bottom"
-              align="end"
-              sideOffset={4}
-              asChild={true}
-            >
-              <DropdownMenu>
-                <DropdownMenu.DropdownItem icon="FeatherCheck">
-                  Confirm
-                </DropdownMenu.DropdownItem>
-              </DropdownMenu>
-            </SubframeCore.DropdownMenu.Content>
-          </SubframeCore.DropdownMenu.Portal>
-        </SubframeCore.DropdownMenu.Root>
+        <DeleteWithConfirmation onConfirm={()=>{}}/>
       </Table.Cell>
 
     </Table.Row>
