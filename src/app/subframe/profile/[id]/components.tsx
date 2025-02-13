@@ -198,4 +198,32 @@ function AddressTab(props: {addresses: {[prop: string]: Address}}) {
     </div>
   )
 }
+
+export function DeleteWithConfirmation(props: {onConfirm: () => void}) {
+  return (
+    <SubframeCore.DropdownMenu.Root>
+      <SubframeCore.DropdownMenu.Trigger asChild={true}>
+        <IconButton
+          variant="destructive-secondary"
+          size="large"
+          icon="FeatherTrash"
+          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+        />
+      </SubframeCore.DropdownMenu.Trigger>
+      <SubframeCore.DropdownMenu.Portal>
+        <SubframeCore.DropdownMenu.Content
+          side="bottom"
+          align="end"
+          sideOffset={4}
+          asChild={true}
+        >
+          <DropdownMenu>
+            <DropdownMenu.DropdownItem onClick={props.onConfirm} icon="FeatherCheck">
+              Confirm
+            </DropdownMenu.DropdownItem>
+          </DropdownMenu>
+        </SubframeCore.DropdownMenu.Content>
+      </SubframeCore.DropdownMenu.Portal>
+    </SubframeCore.DropdownMenu.Root>
+  )
 }
