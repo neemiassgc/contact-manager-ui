@@ -202,7 +202,7 @@ function ContactRow(props: {
         <IconButton
           loading={editLoading}
           variant="brand-secondary"
-          icon="FeatherEdit"
+          icon="FeatherUser"
           onClick={() => {
             setEditLoading(true);
             nextRouter.push("/subframe/profile/"+props.id);
