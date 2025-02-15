@@ -47,13 +47,19 @@ export default function Drawer(props: {open: boolean, close: () => void}) {
 
 function ContactNameForm() {
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-      <TextField
-        className="h-auto w-full flex-none"
-        label="Contact Name"
-        helpText="Name not valid"
-        icon="FeatherUser"
-      >
+    <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+      <div className="flex w-full flex-col items-start">
+        <div className="flex items-center justify-center gap-2">
+          <SubframeCore.Icon
+            className="text-body font-body text-default-font"
+            name="FeatherContact"
+          />
+          <span className="text-caption-bold font-caption-bold text-default-font">
+            Contact Name
+          </span>
+        </div>
+      </div>
+      <TextField className="h-auto w-full flex-none" label="" helpText="">
         <TextField.Input
           placeholder="Contact Name"
           value=""
