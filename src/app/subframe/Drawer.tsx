@@ -7,7 +7,6 @@ import { TextField } from "@/subframe/components/TextField";
 import { Badge } from "@/subframe/components/Badge";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
-import { toCamelCase } from "../lib/misc";
 
 export default function Drawer(props: {open: boolean, close: () => void}) {
   return (
@@ -73,7 +72,7 @@ function SimpleContactForm(props: {
             name={props.variant === "phone" ? "FeatherPhone" : "FeatherAtSign"}
           />
           <span className="text-caption-bold font-caption-bold text-default-font">
-            {toCamelCase(props.variant)}
+            {capitalize(props.variant)}
           </span>
         </div>
         <SubframeCore.Popover.Root>
@@ -103,7 +102,7 @@ function SimpleContactForm(props: {
         </SubframeCore.Popover.Root>
       </div>
       <TextInput placeholder={props.variant} />
-      <AddButton title={toCamelCase(props.variant)} onClick={() => {}} />
+      <AddButton title={capitalize(props.variant)} onClick={() => {}} />
     </div>
   );
 }
@@ -191,4 +190,8 @@ function AddButton(props: {
         {props.title}
     </Button>
   )
+}
+
+function capitalize(word: string): string {
+  return word[0].toUpperCase() + word.slice(1);
 }
