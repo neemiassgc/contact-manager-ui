@@ -121,6 +121,20 @@ function SimpleContactForm(props: {
 }
 
 function ContactAddressForm() {
+
+  const fieldInput = (placeholder: string) => (
+    <TextField
+      className="h-auto w-full flex-none"
+      label=""
+    >
+      <TextField.Input
+        placeholder={placeholder}
+        value=""
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+      />
+    </TextField>
+  )
+
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
       <div className="flex w-full items-end justify-between">
@@ -133,40 +147,45 @@ function ContactAddressForm() {
             Address
           </span>
         </div>
-        <SubframeCore.Popover.Root>
-          <SubframeCore.Popover.Trigger asChild={true}>
-            <Badge icon="FeatherTag" iconRight="FeatherChevronDown">
-              Mark
-            </Badge>
-          </SubframeCore.Popover.Trigger>
-          <SubframeCore.Popover.Portal>
-            <SubframeCore.Popover.Content
-              side="bottom"
-              align="center"
-              sideOffset={4}
-              asChild={true}
-            >
-              <div className="flex w-36 flex-none flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
-                <TextField label="" helpText="" icon="FeatherTag">
-                  <TextField.Input
-                    placeholder=""
-                    value=""
-                    onChange={(
-                      event: React.ChangeEvent<HTMLInputElement>
-                    ) => {}}
-                  />
-                </TextField>
-              </div>
-            </SubframeCore.Popover.Content>
-          </SubframeCore.Popover.Portal>
-        </SubframeCore.Popover.Root>
       </div>
-      <TextInput placeholder="Country"/>
-      <TextInput placeholder="Address"/>
-      <TextInput placeholder="State"/>
-      <TextInput placeholder="City"/>
-      <TextInput placeholder="Zipcode"/>
-      <AddButton title="Add Address" onClick={() => {}}/>
+      <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+        <div className="flex w-full items-center justify-between">
+          <SubframeCore.Popover.Root>
+            <SubframeCore.Popover.Trigger asChild={true}>
+              <Badge iconRight="FeatherChevronDown">Mark</Badge>
+            </SubframeCore.Popover.Trigger>
+            <SubframeCore.Popover.Portal>
+              <SubframeCore.Popover.Content
+                side="bottom"
+                align="center"
+                sideOffset={4}
+                asChild={true}
+              >
+                <div className="flex w-36 flex-none flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
+                  <TextField label="" helpText="" icon="FeatherTag">
+                    <TextField.Input
+                      placeholder=""
+                      value=""
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                    />
+                  </TextField>
+                </div>
+              </SubframeCore.Popover.Content>
+            </SubframeCore.Popover.Portal>
+          </SubframeCore.Popover.Root>
+          <IconButton
+            variant="destructive-tertiary"
+            icon="FeatherX"
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+          />
+        </div>
+        {fieldInput("Zipcode")}
+        {fieldInput("Country")}
+        {fieldInput("State")}
+        {fieldInput("city")}
+        {fieldInput("Address")}
+      </div>
+      <AddButton title="Add Address" onClick={() => {}} />
     </div>
   )
 }
