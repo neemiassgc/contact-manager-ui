@@ -103,15 +103,7 @@ function SimpleContactForm(props: {
         </SubframeCore.Popover.Root>
       </div>
       <TextInput placeholder={props.variant} />
-      <div className="flex w-full items-center justify-center gap-2 overflow-hidden rounded-md bg-neutral-50 px-3 py-2">
-        <SubframeCore.Icon
-          className="text-heading-3 font-heading-3 text-brand-700"
-          name="FeatherPlus"
-        />
-        <span className="text-caption-bold font-caption-bold text-default-font">
-          Add {toCamelCase(props.variant)}
-        </span>
-      </div>
+      <AddButton title={toCamelCase(props.variant)} onClick={() => {}} />
     </div>
   );
 }
@@ -162,15 +154,7 @@ function ContactAddressForm() {
       <TextInput placeholder="State"/>
       <TextInput placeholder="City"/>
       <TextInput placeholder="Zipcode"/>
-      <div className="flex w-full items-center justify-center gap-2 overflow-hidden rounded-md bg-neutral-50 px-3 py-2">
-        <SubframeCore.Icon
-          className="text-heading-3 font-heading-3 text-brand-700"
-          name="FeatherPlus"
-        />
-        <span className="text-caption-bold font-caption-bold text-default-font">
-          Add Address
-        </span>
-      </div>
+      <AddButton title="Add Address" onClick={() => {}}/>
     </div>
   )
 }
@@ -190,5 +174,21 @@ function TextInput(props: {
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
       />
     </TextField>
+  )
+}
+
+function AddButton(props: {
+  title: string,
+  onClick: () => void
+}) {
+  return (
+    <Button
+      className="h-8 w-full flex-none"
+      variant="neutral-primary"
+      icon="FeatherPlus"
+      onClick={props.onClick}
+      >
+        {props.title}
+    </Button>
   )
 }
