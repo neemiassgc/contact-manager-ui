@@ -36,9 +36,9 @@ export function isNotViolationError(error: Error): boolean {
   return !isViolationError(error);
 }
 
-export function iterator(size: number): any[] {
-  const array: any[] = [];
-  for (let i = 0; i < size; i++) array.push(null);
+export function initArray(size: number): number[] {
+  const array: number[] = [];
+  for (let i = 0; i < size; i++) array.push(i);
   return array;
 }
 

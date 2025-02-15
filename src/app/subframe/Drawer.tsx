@@ -1,14 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import * as SubframeCore from "@subframe/core";
 import { DrawerLayout } from "@/subframe/layouts/DrawerLayout";
 import { TextField } from "@/subframe/components/TextField";
 import { Badge } from "@/subframe/components/Badge";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
+import { initArray } from "../lib/misc";
 
 export default function Drawer(props: {open: boolean, close: () => void}) {
+  const [phoneEntries, setPhoneEntries] = useState(1);
+  const [emailEntries, setEmailEntries] = useState(1);
+
   return (
     <DrawerLayout open={props.open} onOpenChange={() => {}}>
       <div className="flex h-screen w-144 flex-col items-start gap-2 p-3 overflow-auto">
@@ -25,8 +29,8 @@ export default function Drawer(props: {open: boolean, close: () => void}) {
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <ContactNameForm/>
-          <SimpleContactForm variant="phone"/>
-          <SimpleContactForm variant="email"/>
+          <SimpleContactForm entries={phoneEntries} onAddButtonClick={() => setPhoneEntries(phoneEntries + 1)} variant="phone"/>
+          <SimpleContactForm entries={emailEntries} onAddButtonClick={() => setEmailEntries(emailEntries + 1)} variant="email"/>
           <ContactAddressForm/>
           <Button
             size="large"
@@ -62,6 +66,8 @@ function ContactNameForm() {
 
 function SimpleContactForm(props: {
   variant: "phone" | "email",
+  entries?: number,
+  onAddButtonClick: () => void
 }) {
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -75,9 +81,13 @@ function SimpleContactForm(props: {
             {capitalize(props.variant)}
           </span>
         </div>
+      </div>
+      <div className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
         <SubframeCore.Popover.Root>
           <SubframeCore.Popover.Trigger asChild={true}>
-            <Badge iconRight="FeatherChevronDown">Mark</Badge>
+            <Badge variant="neutral" iconRight="FeatherChevronDown">
+              Mark
+            </Badge>
           </SubframeCore.Popover.Trigger>
           <SubframeCore.Popover.Portal>
             <SubframeCore.Popover.Content
@@ -91,18 +101,21 @@ function SimpleContactForm(props: {
                   <TextField.Input
                     placeholder=""
                     value=""
-                    onChange={(
-                      event: React.ChangeEvent<HTMLInputElement>
-                    ) => {}}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
                   />
                 </TextField>
               </div>
             </SubframeCore.Popover.Content>
           </SubframeCore.Popover.Portal>
         </SubframeCore.Popover.Root>
+        <TextInput placeholder={props.variant} />
+        <IconButton
+          variant="destructive-tertiary"
+          icon="FeatherX"
+          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+        />
       </div>
-      <TextInput placeholder={props.variant} />
-      <AddButton title={capitalize(props.variant)} onClick={() => {}} />
+      <AddButton title={capitalize(props.variant)} onClick={() => {}}/>
     </div>
   );
 }
@@ -162,11 +175,7 @@ function TextInput(props: {
   placeholder: string
 }) {
   return (
-    <TextField
-      className="h-auto w-full flex-none"
-      label=""
-      helpText={props.placeholder + "not valid"}
-    >
+    <TextField className="h-auto grow shrink-0 basis-0" label="" helpText="">
       <TextField.Input
         placeholder={props.placeholder}
         value=""
