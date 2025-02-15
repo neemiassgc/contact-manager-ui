@@ -15,98 +15,103 @@ import { useFetch } from "./hooks";
 import { Contact } from "../lib/types";
 import { useRouter } from "next/navigation";
 import { DeleteWithConfirmation } from "./profile/[id]/components";
+import Drawer from "./Drawer"
 
 function Page() {
+  const [openContactDrawer, setOpenContactDrawer] = useState(false);
+
   return (
-    <PageLayout>
-      <div className="container max-w-none flex h-full w-full flex-col items-start">
-        <BreadcrumbsBox/>
-        <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
-          <div className="flex w-full flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-            <span className="w-full text-heading-3 font-heading-3 text-default-font">
-              Contacts
-            </span>
-            <div className="flex w-full items-center gap-2">
-              <div className="flex grow shrink-0 basis-0 flex-wrap items-center gap-4">
-                <div className="flex grow shrink-0 basis-0 items-center gap-1">
-                  <TextField
-                    variant="filled"
-                    label=""
-                    helpText=""
-                    icon="FeatherSearch"
-                  >
-                    <TextField.Input
-                      placeholder="Search..."
-                      value=""
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
-                    />
-                  </TextField>
+    <>
+      <PageLayout>
+        <div className="container max-w-none flex h-full w-full flex-col items-start">
+          <BreadcrumbsBox/>
+          <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
+            <div className="flex w-full flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+              <span className="w-full text-heading-3 font-heading-3 text-default-font">
+                Contacts
+              </span>
+              <div className="flex w-full items-center gap-2">
+                <div className="flex grow shrink-0 basis-0 flex-wrap items-center gap-4">
+                  <div className="flex grow shrink-0 basis-0 items-center gap-1">
+                    <TextField
+                      variant="filled"
+                      label=""
+                      helpText=""
+                      icon="FeatherSearch"
+                    >
+                      <TextField.Input
+                        placeholder="Search..."
+                        value=""
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                      />
+                    </TextField>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <SubframeCore.DropdownMenu.Root>
+                      <SubframeCore.DropdownMenu.Trigger asChild={true}>
+                        <Button
+                          variant="neutral-secondary"
+                          iconRight="FeatherChevronDown"
+                          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                        >
+                          Sort by
+                        </Button>
+                      </SubframeCore.DropdownMenu.Trigger>
+                      <SubframeCore.DropdownMenu.Portal>
+                        <SubframeCore.DropdownMenu.Content
+                          side="bottom"
+                          align="end"
+                          sideOffset={4}
+                          asChild={true}
+                        >
+                          <DropdownMenu>
+                            <DropdownMenu.DropdownItem icon={null}>Name</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Phone</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Email</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Birth</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Address</DropdownMenu.DropdownItem>
+                          </DropdownMenu>
+                        </SubframeCore.DropdownMenu.Content>
+                      </SubframeCore.DropdownMenu.Portal>
+                    </SubframeCore.DropdownMenu.Root>
+                    <Button
+                      icon="FeatherPlus"
+                      onClick={() => setOpenContactDrawer(true)}
+                    >
+                      Add
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <SubframeCore.DropdownMenu.Root>
-                    <SubframeCore.DropdownMenu.Trigger asChild={true}>
-                      <Button
-                        variant="neutral-secondary"
-                        iconRight="FeatherChevronDown"
-                        onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-                      >
-                        Sort by
-                      </Button>
-                    </SubframeCore.DropdownMenu.Trigger>
-                    <SubframeCore.DropdownMenu.Portal>
-                      <SubframeCore.DropdownMenu.Content
-                        side="bottom"
-                        align="end"
-                        sideOffset={4}
-                        asChild={true}
-                      >
-                        <DropdownMenu>
-                          <DropdownMenu.DropdownItem icon={null}>Name</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Phone</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Email</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Birth</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Address</DropdownMenu.DropdownItem>
-                        </DropdownMenu>
-                      </SubframeCore.DropdownMenu.Content>
-                    </SubframeCore.DropdownMenu.Portal>
-                  </SubframeCore.DropdownMenu.Root>
+              </div>
+              <TableContainer/>
+              <div className="flex w-full items-center justify-center gap-4">
+                <span className="grow shrink-0 basis-0 text-body font-body text-subtext-color">
+                  Showing 1 – 4 of 8
+                </span>
+                <div className="flex items-center justify-center gap-2">
                   <Button
-                    icon="FeatherPlus"
+                    variant="neutral-secondary"
                     onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
                   >
-                    Add
+                    Prev
+                  </Button>
+                  <Button
+                    variant="neutral-secondary"
+                    onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                  >
+                    Next
                   </Button>
                 </div>
               </div>
             </div>
-            <TableContainer/>
-            <div className="flex w-full items-center justify-center gap-4">
-              <span className="grow shrink-0 basis-0 text-body font-body text-subtext-color">
-                Showing 1 – 4 of 8
-              </span>
-              <div className="flex items-center justify-center gap-2">
-                <Button
-                  variant="neutral-secondary"
-                  onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-                >
-                  Prev
-                </Button>
-                <Button
-                  variant="neutral-secondary"
-                  onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
+            <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
+              © 2025 Created by <span className="underline">Neemias Santos</span>
+            </span>
           </div>
-          <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
-            © 2025 Created by <span className="underline">Neemias Santos</span>
-          </span>
         </div>
-      </div>
-    </PageLayout>
-
+      </PageLayout>
+      <Drawer open={openContactDrawer} close={() => setOpenContactDrawer(false)} />
+    </>
   );
 }
 
