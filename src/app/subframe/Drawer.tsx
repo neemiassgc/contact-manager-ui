@@ -12,6 +12,7 @@ import { initArray } from "../lib/misc";
 export default function Drawer(props: {open: boolean, close: () => void}) {
   const [phoneEntries, setPhoneEntries] = useState(1);
   const [emailEntries, setEmailEntries] = useState(1);
+  const [addressEntries, setAddressEntries] = useState(1);
 
   return (
     <DrawerLayout open={props.open} onOpenChange={() => {}}>
@@ -29,9 +30,23 @@ export default function Drawer(props: {open: boolean, close: () => void}) {
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <ContactNameForm/>
-          <SimpleContactForm entries={phoneEntries} onAddButtonClick={() => setPhoneEntries(phoneEntries + 1)} variant="phone"/>
-          <SimpleContactForm entries={emailEntries} onAddButtonClick={() => setEmailEntries(emailEntries + 1)} variant="email"/>
-          <ContactAddressForm/>
+          <SimpleContactForm
+            entries={phoneEntries}
+            onAddButtonClick={() => setPhoneEntries(phoneEntries + 1)}
+            onRemoveButtonClick={() => setPhoneEntries(phoneEntries - 1)}
+            variant="phone"
+          />
+          <SimpleContactForm
+            entries={emailEntries}
+            onAddButtonClick={() => setEmailEntries(emailEntries + 1)}
+            onRemoveButtonClick={() => setEmailEntries(emailEntries - 1)}
+            variant="email"
+          />
+          <ContactAddressForm
+            entries={addressEntries}
+            onAddButtonClick={() => setAddressEntries(addressEntries + 1)}
+            onRemoveButtonClick={() => setAddressEntries(addressEntries - 1)}
+          />
           <Button
             size="large"
             icon="FeatherUserPlus"
@@ -73,7 +88,8 @@ function ContactNameForm() {
 function SimpleContactForm(props: {
   variant: "phone" | "email",
   entries?: number,
-  onAddButtonClick: () => void
+  onAddButtonClick: () => void,
+  onRemoveButtonClick: () => void,
 }) {
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -88,45 +104,56 @@ function SimpleContactForm(props: {
           </span>
         </div>
       </div>
-      <div className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-        <SubframeCore.Popover.Root>
-          <SubframeCore.Popover.Trigger asChild={true}>
-            <Badge variant="neutral" iconRight="FeatherChevronDown">
-              Mark
-            </Badge>
-          </SubframeCore.Popover.Trigger>
-          <SubframeCore.Popover.Portal>
-            <SubframeCore.Popover.Content
-              side="bottom"
-              align="center"
-              sideOffset={4}
-              asChild={true}
-            >
-              <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
-                <TextField label="" helpText="" icon="FeatherTag">
-                  <TextField.Input
-                    placeholder=""
-                    value=""
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
-                  />
-                </TextField>
-              </div>
-            </SubframeCore.Popover.Content>
-          </SubframeCore.Popover.Portal>
-        </SubframeCore.Popover.Root>
-        <TextInput placeholder={props.variant} />
-        <IconButton
-          variant="destructive-tertiary"
-          icon="FeatherX"
-          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-        />
-      </div>
-      <AddButton title={capitalize(props.variant)} onClick={() => {}}/>
+      {
+        initArray(props.entries ?? 1).map((_, index) =>(
+          <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+            <SubframeCore.Popover.Root>
+              <SubframeCore.Popover.Trigger asChild={true}>
+                <Badge variant="neutral" iconRight="FeatherChevronDown">
+                  Mark
+                </Badge>
+              </SubframeCore.Popover.Trigger>
+              <SubframeCore.Popover.Portal>
+                <SubframeCore.Popover.Content
+                  side="bottom"
+                  align="center"
+                  sideOffset={4}
+                  asChild={true}
+                >
+                  <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
+                    <TextField label="" helpText="" icon="FeatherTag">
+                      <TextField.Input
+                        placeholder=""
+                        value=""
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                      />
+                    </TextField>
+                  </div>
+                </SubframeCore.Popover.Content>
+              </SubframeCore.Popover.Portal>
+            </SubframeCore.Popover.Root>
+            <TextInput placeholder={props.variant} />
+            {
+              index + 1 > 1 &&
+              <IconButton
+                variant="destructive-tertiary"
+                icon="FeatherX"
+                onClick={props.onRemoveButtonClick}
+              />
+            }
+          </div>
+        ))
+      }
+      <AddButton title={capitalize(props.variant)} onClick={props.onAddButtonClick}/>
     </div>
   );
 }
 
-function ContactAddressForm() {
+function ContactAddressForm(props: {
+  entries?: number,
+  onAddButtonClick: () => void,
+  onRemoveButtonClick: () => void
+}) {
 
   const fieldInput = (placeholder: string) => (
     <TextField
@@ -154,44 +181,51 @@ function ContactAddressForm() {
           </span>
         </div>
       </div>
-      <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-        <div className="flex w-full items-center justify-between">
-          <SubframeCore.Popover.Root>
-            <SubframeCore.Popover.Trigger asChild={true}>
-              <Badge iconRight="FeatherChevronDown">Mark</Badge>
-            </SubframeCore.Popover.Trigger>
-            <SubframeCore.Popover.Portal>
-              <SubframeCore.Popover.Content
-                side="bottom"
-                align="center"
-                sideOffset={4}
-                asChild={true}
-              >
-                <div className="flex w-36 flex-none flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
-                  <TextField label="" helpText="" icon="FeatherTag">
-                    <TextField.Input
-                      placeholder=""
-                      value=""
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
-                    />
-                  </TextField>
-                </div>
-              </SubframeCore.Popover.Content>
-            </SubframeCore.Popover.Portal>
-          </SubframeCore.Popover.Root>
-          <IconButton
-            variant="destructive-tertiary"
-            icon="FeatherX"
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-          />
-        </div>
-        {fieldInput("Zipcode")}
-        {fieldInput("Country")}
-        {fieldInput("State")}
-        {fieldInput("city")}
-        {fieldInput("Address")}
-      </div>
-      <AddButton title="Add Address" onClick={() => {}} />
+      {
+        initArray(props.entries ?? 1).map((_, index) => (
+          <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+            <div className="flex w-full items-center justify-between">
+              <SubframeCore.Popover.Root>
+                <SubframeCore.Popover.Trigger asChild={true}>
+                  <Badge iconRight="FeatherChevronDown">Mark</Badge>
+                </SubframeCore.Popover.Trigger>
+                <SubframeCore.Popover.Portal>
+                  <SubframeCore.Popover.Content
+                    side="bottom"
+                    align="center"
+                    sideOffset={4}
+                    asChild={true}
+                  >
+                    <div className="flex w-36 flex-none flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
+                      <TextField label="" helpText="" icon="FeatherTag">
+                        <TextField.Input
+                          placeholder=""
+                          value=""
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                        />
+                      </TextField>
+                    </div>
+                  </SubframeCore.Popover.Content>
+                </SubframeCore.Popover.Portal>
+              </SubframeCore.Popover.Root>
+              {
+                index + 1 > 1 &&
+                <IconButton
+                  variant="destructive-tertiary"
+                  icon="FeatherX"
+                  onClick={props.onRemoveButtonClick}
+                />
+              }
+            </div>
+            {fieldInput("Zipcode")}
+            {fieldInput("Country")}
+            {fieldInput("State")}
+            {fieldInput("City")}
+            {fieldInput("Address")}
+          </div>
+        ))
+      }
+      <AddButton title="Add Address" onClick={props.onAddButtonClick} />
     </div>
   )
 }
