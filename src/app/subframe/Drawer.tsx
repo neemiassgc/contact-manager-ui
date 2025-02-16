@@ -23,7 +23,7 @@ export default function Drawer(props: {
     <DrawerLayout open={props.open} onOpenChange={() => {}}>
       <div className="flex h-screen w-144 flex-col items-start gap-2 p-3 overflow-auto">
         <div className="flex w-full items-center justify-between px-4 pt-4 pb-1">
-          <span className="text-body font-body text-default-font">
+          <span className="text-heading-2 font-heading-2 text-default-font">
             Create a new contact
           </span>
           <IconButton
