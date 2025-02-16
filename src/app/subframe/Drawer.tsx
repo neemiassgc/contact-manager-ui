@@ -252,3 +252,10 @@ function RemoveButton(props: {onClick: () => void}) {
     />
   )
 }
+
+function insertValueAt(array: number[], index: number, value: number): number[] {
+  const newArray: number[] = [];
+  for (let i = 0; i < array.length; i++)
+    newArray[i] = i === index ? value : array[i];
+  return newArray;
+}
