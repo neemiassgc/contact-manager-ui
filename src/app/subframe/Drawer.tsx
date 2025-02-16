@@ -107,31 +107,7 @@ function SimpleContactForm(props: {
       {
         initArray(props.entries ?? 1).map((_, index) =>(
           <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-            <SubframeCore.Popover.Root>
-              <SubframeCore.Popover.Trigger asChild={true}>
-                <Badge variant="neutral" iconRight="FeatherChevronDown">
-                  Mark
-                </Badge>
-              </SubframeCore.Popover.Trigger>
-              <SubframeCore.Popover.Portal>
-                <SubframeCore.Popover.Content
-                  side="bottom"
-                  align="center"
-                  sideOffset={4}
-                  asChild={true}
-                >
-                  <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
-                    <TextField label="" helpText="" icon="FeatherTag">
-                      <TextField.Input
-                        placeholder=""
-                        value=""
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
-                      />
-                    </TextField>
-                  </div>
-                </SubframeCore.Popover.Content>
-              </SubframeCore.Popover.Portal>
-            </SubframeCore.Popover.Root>
+            <FieldMarker/>
             <TextInput placeholder={props.variant} />
             {
               index + 1 > 1 &&
@@ -185,29 +161,7 @@ function ContactAddressForm(props: {
         initArray(props.entries ?? 1).map((_, index) => (
           <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <div className="flex w-full items-center justify-between">
-              <SubframeCore.Popover.Root>
-                <SubframeCore.Popover.Trigger asChild={true}>
-                  <Badge iconRight="FeatherChevronDown">Mark</Badge>
-                </SubframeCore.Popover.Trigger>
-                <SubframeCore.Popover.Portal>
-                  <SubframeCore.Popover.Content
-                    side="bottom"
-                    align="center"
-                    sideOffset={4}
-                    asChild={true}
-                  >
-                    <div className="flex w-36 flex-none flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
-                      <TextField label="" helpText="" icon="FeatherTag">
-                        <TextField.Input
-                          placeholder=""
-                          value=""
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
-                        />
-                      </TextField>
-                    </div>
-                  </SubframeCore.Popover.Content>
-                </SubframeCore.Popover.Portal>
-              </SubframeCore.Popover.Root>
+              <FieldMarker/>
               {
                 index + 1 > 1 &&
                 <IconButton
@@ -262,4 +216,34 @@ function AddButton(props: {
 
 function capitalize(word: string): string {
   return word[0].toUpperCase() + word.slice(1);
+}
+
+function FieldMarker() {
+  return (
+    <SubframeCore.Popover.Root>
+      <SubframeCore.Popover.Trigger asChild={true}>
+        <Badge variant="neutral" iconRight="FeatherChevronDown">
+          Mark
+        </Badge>
+      </SubframeCore.Popover.Trigger>
+      <SubframeCore.Popover.Portal>
+        <SubframeCore.Popover.Content
+          side="bottom"
+          align="center"
+          sideOffset={4}
+          asChild={true}
+        >
+          <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
+            <TextField label="" helpText="" icon="FeatherTag">
+              <TextField.Input
+                placeholder=""
+                value=""
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+              />
+            </TextField>
+          </div>
+        </SubframeCore.Popover.Content>
+      </SubframeCore.Popover.Portal>
+    </SubframeCore.Popover.Root>
+  )
 }
