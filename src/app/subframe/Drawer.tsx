@@ -110,12 +110,7 @@ function SimpleContactForm(props: {
             <FieldMarker/>
             <TextInput placeholder={props.variant} />
             {
-              index + 1 > 1 &&
-              <IconButton
-                variant="destructive-tertiary"
-                icon="FeatherX"
-                onClick={props.onRemoveButtonClick}
-              />
+              index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
             }
           </div>
         ))
@@ -163,12 +158,7 @@ function ContactAddressForm(props: {
             <div className="flex w-full items-center justify-between">
               <FieldMarker/>
               {
-                index + 1 > 1 &&
-                <IconButton
-                  variant="destructive-tertiary"
-                  icon="FeatherX"
-                  onClick={props.onRemoveButtonClick}
-                />
+                index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
               }
             </div>
             {fieldInput("Zipcode")}
@@ -245,5 +235,15 @@ function FieldMarker() {
         </SubframeCore.Popover.Content>
       </SubframeCore.Popover.Portal>
     </SubframeCore.Popover.Root>
+  )
+}
+
+function RemoveButton(props: {onClick: () => void}) {
+  return (
+    <IconButton
+      variant="destructive-tertiary"
+      icon="FeatherX"
+      onClick={props.onClick}
+    />
   )
 }
