@@ -7,6 +7,8 @@ export interface Address {
   zipcode: string
 }
 
+export type Variant = "success" | "error" | "warning";
+
 export interface IndexedString {
   [propName: string]: string
 }

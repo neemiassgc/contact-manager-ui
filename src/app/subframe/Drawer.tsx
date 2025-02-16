@@ -8,8 +8,13 @@ import { Badge } from "@/subframe/components/Badge";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
 import { initArray } from "../lib/misc";
+import { Variant } from "../lib/types";
 
-export default function Drawer(props: {open: boolean, close: () => void}) {
+export default function Drawer(props: {
+  open: boolean,
+  close: () => void,
+  showAlert: (title: string, variant: Variant) => void
+}) {
   const [phoneEntries, setPhoneEntries] = useState(1);
   const [emailEntries, setEmailEntries] = useState(1);
   const [addressEntries, setAddressEntries] = useState(1);
