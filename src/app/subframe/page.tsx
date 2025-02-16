@@ -12,17 +12,30 @@ import { Loader } from "../../subframe/components/Loader";
 import * as SubframeCore from "@subframe/core";
 import PageLayout from "../../subframe/layouts/PageLayout";
 import { useFetch } from "./hooks";
-import { Contact } from "../lib/types";
+import { Contact, Variant } from "../lib/types";
 import { useRouter } from "next/navigation";
 import { DeleteWithConfirmation } from "./profile/[id]/components";
+import { Alert } from "@/subframe/components/Alert";
 import Drawer from "./Drawer"
 
 function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    title: "",
+    variant: "success" as Variant
+  });
 
   return (
     <>
       <PageLayout>
+        { alert.open &&
+          <LocalAlert
+            title={alert.title}
+            variant={alert.variant}
+            onDispose={() => setAlert({...alert, open: false})}
+          />
+        }
         <div className="container max-w-none flex h-full w-full flex-col items-start">
           <BreadcrumbsBox/>
           <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
@@ -110,7 +123,10 @@ function Page() {
           </div>
         </div>
       </PageLayout>
-      <Drawer open={openContactDrawer} close={() => setOpenContactDrawer(false)} />
+      <Drawer
+        showAlert={(title: string, variant: Variant) => setAlert({title, variant, open: true})}
+        open={openContactDrawer}
+        close={() => setOpenContactDrawer(false)} />
     </>
   );
 }
@@ -235,6 +251,28 @@ function InformativeFeedback({ loading = false, text = "Loading...", icon }: {
       }
       <span className="text-body font-body text-default-font">{text}</span>
     </div>
+  )
+}
+
+function LocalAlert(props: {
+  onDispose: () => void,
+  variant?: Variant,
+  title: string,
+}) {
+  setTimeout(props.onDispose, 2000);
+
+  return (
+    <Alert
+      variant={props.variant}
+      title={props.title}
+      actions={
+        <IconButton
+          size="medium"
+          icon="FeatherX"
+          onClick={props.onDispose}
+        />
+      }
+    />
   )
 }
 
