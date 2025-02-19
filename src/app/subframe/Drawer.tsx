@@ -253,10 +253,8 @@ function RemoveButton(props: {onClick: () => void}) {
   )
 }
 
-function insertAt<T>(array: T[], index: number, value: T): T[] {
-  return [
-    ...array.slice(0, index),
-    value,
-    ...array.slice(index)
-  ]
+function editAt<T>(array: T[], index: number, value: T): T[] {
+  const newArray: T[] = array.slice(0);
+  newArray[index] = value;
+  return newArray;
 };
