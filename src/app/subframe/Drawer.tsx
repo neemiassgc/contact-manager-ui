@@ -8,7 +8,7 @@ import { Badge } from "@/subframe/components/Badge";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
 import { initArray } from "../lib/misc";
-import { Variant } from "../lib/types";
+import { Address, Contact, IndexedAddress, IndexedString, Variant } from "../lib/types";
 
 type Markers = { markers: string[] }
 type StringField = Markers & { values: string[] }
@@ -112,7 +112,7 @@ export default function Drawer(props: {
           <Button
             size="large"
             icon="FeatherUserPlus"
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+            onClick={() => console.log(buildContactJson(contactName, phone, email, address))}
           >
             Create
           </Button>
@@ -348,6 +348,32 @@ function editAt<T>(array: T[], index: number, value: T): T[] {
   return newArray;
 };
 
-function buildJson() {
+function buildContactJson(
+  contactName: string,
+  phones: StringField,
+  emails: StringField,
+  addresses: AddressField
+): Contact {
 
+  return {
+    name: contactName,
+    phoneNumbers: initArray(phones.markers.length).reduce((prev, curr) => ({
+      ...prev,
+      [phones.markers[curr]]: phones.values[curr]
+    }), {}),
+    emails: initArray(emails.markers.length).reduce((prev, curr) => ({
+      ...prev,
+      [emails.markers[curr]]: emails.values[curr]
+    }), {}),
+    addresses: initArray(addresses.markers.length).reduce((prev, curr) => ({
+      ...prev,
+      [addresses.markers[curr]]: {
+        zipcode: addresses.values[curr][0],
+        country: addresses.values[curr][1],
+        state: addresses.values[curr][2],
+        city: addresses.values[curr][3],
+        address: addresses.values[curr][4]
+      }
+    }), {})
+  }
 }

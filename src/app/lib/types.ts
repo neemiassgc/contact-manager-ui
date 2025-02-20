@@ -18,7 +18,6 @@ export interface IndexedAddress {
 }
 
 export interface Contact {
-  id: string,
   name: string,
   phoneNumbers: IndexedString,
   addresses: IndexedAddress,
