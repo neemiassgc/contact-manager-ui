@@ -10,14 +10,23 @@ import { Button } from "@/subframe/components/Button";
 import { initArray } from "../lib/misc";
 import { Variant } from "../lib/types";
 
+type Markers = { markers: string[] }
+type StringField = Markers & { values: string[] }
+type AddressField = Markers & { values: string[][] }
+
 export default function Drawer(props: {
   open: boolean,
   close: () => void,
   showAlert: (title: string, variant: Variant) => void
 }) {
-  const [phoneEntries, setPhoneEntries] = useState(1);
-  const [emailEntries, setEmailEntries] = useState(1);
-  const [addressEntries, setAddressEntries] = useState(1);
+  const [contactName, setContactName] = useState("");
+  const [amountOfInputs, setAmountOfInputs] = useState([1, 1, 1]);
+  const [phone, setPhone] = useState<StringField>({markers: [""], values: [""]});
+  const [email, setEmail] = useState<StringField>({markers: [""], values: [""]});
+  const [address, setAddress] = useState<AddressField>({markers: [""], values: [["", "", "", "", ""]]});
+
+  const immutablePush = (array: string[], value: string) => [...array, value];
+  const immutablePop = (array: string[]) => array.slice(0, array.length - 1);
 
   return (
     <DrawerLayout open={props.open} onOpenChange={() => {}}>
@@ -34,23 +43,71 @@ export default function Drawer(props: {
         </div>
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
-          <ContactNameForm/>
+          <ContactNameForm value={contactName} onChange={setContactName}/>
           <SimpleContactForm
-            entries={phoneEntries}
-            onAddButtonClick={() => setPhoneEntries(phoneEntries + 1)}
-            onRemoveButtonClick={() => setPhoneEntries(phoneEntries - 1)}
+            setMarkers={newMarkers => setPhone({...phone, markers: newMarkers })}
+            setValues={newValues => setPhone({...phone, values: newValues })}
+            markers={phone.markers} 
+            values={phone.values} 
+            entries={amountOfInputs[0]}
+            onAddButtonClick={() => {
+              setAmountOfInputs(editAt(amountOfInputs, 0, amountOfInputs[0] + 1))
+              setPhone({
+                markers: immutablePush(phone.markers, ""),
+                values: immutablePush(phone.values, "")
+              })
+            }}
+            onRemoveButtonClick={() => {
+              setAmountOfInputs(editAt(amountOfInputs, 0, amountOfInputs[0] - 1))
+              setPhone({
+                markers: immutablePop(phone.markers),
+                values: immutablePop(phone.values)
+              })
+            }}
             variant="phone"
           />
           <SimpleContactForm
-            entries={emailEntries}
-            onAddButtonClick={() => setEmailEntries(emailEntries + 1)}
-            onRemoveButtonClick={() => setEmailEntries(emailEntries - 1)}
+            setMarkers={newMarkers => setEmail({...email, markers: newMarkers })}
+            setValues={newValues => setEmail({...email, values: newValues })}
+            markers={email.markers} 
+            values={email.values} 
+            entries={amountOfInputs[1]}
+            onAddButtonClick={() => {
+              setAmountOfInputs(editAt(amountOfInputs, 1, amountOfInputs[1] + 1))
+              setEmail({
+                markers: immutablePush(phone.markers, ""),
+                values: immutablePush(phone.values, "")
+              })
+            }}
+            onRemoveButtonClick={() => {
+              setAmountOfInputs(editAt(amountOfInputs, 1, amountOfInputs[1] - 1))
+              setEmail({
+                markers: immutablePop(phone.markers),
+                values: immutablePop(phone.values)
+              })
+            }}
             variant="email"
           />
           <ContactAddressForm
-            entries={addressEntries}
-            onAddButtonClick={() => setAddressEntries(addressEntries + 1)}
-            onRemoveButtonClick={() => setAddressEntries(addressEntries - 1)}
+            setMarkers={newMarkers => setAddress({...address, markers: newMarkers })}
+            setValues={newValues => setAddress({...address, values: newValues })}
+            markers={address.markers} 
+            values={address.values} 
+            entries={amountOfInputs[2]}
+            onAddButtonClick={() => {
+              setAmountOfInputs(editAt(amountOfInputs, 2, amountOfInputs[2] + 1))
+              setAddress({
+                markers: immutablePush(address.markers, ""),
+                values: [...address.values, ["", "", "", "", ""]]
+              })
+            }}
+            onRemoveButtonClick={() => {
+              setAmountOfInputs(editAt(amountOfInputs, 2, amountOfInputs[2] - 1))
+              setAddress({
+                markers: immutablePop(phone.markers),
+                values: address.values.slice(0, address.values.length - 1)
+              })
+            }}
           />
           <Button
             size="large"
@@ -65,7 +122,10 @@ export default function Drawer(props: {
   );
 }
 
-function ContactNameForm() {
+function ContactNameForm(props: {
+  value: string,
+  onChange: (value: string) => void
+}) {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
       <div className="flex w-full flex-col items-start">
@@ -82,8 +142,8 @@ function ContactNameForm() {
       <TextField className="h-auto w-full flex-none" label="" helpText="">
         <TextField.Input
           placeholder="Contact Name"
-          value=""
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+          value={props.value}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange(event.target.value)}
         />
       </TextField>
     </div>
@@ -95,6 +155,10 @@ function SimpleContactForm(props: {
   entries?: number,
   onAddButtonClick: () => void,
   onRemoveButtonClick: () => void,
+  setMarkers: (markers: string[]) => void,
+  setValues: (values: string[]) => void,
+  values: string[],
+  markers: string[]
 }) {
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -112,8 +176,17 @@ function SimpleContactForm(props: {
       {
         initArray(props.entries ?? 1).map((_, index) =>(
           <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-            <FieldMarker/>
-            <TextInput placeholder={props.variant} />
+            <FieldMarker
+              value={props.markers[index]}
+              onChange={value =>
+                props.setMarkers(editAt(props.markers, index, value))
+              }
+            />
+            <TextInput
+              placeholder={props.variant}
+              value={props.values[index]}
+              onChange={value => props.setValues(editAt(props.values, index, value))}
+            />
             {
               index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
             }
@@ -128,18 +201,23 @@ function SimpleContactForm(props: {
 function ContactAddressForm(props: {
   entries?: number,
   onAddButtonClick: () => void,
-  onRemoveButtonClick: () => void
+  onRemoveButtonClick: () => void,
+  setMarkers: (markers: string[]) => void,
+  setValues: (values: string[][]) => void,
+  values: string[][],
+  markers: string[]
 }) {
 
-  const fieldInput = (placeholder: string) => (
+  const fieldInput = (placeholder: string, markIndex: number, index: number) => (
     <TextField
       className="h-auto w-full flex-none"
-      label=""
     >
       <TextField.Input
         placeholder={placeholder}
-        value=""
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+        value={props.values[markIndex][index]}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          props.setValues(editAt(props.values, markIndex, editAt(props.values[markIndex], index, event.target.value)))
+        }
       />
     </TextField>
   )
@@ -161,16 +239,19 @@ function ContactAddressForm(props: {
         initArray(props.entries ?? 1).map((_, index) => (
           <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <div className="flex w-full items-center justify-between">
-              <FieldMarker/>
+              <FieldMarker
+                value={props.markers[index]}
+                onChange={value => props.setMarkers(editAt(props.markers, index, value))}
+              />
               {
                 index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
               }
             </div>
-            {fieldInput("Zipcode")}
-            {fieldInput("Country")}
-            {fieldInput("State")}
-            {fieldInput("City")}
-            {fieldInput("Address")}
+            {fieldInput("Zipcode", index, 0)}
+            {fieldInput("Country", index, 1)}
+            {fieldInput("State", index, 2)}
+            {fieldInput("City", index, 3)}
+            {fieldInput("Address", index, 4)}
           </div>
         ))
       }
@@ -180,14 +261,16 @@ function ContactAddressForm(props: {
 }
 
 function TextInput(props: {
-  placeholder: string
+  placeholder: string,
+  value: string,
+  onChange: (value: string) => void
 }) {
   return (
     <TextField className="h-auto grow shrink-0 basis-0" label="" helpText="">
       <TextField.Input
         placeholder={props.placeholder}
-        value=""
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+        value={props.value}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange(event.target.value)}
       />
     </TextField>
   )
@@ -213,16 +296,22 @@ function capitalize(word: string): string {
   return word[0].toUpperCase() + word.slice(1);
 }
 
-function FieldMarker() {
+function FieldMarker(props: {
+  value: string,
+  onChange: (value: string) => void
+}) {
+  const [marker, setMarker] = useState("mark");
+
   return (
     <SubframeCore.Popover.Root>
       <SubframeCore.Popover.Trigger asChild={true}>
         <Badge variant="neutral" iconRight="FeatherChevronDown">
-          Mark
+          {marker}
         </Badge>
       </SubframeCore.Popover.Trigger>
       <SubframeCore.Popover.Portal>
         <SubframeCore.Popover.Content
+          onInteractOutside={() => setMarker(props.value)}
           side="bottom"
           align="center"
           sideOffset={4}
@@ -231,9 +320,9 @@ function FieldMarker() {
           <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
             <TextField label="" helpText="" icon="FeatherTag">
               <TextField.Input
-                placeholder=""
-                value=""
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                placeholder="Type here"
+                value={props.value}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange(event.target.value)}
               />
             </TextField>
           </div>
@@ -258,3 +347,7 @@ function editAt<T>(array: T[], index: number, value: T): T[] {
   newArray[index] = value;
   return newArray;
 };
+
+function buildJson() {
+
+}
