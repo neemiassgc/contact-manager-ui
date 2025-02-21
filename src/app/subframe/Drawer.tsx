@@ -386,3 +386,7 @@ function validateMarkers(markers: string[]): string[] {
     return "";
   })
 }
+
+function concat<T>(...arrays: T[][]): T[] {
+  return arrays.reduce((prev, curr) => [...prev, ...curr], [])
+}
