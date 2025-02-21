@@ -24,6 +24,9 @@ export default function Drawer(props: {
   const [phone, setPhone] = useState<StringField>({markers: [""], values: [""]});
   const [email, setEmail] = useState<StringField>({markers: [""], values: [""]});
   const [address, setAddress] = useState<AddressField>({markers: [""], values: [["", "", "", "", ""]]});
+  const [errorPhone, setErrorPhone] = useState<StringField>({markers: [""], values: [""]});
+  const [errorEmail, setErrorEmail] = useState<StringField>({markers: [""], values: [""]});
+  const [errorAddress, setErrorAddress] = useState<AddressField>({markers: [""], values: [["", "", "", "", ""]]});
 
   const immutablePush = (array: string[], value: string) => [...array, value];
   const immutablePop = (array: string[]) => array.slice(0, array.length - 1);
@@ -45,7 +48,11 @@ export default function Drawer(props: {
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <ContactNameForm value={contactName} onChange={setContactName}/>
           <SimpleContactForm
-            setMarkers={newMarkers => setPhone({...phone, markers: newMarkers })}
+            error={errorPhone}
+            setMarkers={(newMarkers, index) => {
+              setPhone({...phone, markers: newMarkers })
+              setErrorPhone({...errorPhone, markers: editAt(errorPhone.markers, index, "")})
+            }}
             setValues={newValues => setPhone({...phone, values: newValues })}
             markers={phone.markers} 
             values={phone.values} 
@@ -67,7 +74,11 @@ export default function Drawer(props: {
             variant="phone"
           />
           <SimpleContactForm
-            setMarkers={newMarkers => setEmail({...email, markers: newMarkers })}
+            error={errorEmail}
+            setMarkers={(newMarkers, index) => {
+              setEmail({...email, markers: newMarkers })
+              setErrorEmail({...errorEmail, markers: editAt(errorEmail.markers, index, "")})
+            }}
             setValues={newValues => setEmail({...email, values: newValues })}
             markers={email.markers} 
             values={email.values} 
@@ -89,7 +100,11 @@ export default function Drawer(props: {
             variant="email"
           />
           <ContactAddressForm
-            setMarkers={newMarkers => setAddress({...address, markers: newMarkers })}
+            error={errorAddress}
+            setMarkers={(newMarkers) => {
+              setAddress({...address, markers: newMarkers })
+              setErrorAddress({...errorAddress, markers: editAt(errorAddress.markers, 0, "")})
+            }}
             setValues={newValues => setAddress({...address, values: newValues })}
             markers={address.markers} 
             values={address.values} 
@@ -112,7 +127,21 @@ export default function Drawer(props: {
           <Button
             size="large"
             icon="FeatherUserPlus"
-            onClick={() => console.log(buildContactJson(contactName, phone, email, address))}
+            onClick={() => {
+              const validatedPhoneMarkers = validateMarkers(phone.markers);
+              const validatedEmailMarkers = validateMarkers(email.markers);
+              const validatedAddressMarkers = validateMarkers(address.markers);
+              
+              if (concat(validatedPhoneMarkers, validatedEmailMarkers, validatedAddressMarkers)
+                  .some(error => error.length > 0)
+              ) {
+                setErrorPhone({...errorPhone, markers: validatedPhoneMarkers});
+                setErrorEmail({...errorEmail, markers: validatedEmailMarkers});
+                setErrorAddress({...errorAddress, markers: validatedAddressMarkers});
+              }
+
+              // buildContactJson(contactName, phone, email, address);
+            }}
           >
             Create
           </Button>
@@ -155,10 +184,11 @@ function SimpleContactForm(props: {
   entries?: number,
   onAddButtonClick: () => void,
   onRemoveButtonClick: () => void,
-  setMarkers: (markers: string[]) => void,
-  setValues: (values: string[]) => void,
+  setMarkers: (markers: string[], index: number) => void,
+  setValues: (values: string[], index: number) => void,
   values: string[],
-  markers: string[]
+  markers: string[],
+  error: StringField
 }) {
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -177,15 +207,16 @@ function SimpleContactForm(props: {
         initArray(props.entries ?? 1).map((_, index) =>(
           <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <FieldMarker
+              error={props.error.markers[index]}
               value={props.markers[index]}
               onChange={value =>
-                props.setMarkers(editAt(props.markers, index, value))
+                props.setMarkers(editAt(props.markers, index, value), index)
               }
             />
             <TextInput
               placeholder={props.variant}
               value={props.values[index]}
-              onChange={value => props.setValues(editAt(props.values, index, value))}
+              onChange={value => props.setValues(editAt(props.values, index, value), index)}
             />
             {
               index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
@@ -202,10 +233,11 @@ function ContactAddressForm(props: {
   entries?: number,
   onAddButtonClick: () => void,
   onRemoveButtonClick: () => void,
-  setMarkers: (markers: string[]) => void,
-  setValues: (values: string[][]) => void,
+  setMarkers: (markers: string[], index: number) => void,
+  setValues: (values: string[][], index: [number, number]) => void,
   values: string[][],
-  markers: string[]
+  markers: string[],
+  error: AddressField
 }) {
 
   const fieldInput = (placeholder: string, markIndex: number, index: number) => (
@@ -216,7 +248,13 @@ function ContactAddressForm(props: {
         placeholder={placeholder}
         value={props.values[markIndex][index]}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          props.setValues(editAt(props.values, markIndex, editAt(props.values[markIndex], index, event.target.value)))
+          props.setValues(
+            editAt(
+              props.values, markIndex,
+              editAt(props.values[markIndex], index, event.target.value)
+            ),
+            [markIndex, index]
+          )
         }
       />
     </TextField>
@@ -240,8 +278,9 @@ function ContactAddressForm(props: {
           <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <div className="flex w-full items-center justify-between">
               <FieldMarker
+                error={props.error.markers[index]}
                 value={props.markers[index]}
-                onChange={value => props.setMarkers(editAt(props.markers, index, value))}
+                onChange={value => props.setMarkers(editAt(props.markers, index, value), index)}
               />
               {
                 index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
@@ -266,7 +305,7 @@ function TextInput(props: {
   onChange: (value: string) => void
 }) {
   return (
-    <TextField className="h-auto grow shrink-0 basis-0" label="" helpText="">
+    <TextField className="h-auto grow shrink-0 basis-0" helpText="">
       <TextField.Input
         placeholder={props.placeholder}
         value={props.value}
@@ -298,14 +337,17 @@ function capitalize(word: string): string {
 
 function FieldMarker(props: {
   value: string,
-  onChange: (value: string) => void
+  onChange: (value: string) => void,
+  error: string | undefined
 }) {
   const [marker, setMarker] = useState("mark");
+
+  const checkedError: boolean = props.error !== undefined && props.error.length > 0;
 
   return (
     <SubframeCore.Popover.Root>
       <SubframeCore.Popover.Trigger asChild={true}>
-        <Badge variant="neutral" iconRight="FeatherChevronDown">
+        <Badge variant={checkedError ? "error" : "neutral"} iconRight="FeatherChevronDown">
           {marker}
         </Badge>
       </SubframeCore.Popover.Trigger>
@@ -318,9 +360,9 @@ function FieldMarker(props: {
           asChild={true}
         >
           <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
-            <TextField label="" helpText="" icon="FeatherTag">
+            <TextField icon="FeatherTag" error={checkedError} helpText={props.error}>
               <TextField.Input
-                placeholder="Type here"
+                placeholder={checkedError ? "type here" : props.error}
                 value={props.value}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange(event.target.value)}
               />
