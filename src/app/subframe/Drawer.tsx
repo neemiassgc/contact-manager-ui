@@ -377,3 +377,12 @@ function buildContactJson(
     }), {})
   }
 }
+
+function validateMarkers(markers: string[]): string[] {
+  return markers.map(marker => {
+    if (marker.length === 0) return "marker cannot be empty";
+    if (marker.length <= 3) return "marker is too short";
+    if (marker.length > 14) return "marker is too long";
+    return "";
+  })
+}
