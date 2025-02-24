@@ -201,7 +201,7 @@ function SimpleContactForm(props: {
               onChange={value =>
                 props.setObjects(editAt(props.objects, index, {
                   field: {...obj.field},
-                  marker: {...obj.marker, value}
+                  marker: {value}
                 }))
               }
             />
@@ -255,7 +255,7 @@ function ContactAddressForm(props: {
                 value={address.marker.value}
                 onChange={value => props.setAddresses(editAt(props.addresses, index, {
                   field: {...address.field},
-                  marker: {...address.marker, value}
+                  marker: {value}
                 }))}
               />
               <RemoveButton onClick={props.onRemoveButtonClick}/>
