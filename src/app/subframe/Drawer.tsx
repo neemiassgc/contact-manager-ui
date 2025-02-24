@@ -216,7 +216,7 @@ function SimpleContactForm(props: {
             }
             />
             {
-              (props.variant === "email" && index + 1 > 1) && <RemoveButton onClick={props.onRemoveButtonClick}/>
+              (props.variant === "phone" && index + 1 === 1) ? null : <RemoveButton onClick={props.onRemoveButtonClick}/>
             }
           </div>
         ))
