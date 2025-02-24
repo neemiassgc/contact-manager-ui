@@ -123,10 +123,13 @@ function Page() {
           </div>
         </div>
       </PageLayout>
-      <Drawer
-        showAlert={(title: string, variant: Variant) => setAlert({title, variant, open: true})}
-        open={openContactDrawer}
-        close={() => setOpenContactDrawer(false)} />
+      {
+        openContactDrawer &&
+        <Drawer
+          showAlert={(title: string, variant: Variant) => setAlert({title, variant, open: true})}
+          close={() => setOpenContactDrawer(false)}
+        />
+      }
     </>
   );
 }
