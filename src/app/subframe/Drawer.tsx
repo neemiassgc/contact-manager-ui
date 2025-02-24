@@ -25,7 +25,7 @@ export default function Drawer(props: {
   close: () => void,
   showAlert: (title: string, variant: Variant) => void
 }) {
-  const [contactName, setContactName] = useState("");
+  const [contactName, setContactName] = useState<Props>({value: ""});
   const [phone, setPhone] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
   const [email, setEmail] = useState<StringField[]>([]);
   const [address, setAddress] = useState<AddressField[]>([]);
@@ -78,7 +78,7 @@ export default function Drawer(props: {
         </div>
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
-          <ContactNameForm value={contactName} onChange={setContactName}/>
+          <ContactNameForm value={contactName.value} error={contactName.error} onChange={setContactName}/>
           <SimpleContactForm
             objects={phone}
             setObjects={setPhone}
@@ -133,7 +133,7 @@ export default function Drawer(props: {
                 setAddress(validatedAddressMarkers as AddressField[]);
               }
 
-              console.log(buildContactJson(contactName, phone, email, address));
+              console.log(buildContactJson(contactName.value, phone, email, address));
             }}
           >
             Create
@@ -146,7 +146,8 @@ export default function Drawer(props: {
 
 function ContactNameForm(props: {
   value: string,
-  onChange: (value: string) => void
+  error?: string,
+  onChange: (obj: Props) => void
 }) {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -161,11 +162,11 @@ function ContactNameForm(props: {
           </span>
         </div>
       </div>
-      <TextField className="h-auto w-full flex-none" label="" helpText="">
+      <TextField className="h-auto w-full flex-none" helpText={props.error} error={!!props.error}>
         <TextField.Input
           placeholder="Contact Name"
           value={props.value}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange(event.target.value)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange({value: event.target.value})}
         />
       </TextField>
     </div>
