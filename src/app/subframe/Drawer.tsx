@@ -216,7 +216,7 @@ function SimpleContactForm(props: {
             }
             />
             {
-              index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
+              (props.variant === "phone" && index + 1 > 1) && <RemoveButton onClick={props.onRemoveButtonClick}/>
             }
           </div>
         ))
@@ -258,9 +258,7 @@ function ContactAddressForm(props: {
                   marker: {...address.marker, value}
                 }))}
               />
-              {
-                index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
-              }
+              <RemoveButton onClick={props.onRemoveButtonClick}/>
             </div>
             {
               ["zipcode", "country", "state", "city", "address"].map((key, j) => (
