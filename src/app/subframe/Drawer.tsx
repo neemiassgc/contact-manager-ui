@@ -90,6 +90,8 @@ export default function Drawer(props: {
             email.length === 0 ?
             <AddButton
               title={"Add Email"}
+              iconRight="FeatherAtSign"
+              variant="neutral-secondary"
               onClick={() => setEmail(pushField(email))}
             /> :
             <SimpleContactForm
@@ -104,6 +106,8 @@ export default function Drawer(props: {
              address.length === 0 ?
              <AddButton
                title={"Add Address"}
+               iconRight="FeatherMapPin"
+               variant="neutral-secondary"
                onClick={() => setAddress(pushAddressField(address))}
              /> :
             <ContactAddressForm
@@ -309,13 +313,16 @@ function TextInput(props: {
 
 function AddButton(props: {
   title: string,
-  onClick: () => void
+  onClick: () => void,
+  iconRight?: string,
+  variant?: "neutral-primary" | "neutral-secondary"
 }) {
   return (
     <Button
       className="h-8 w-full flex-none"
-      variant="neutral-primary"
+      variant={props.variant ?? "neutral-primary"}
       icon="FeatherPlus"
+      iconRight={props.iconRight as SubframeCore.IconName}
       onClick={props.onClick}>
       {props.title}
     </Button>
