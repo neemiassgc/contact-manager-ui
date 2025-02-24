@@ -7,12 +7,18 @@ import { TextField } from "@/subframe/components/TextField";
 import { Badge } from "@/subframe/components/Badge";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
-import { initArray } from "../lib/misc";
-import { Address, Contact, IndexedAddress, IndexedString, Variant } from "../lib/types";
+import { Address, Contact, Variant } from "../lib/types";
 
-type Markers = { markers: string[] }
-type StringField = Markers & { values: string[] }
-type AddressField = Markers & { values: string[][] }
+type Props = {
+  value: string,
+  error?: string | undefined
+}
+
+type Marker = { marker: Props }
+
+type StringField = Marker & { field: Props }
+
+type AddressField = Marker & { field: { value: Address, error?: string | undefined } }
 
 export default function Drawer(props: {
   open: boolean,
@@ -20,16 +26,42 @@ export default function Drawer(props: {
   showAlert: (title: string, variant: Variant) => void
 }) {
   const [contactName, setContactName] = useState("");
-  const [amountOfInputs, setAmountOfInputs] = useState([1, 1, 1]);
-  const [phone, setPhone] = useState<StringField>({markers: [""], values: [""]});
-  const [email, setEmail] = useState<StringField>({markers: [""], values: [""]});
-  const [address, setAddress] = useState<AddressField>({markers: [""], values: [["", "", "", "", ""]]});
-  const [errorPhone, setErrorPhone] = useState<StringField>({markers: [""], values: [""]});
-  const [errorEmail, setErrorEmail] = useState<StringField>({markers: [""], values: [""]});
-  const [errorAddress, setErrorAddress] = useState<AddressField>({markers: [""], values: [["", "", "", "", ""]]});
+  const [phone, setPhone] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
+  const [email, setEmail] = useState<StringField[]>([]);
+  const [address, setAddress] = useState<AddressField[]>([]);
 
-  const immutablePush = (array: string[], value: string) => [...array, value];
-  const immutablePop = (array: string[]) => array.slice(0, array.length - 1);
+  const pushField = (array: StringField[]) => [
+    ...array,
+    {
+      marker: {
+        value: ""
+      },
+      field: {
+        value: ""
+      }
+    }
+  ]
+
+  function pushAddressField(array: AddressField[]): AddressField[] {
+    return [
+      ...array,
+      {
+        marker: {
+          value: ""
+        },
+        field: {
+          value: {
+            street: "",
+            zipcode: "",
+            country: "",
+            state: "",
+            city: "",
+            address: ""
+          }
+        }
+      }
+    ]
+  }
 
   return (
     <DrawerLayout open={props.open} onOpenChange={() => {}}>
@@ -48,99 +80,56 @@ export default function Drawer(props: {
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <ContactNameForm value={contactName} onChange={setContactName}/>
           <SimpleContactForm
-            error={errorPhone}
-            setMarkers={(newMarkers, index) => {
-              setPhone({...phone, markers: newMarkers })
-              setErrorPhone({...errorPhone, markers: editAt(errorPhone.markers, index, "")})
-            }}
-            setValues={newValues => setPhone({...phone, values: newValues })}
-            markers={phone.markers} 
-            values={phone.values} 
-            entries={amountOfInputs[0]}
-            onAddButtonClick={() => {
-              setAmountOfInputs(editAt(amountOfInputs, 0, amountOfInputs[0] + 1))
-              setPhone({
-                markers: immutablePush(phone.markers, ""),
-                values: immutablePush(phone.values, "")
-              })
-            }}
-            onRemoveButtonClick={() => {
-              setAmountOfInputs(editAt(amountOfInputs, 0, amountOfInputs[0] - 1))
-              setPhone({
-                markers: immutablePop(phone.markers),
-                values: immutablePop(phone.values)
-              })
-            }}
+            objects={phone}
+            setObjects={setPhone}
+            onAddButtonClick={() => setPhone(pushField(phone))}
+            onRemoveButtonClick={() => setPhone(phone.slice(0, phone.length - 1))}
             variant="phone"
           />
-          <SimpleContactForm
-            error={errorEmail}
-            setMarkers={(newMarkers, index) => {
-              setEmail({...email, markers: newMarkers })
-              setErrorEmail({...errorEmail, markers: editAt(errorEmail.markers, index, "")})
-            }}
-            setValues={newValues => setEmail({...email, values: newValues })}
-            markers={email.markers} 
-            values={email.values} 
-            entries={amountOfInputs[1]}
-            onAddButtonClick={() => {
-              setAmountOfInputs(editAt(amountOfInputs, 1, amountOfInputs[1] + 1))
-              setEmail({
-                markers: immutablePush(phone.markers, ""),
-                values: immutablePush(phone.values, "")
-              })
-            }}
-            onRemoveButtonClick={() => {
-              setAmountOfInputs(editAt(amountOfInputs, 1, amountOfInputs[1] - 1))
-              setEmail({
-                markers: immutablePop(phone.markers),
-                values: immutablePop(phone.values)
-              })
-            }}
-            variant="email"
-          />
-          <ContactAddressForm
-            error={errorAddress}
-            setMarkers={(newMarkers) => {
-              setAddress({...address, markers: newMarkers })
-              setErrorAddress({...errorAddress, markers: editAt(errorAddress.markers, 0, "")})
-            }}
-            setValues={newValues => setAddress({...address, values: newValues })}
-            markers={address.markers} 
-            values={address.values} 
-            entries={amountOfInputs[2]}
-            onAddButtonClick={() => {
-              setAmountOfInputs(editAt(amountOfInputs, 2, amountOfInputs[2] + 1))
-              setAddress({
-                markers: immutablePush(address.markers, ""),
-                values: [...address.values, ["", "", "", "", ""]]
-              })
-            }}
-            onRemoveButtonClick={() => {
-              setAmountOfInputs(editAt(amountOfInputs, 2, amountOfInputs[2] - 1))
-              setAddress({
-                markers: immutablePop(phone.markers),
-                values: address.values.slice(0, address.values.length - 1)
-              })
-            }}
-          />
+          {
+            email.length === 0 ?
+            <AddButton
+              title={"Add Email"}
+              onClick={() => setEmail(pushField(email))}
+            /> :
+            <SimpleContactForm
+              objects={email}
+              setObjects={setEmail}
+              onAddButtonClick={() => setEmail(pushField(email))}
+              onRemoveButtonClick={() => setEmail(email.slice(0, email.length - 1))}
+              variant="email"
+            />
+          }
+          {
+             address.length === 0 ?
+             <AddButton
+               title={"Add Address"}
+               onClick={() => setAddress(pushAddressField(address))}
+             /> :
+            <ContactAddressForm
+              addresses={address}
+              setAddresses={setAddress}
+              onAddButtonClick={() => setAddress(pushAddressField(address))}
+              onRemoveButtonClick={() => setAddress(address.slice(0, address.length - 1))}
+            />
+          }
           <Button
             size="large"
             icon="FeatherUserPlus"
             onClick={() => {
-              const validatedPhoneMarkers = validateMarkers(phone.markers);
-              const validatedEmailMarkers = validateMarkers(email.markers);
-              const validatedAddressMarkers = validateMarkers(address.markers);
+              const validatedPhoneMarkers = validateMarkers(phone);
+              const validatedEmailMarkers = validateMarkers(email);
+              const validatedAddressMarkers = validateMarkers(address);
               
               if (concat(validatedPhoneMarkers, validatedEmailMarkers, validatedAddressMarkers)
-                  .some(error => error.length > 0)
+                  .some(it => it.marker.error && it.marker.error.length > 0)
               ) {
-                setErrorPhone({...errorPhone, markers: validatedPhoneMarkers});
-                setErrorEmail({...errorEmail, markers: validatedEmailMarkers});
-                setErrorAddress({...errorAddress, markers: validatedAddressMarkers});
+                setPhone(validatedPhoneMarkers as StringField[]);
+                setEmail(validatedEmailMarkers as StringField[]);
+                setAddress(validatedAddressMarkers as AddressField[]);
               }
 
-              // buildContactJson(contactName, phone, email, address);
+              console.log(buildContactJson(contactName, phone, email, address));
             }}
           >
             Create
@@ -181,14 +170,10 @@ function ContactNameForm(props: {
 
 function SimpleContactForm(props: {
   variant: "phone" | "email",
-  entries?: number,
   onAddButtonClick: () => void,
   onRemoveButtonClick: () => void,
-  setMarkers: (markers: string[], index: number) => void,
-  setValues: (values: string[], index: number) => void,
-  values: string[],
-  markers: string[],
-  error: StringField
+  objects: StringField[],
+  setObjects: (object: StringField[]) => void
 }) {
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -204,19 +189,27 @@ function SimpleContactForm(props: {
         </div>
       </div>
       {
-        initArray(props.entries ?? 1).map((_, index) =>(
+        props.objects.map((obj, index) =>(
           <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <FieldMarker
-              error={props.error.markers[index]}
-              value={props.markers[index]}
+              error={obj.marker.error}
+              value={obj.marker.value}
               onChange={value =>
-                props.setMarkers(editAt(props.markers, index, value), index)
+                props.setObjects(editAt(props.objects, index, {
+                  field: {...obj.field},
+                  marker: {...obj.marker, value}
+                }))
               }
             />
             <TextInput
               placeholder={props.variant}
-              value={props.values[index]}
-              onChange={value => props.setValues(editAt(props.values, index, value), index)}
+              value={obj.field.value}
+              onChange={value =>
+                props.setObjects(editAt(props.objects, index, {
+                  field: {...obj.field, value},
+                  marker: {...obj.marker}
+                }))
+            }
             />
             {
               index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
@@ -230,35 +223,11 @@ function SimpleContactForm(props: {
 }
 
 function ContactAddressForm(props: {
-  entries?: number,
   onAddButtonClick: () => void,
   onRemoveButtonClick: () => void,
-  setMarkers: (markers: string[], index: number) => void,
-  setValues: (values: string[][], index: [number, number]) => void,
-  values: string[][],
-  markers: string[],
-  error: AddressField
+  setAddresses: (addresses: AddressField[]) => void,
+  addresses: AddressField[],
 }) {
-
-  const fieldInput = (placeholder: string, markIndex: number, index: number) => (
-    <TextField
-      className="h-auto w-full flex-none"
-    >
-      <TextField.Input
-        placeholder={placeholder}
-        value={props.values[markIndex][index]}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          props.setValues(
-            editAt(
-              props.values, markIndex,
-              editAt(props.values[markIndex], index, event.target.value)
-            ),
-            [markIndex, index]
-          )
-        }
-      />
-    </TextField>
-  )
 
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -274,23 +243,46 @@ function ContactAddressForm(props: {
         </div>
       </div>
       {
-        initArray(props.entries ?? 1).map((_, index) => (
+        props.addresses.map((address, index) => (
           <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <div className="flex w-full items-center justify-between">
               <FieldMarker
-                error={props.error.markers[index]}
-                value={props.markers[index]}
-                onChange={value => props.setMarkers(editAt(props.markers, index, value), index)}
+                error={address.marker.error}
+                value={address.marker.value}
+                onChange={value => props.setAddresses(editAt(props.addresses, index, {
+                  field: {...address.field},
+                  marker: {...address.marker, value}
+                }))}
               />
               {
                 index + 1 > 1 && <RemoveButton onClick={props.onRemoveButtonClick}/>
               }
             </div>
-            {fieldInput("Zipcode", index, 0)}
-            {fieldInput("Country", index, 1)}
-            {fieldInput("State", index, 2)}
-            {fieldInput("City", index, 3)}
-            {fieldInput("Address", index, 4)}
+            {
+              ["zipcode", "country", "state", "city", "address"].map((key, j) => (
+                <TextField
+                  key={j}
+                  className="h-auto w-full flex-none"
+                >
+                  <TextField.Input
+                    placeholder={key}
+                    value={address.field.value[key]}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      props.setAddresses(editAt(props.addresses, index, {
+                        marker: {...address.marker},
+                        field: {
+                          ...address.field,
+                          value: {
+                            ...address.field.value,
+                            [key]: event.target.value
+                          }
+                        }
+                      }))
+                    }
+                  />
+                </TextField>
+              ))
+            }
           </div>
         ))
       }
@@ -324,9 +316,8 @@ function AddButton(props: {
       className="h-8 w-full flex-none"
       variant="neutral-primary"
       icon="FeatherPlus"
-      onClick={props.onClick}
-      >
-        {props.title}
+      onClick={props.onClick}>
+      {props.title}
     </Button>
   )
 }
@@ -392,40 +383,44 @@ function editAt<T>(array: T[], index: number, value: T): T[] {
 
 function buildContactJson(
   contactName: string,
-  phones: StringField,
-  emails: StringField,
-  addresses: AddressField
+  phones: StringField[],
+  emails: StringField[],
+  addresses: AddressField[]
 ): Contact {
-
   return {
     name: contactName,
-    phoneNumbers: initArray(phones.markers.length).reduce((prev, curr) => ({
+    phoneNumbers: phones.reduce((prev, curr) => ({
       ...prev,
-      [phones.markers[curr]]: phones.values[curr]
-    }), {}),
-    emails: initArray(emails.markers.length).reduce((prev, curr) => ({
+      [curr.marker.value]: curr.field.value }), {}),
+    emails: emails.reduce((prev, curr) => ({
       ...prev,
-      [emails.markers[curr]]: emails.values[curr]
-    }), {}),
-    addresses: initArray(addresses.markers.length).reduce((prev, curr) => ({
+      [curr.marker.value]: curr.field.value }), {}),
+    addresses: addresses.reduce((prev, curr) => ({
       ...prev,
-      [addresses.markers[curr]]: {
-        zipcode: addresses.values[curr][0],
-        country: addresses.values[curr][1],
-        state: addresses.values[curr][2],
-        city: addresses.values[curr][3],
-        address: addresses.values[curr][4]
+      [curr.marker.value]: {
+        street: curr.field.value.street,
+        zipcode: curr.field.value.zipcode,
+        country: curr.field.value.country,
+        state: curr.field.value.state,
+        city: curr.field.value.city
       }
     }), {})
   }
 }
 
-function validateMarkers(markers: string[]): string[] {
-  return markers.map(marker => {
-    if (marker.length === 0) return "marker cannot be empty";
-    if (marker.length <= 3) return "marker is too short";
-    if (marker.length > 14) return "marker is too long";
-    return "";
+function validateMarkers(fields: StringField[] | AddressField[]) {
+  return fields.map(it => {
+    let error: string = "";
+    if (it.marker.value.length === 0) error = "marker cannot be empty";
+    if (it.marker.value.length <= 3) error = "marker is too short";
+    if (it.marker.value.length > 14) error = "marker is too long";
+    return {
+      field: { ...it.field },
+      marker: {
+        ...it.marker,
+        error
+      }
+    }
   })
 }
 
