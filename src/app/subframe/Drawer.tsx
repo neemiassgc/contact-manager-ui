@@ -25,9 +25,9 @@ export default function Drawer(props: {
   showAlert: (title: string, variant: Variant) => void
 }) {
   const [contactName, setContactName] = useState<Props>({value: ""});
-  const [phone, setPhone] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
-  const [email, setEmail] = useState<StringField[]>([]);
-  const [address, setAddress] = useState<AddressField[]>([]);
+  const [phones, setPhones] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
+  const [emails, setEmails] = useState<StringField[]>([]);
+  const [addresses, setAddresses] = useState<AddressField[]>([]);
 
   const pushField = (array: StringField[]) => [
     ...array,
@@ -79,60 +79,60 @@ export default function Drawer(props: {
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <ContactNameForm value={contactName.value} error={contactName.error} onChange={setContactName}/>
           <SimpleContactForm
-            objects={phone}
-            setObjects={setPhone}
-            onAddButtonClick={() => setPhone(pushField(phone))}
-            onRemoveButtonClick={() => setPhone(phone.slice(0, phone.length - 1))}
+            objects={phones}
+            setObjects={setPhones}
+            onAddButtonClick={() => setPhones(pushField(phones))}
+            onRemoveButtonClick={() => setPhones(phones.slice(0, phones.length - 1))}
             variant="phone"
           />
           {
-            email.length === 0 ?
+            emails.length === 0 ?
             <AddButton
               title={"Add Email"}
               iconRight="FeatherAtSign"
               variant="neutral-secondary"
-              onClick={() => setEmail(pushField(email))}
+              onClick={() => setEmails(pushField(emails))}
             /> :
             <SimpleContactForm
-              objects={email}
-              setObjects={setEmail}
-              onAddButtonClick={() => setEmail(pushField(email))}
-              onRemoveButtonClick={() => setEmail(email.slice(0, email.length - 1))}
+              objects={emails}
+              setObjects={setEmails}
+              onAddButtonClick={() => setEmails(pushField(emails))}
+              onRemoveButtonClick={() => setEmails(emails.slice(0, emails.length - 1))}
               variant="email"
             />
           }
           {
-             address.length === 0 ?
+             addresses.length === 0 ?
              <AddButton
                title={"Add Address"}
                iconRight="FeatherMapPin"
                variant="neutral-secondary"
-               onClick={() => setAddress(pushAddressField(address))}
+               onClick={() => setAddresses(pushAddressField(addresses))}
              /> :
             <ContactAddressForm
-              addresses={address}
-              setAddresses={setAddress}
-              onAddButtonClick={() => setAddress(pushAddressField(address))}
-              onRemoveButtonClick={() => setAddress(address.slice(0, address.length - 1))}
+              addresses={addresses}
+              setAddresses={setAddresses}
+              onAddButtonClick={() => setAddresses(pushAddressField(addresses))}
+              onRemoveButtonClick={() => setAddresses(addresses.slice(0, addresses.length - 1))}
             />
           }
           <Button
             size="large"
             icon="FeatherUserPlus"
             onClick={() => {
-              const validatedPhoneMarkers = validateMarkers(phone);
-              const validatedEmailMarkers = validateMarkers(email);
-              const validatedAddressMarkers = validateMarkers(address);
+              const validatedPhoneMarkers = validateMarkers(phones);
+              const validatedEmailMarkers = validateMarkers(emails);
+              const validatedAddressMarkers = validateMarkers(addresses);
               
               if (concat(validatedPhoneMarkers, validatedEmailMarkers, validatedAddressMarkers)
                   .some(it => it.marker.error && it.marker.error.length > 0)
               ) {
-                setPhone(validatedPhoneMarkers as StringField[]);
-                setEmail(validatedEmailMarkers as StringField[]);
-                setAddress(validatedAddressMarkers as AddressField[]);
+                setPhones(validatedPhoneMarkers as StringField[]);
+                setEmails(validatedEmailMarkers as StringField[]);
+                setAddresses(validatedAddressMarkers as AddressField[]);
               }
 
-              console.log(buildContactJson(contactName.value, phone, email, address));
+              console.log(buildContactJson(contactName.value, phones, emails, addresses));
             }}
           >
             Create
