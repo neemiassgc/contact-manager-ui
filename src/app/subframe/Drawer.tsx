@@ -146,7 +146,8 @@ export default function Drawer(props: {
 function ContactNameForm(props: {
   value: string,
   error?: string,
-  onChange: (obj: Props) => void
+  onChange: (obj: Props) => void,
+  disabled: boolean
 }) {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -161,7 +162,12 @@ function ContactNameForm(props: {
           </span>
         </div>
       </div>
-      <TextField className="h-auto w-full flex-none" helpText={props.error} error={!!props.error}>
+      <TextField
+        className="h-auto w-full flex-none"
+        helpText={props.error}
+        error={!!props.error}
+        disabled= {props.disabled}
+      >
         <TextField.Input
           placeholder="Contact Name"
           value={props.value}
@@ -177,7 +183,8 @@ function SimpleContactForm(props: {
   onAddButtonClick: () => void,
   onRemoveButtonClick: () => void,
   objects: StringField[],
-  setObjects: (object: StringField[]) => void
+  setObjects: (object: StringField[]) => void,
+  disabled: boolean
 }) {
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
@@ -196,6 +203,7 @@ function SimpleContactForm(props: {
         props.objects.map((obj, index) =>(
           <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <FieldMarker
+              disabled={props.disabled}
               error={obj.marker.error}
               value={obj.marker.value}
               onChange={value =>
@@ -206,6 +214,7 @@ function SimpleContactForm(props: {
               }
             />
             <TextInput
+              disabled={props.disabled}
               placeholder={props.variant}
               value={obj.field.value}
               onChange={value =>
@@ -231,6 +240,7 @@ function ContactAddressForm(props: {
   onRemoveButtonClick: () => void,
   setAddresses: (addresses: AddressField[]) => void,
   addresses: AddressField[],
+  disabled: boolean
 }) {
 
   return (
@@ -251,6 +261,7 @@ function ContactAddressForm(props: {
           <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <div className="flex w-full items-center justify-between">
               <FieldMarker
+                disabled={props.disabled}
                 error={address.marker.error}
                 value={address.marker.value}
                 onChange={value => props.setAddresses(editAt(props.addresses, index, {
@@ -265,6 +276,7 @@ function ContactAddressForm(props: {
                 <TextField
                   key={j}
                   className="h-auto w-full flex-none"
+                  disabled={props.disabled}
                 >
                   <TextField.Input
                     placeholder={key}
@@ -296,10 +308,11 @@ function ContactAddressForm(props: {
 function TextInput(props: {
   placeholder: string,
   value: string,
-  onChange: (value: string) => void
+  onChange: (value: string) => void,
+  disabled: boolean
 }) {
   return (
-    <TextField className="h-auto grow shrink-0 basis-0" helpText="">
+    <TextField className="h-auto grow shrink-0 basis-0" helpText="" disabled={props.disabled}>
       <TextField.Input
         placeholder={props.placeholder}
         value={props.value}
@@ -334,7 +347,8 @@ function capitalize(word: string): string {
 function FieldMarker(props: {
   value: string,
   onChange: (value: string) => void,
-  error: string | undefined
+  error: string | undefined,
+  disabled: boolean
 }) {
   const [marker, setMarker] = useState("mark");
 
@@ -356,7 +370,7 @@ function FieldMarker(props: {
           asChild={true}
         >
           <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
-            <TextField icon="FeatherTag" error={checkedError} helpText={props.error}>
+            <TextField icon="FeatherTag" error={checkedError} helpText={props.error} disabled={props.disabled}>
               <TextField.Input
                 placeholder={checkedError ? "type here" : props.error}
                 value={props.value}
