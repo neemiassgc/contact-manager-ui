@@ -1,22 +1,22 @@
 "use client";
 
 import React, { ReactNode, useState } from "react";
-import { Breadcrumbs } from "../../subframe/components/Breadcrumbs";
-import { DropdownMenu } from "../../subframe/components/DropdownMenu";
-import { TextField } from "../../subframe/components/TextField";
-import { Button } from "../../subframe/components/Button";
-import { Table } from "../../subframe/components/Table";
-import { Avatar } from "../../subframe/components/Avatar";
-import { IconButton } from "../../subframe/components/IconButton";
-import { Loader } from "../../subframe/components/Loader";
+import { Breadcrumbs } from "@/subframe/components/Breadcrumbs";
+import { DropdownMenu } from "@/subframe/components/DropdownMenu";
+import { TextField } from "@/subframe/components/TextField";
+import { Button } from "@/subframe/components/Button";
+import { Table } from "@/subframe/components/Table";
+import { Avatar } from "@/subframe/components/Avatar";
+import { IconButton } from "@/subframe/components/IconButton";
+import { Loader } from "@/subframe/components/Loader";
 import * as SubframeCore from "@subframe/core";
-import PageLayout from "../../subframe/layouts/PageLayout";
+import PageLayout from "@/subframe/layouts/PageLayout";
 import { useFetch } from "./hooks";
-import { Contact, Variant } from "../lib/types";
+import { Contact, Variant } from "./components/drawer/types";
 import { useRouter } from "next/navigation";
 import { DeleteWithConfirmation } from "./profile/[id]/components";
 import { Alert } from "@/subframe/components/Alert";
-import Drawer from "./Drawer"
+import Drawer from "./components/drawer/Comp"
 
 function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
