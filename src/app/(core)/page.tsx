@@ -1,349 +1,282 @@
-"use client"
-import {
-  InputAdornment, Box, Pagination,
-  IconButton, TextField, Divider,
-} from '@mui/material';
-import { ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import SearchIcon from '@mui/icons-material/Search';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import DataArrayIcon from '@mui/icons-material/DataArray';
-import {
-  addUnseenContactName, clearLocalContacts, getAllUnseenContactNames,
-  removeUnseenContactName, setSelectedLocalContact
-} from '../lib/storage';
-import { Contact, Run, ShortContact } from "../lib/types"
-import { useRouter } from "next/navigation"
-import { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { paint, bg, border, text, textFieldTheme } from '../lib/colors';
-import {
-  convertNetworkErrorMessage, filterByName, phoneValueTransformer, sliceContacts,
-  isNotUndefined, isUserNotFound, isViolationError,
-  isNotTheLastItem, extractHelperTextFromError
-} from '../lib/misc';
-import { useAllContacts } from '../lib/hooks';
-import { BadgedAvatar, ContactBoardLoading, CustomDivider, DefaultButton, ErrorScreen, Modal } from './components';
-import { createNewContact, createNewUser, deleteContact } from '../lib/net';
-import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
-import AlertContext from '../lib/AlertContext';
+"use client";
 
-export default function Home() {
-  const { user } = useUser();
-  const { data, error, isLoading, reload } = useAllContacts();
+import React, { ReactNode, useState } from "react";
+import { Breadcrumbs } from "../../subframe/components/Breadcrumbs";
+import { DropdownMenu } from "../../subframe/components/DropdownMenu";
+import { TextField } from "../../subframe/components/TextField";
+import { Button } from "../../subframe/components/Button";
+import { Table } from "../../subframe/components/Table";
+import { Avatar } from "../../subframe/components/Avatar";
+import { IconButton } from "../../subframe/components/IconButton";
+import { Loader } from "../../subframe/components/Loader";
+import * as SubframeCore from "@subframe/core";
+import PageLayout from "../../subframe/layouts/PageLayout";
+import { useFetch } from "./hooks";
+import { Contact, Variant } from "../lib/types";
+import { useRouter } from "next/navigation";
+import { DeleteWithConfirmation } from "./profile/[id]/components";
+import { Alert } from "@/subframe/components/Alert";
+import Drawer from "./Drawer"
 
-  useEffect(() => {
-    if (error) {
-      if (isUserNotFound(error))
-        createNewUser((user as UserProfile).name as string)
-          .then(() => reload())
-    }
-  }, [error, user, reload]);
+function Page() {
+  const [openContactDrawer, setOpenContactDrawer] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    title: "",
+    variant: "success" as Variant
+  });
 
   return (
     <>
-      <main className="w-full p-1">
-        {
-          (error && isUserNotFound(error)) || isLoading ? <ContactBoardLoading/>
-          : error ? <ErrorScreen label={error.message}/> :
-          <ContactListBoard reloadContacts={reload} contacts={data as Contact[]}/>
+      <PageLayout>
+        { alert.open &&
+          <LocalAlert
+            title={alert.title}
+            variant={alert.variant}
+            onDispose={() => setAlert({...alert, open: false})}
+          />
         }
-      </main>
+        <div className="container max-w-none flex h-full w-full flex-col items-start">
+          <BreadcrumbsBox/>
+          <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
+            <div className="flex w-full flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+              <span className="w-full text-heading-3 font-heading-3 text-default-font">
+                Contacts
+              </span>
+              <div className="flex w-full items-center gap-2">
+                <div className="flex grow shrink-0 basis-0 flex-wrap items-center gap-4">
+                  <div className="flex grow shrink-0 basis-0 items-center gap-1">
+                    <TextField
+                      variant="filled"
+                      label=""
+                      helpText=""
+                      icon="FeatherSearch"
+                    >
+                      <TextField.Input
+                        placeholder="Search..."
+                        value=""
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                      />
+                    </TextField>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <SubframeCore.DropdownMenu.Root>
+                      <SubframeCore.DropdownMenu.Trigger asChild={true}>
+                        <Button
+                          variant="neutral-secondary"
+                          iconRight="FeatherChevronDown"
+                          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                        >
+                          Sort by
+                        </Button>
+                      </SubframeCore.DropdownMenu.Trigger>
+                      <SubframeCore.DropdownMenu.Portal>
+                        <SubframeCore.DropdownMenu.Content
+                          side="bottom"
+                          align="end"
+                          sideOffset={4}
+                          asChild={true}
+                        >
+                          <DropdownMenu>
+                            <DropdownMenu.DropdownItem icon={null}>Name</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Phone</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Email</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Birth</DropdownMenu.DropdownItem>
+                            <DropdownMenu.DropdownItem icon={null}>Address</DropdownMenu.DropdownItem>
+                          </DropdownMenu>
+                        </SubframeCore.DropdownMenu.Content>
+                      </SubframeCore.DropdownMenu.Portal>
+                    </SubframeCore.DropdownMenu.Root>
+                    <Button
+                      icon="FeatherPlus"
+                      onClick={() => setOpenContactDrawer(true)}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <TableContainer/>
+              <div className="flex w-full items-center justify-center gap-4">
+                <span className="grow shrink-0 basis-0 text-body font-body text-subtext-color">
+                  Showing 1 – 4 of 8
+                </span>
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    variant="neutral-secondary"
+                    onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                  >
+                    Prev
+                  </Button>
+                  <Button
+                    variant="neutral-secondary"
+                    onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
+              © 2025 Created by <span className="underline">Neemias Santos</span>
+            </span>
+          </div>
+        </div>
+      </PageLayout>
+      {
+        openContactDrawer &&
+        <Drawer
+          showAlert={(title: string, variant: Variant) => setAlert({title, variant, open: true})}
+          close={() => setOpenContactDrawer(false)}
+        />
+      }
     </>
   );
 }
 
-function ContactListBoard(props: { contacts: Contact[], reloadContacts: Run }) {
-  const [searchText, setSearchText] = useState("");
-  
-  const filteredContacts: Contact[] = filterByName(props.contacts, searchText);
-
-  const handleSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(event.target.value);
-  }
-
+function BreadcrumbsBox() {
   return (
-    <Box className="p-6 w-full sm:w-9/12 md:w-8/12 lg:w-1/2 xl:w-5/12 mx-auto border rounded-xl" sx={bg("surface-container-high")}>
-      <ContactListHeader
-        reloadContacts={props.reloadContacts}
-        textFieldOnChange={handleSearchText}
-        textFieldValue={searchText}
-      />
-      {
-        filteredContacts.length > 0 ?
-        <PageableContactList
-          reloadContacts={props.reloadContacts}
-          contacts={filteredContacts}
-        /> :
-        <>
-          <CustomDivider/>
-          <Box className="w-full text-center mt-3" sx={{...text("on-surface"), opacity: 0.7}}>
-            <DataArrayIcon fontSize="large"/>
-            <span className="text-2xl align-middle ml-2">Nothing</span>
-          </Box>
-        </>
-      }
-    </Box>
+    <div className="flex w-full items-center gap-4 px-4 py-4">
+      <Breadcrumbs>
+        <div className="flex items-center gap-2">
+          <Breadcrumbs.Divider />
+          <Breadcrumbs.Item>Home</Breadcrumbs.Item>
+        </div>
+      </Breadcrumbs>
+    </div>
   )
 }
 
-function ContactListHeader(props: {
-  textFieldValue: string,
-  textFieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  reloadContacts: Run,
-}) {
-  const [openModal, setOpenModal] = useState(false);
+function TableContainer() {
+  const { data, loading, error } = useFetch("/api/contacts");
 
-  return (
-    <>
-      <Box className="w-full flex mb-3 justify-center flex-wrap-reverse gap-3 sm:gap-0 sm:justify-between">
-        <TextField
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              '& fieldset': {border: "none"},
-            },
-            ...paint(bg("tertiary"), text("on-tertiary")),
-            borderRadius: 2
-          }}
-          size="small"
-          placeholder="search"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={paint(text("on-tertiary"))}/>
-              </InputAdornment>
-            ),
-          }}
-          inputProps={{
-            sx: {
-              "&::placeholder": {
-                ...paint(text("on-tertiary")),
-                opacity: 1
-              },
-              ...paint(text("on-tertiary"))
-            }
-          }}
-          onChange={props.textFieldOnChange}
-          value={props.textFieldValue}
-        />
-        <DefaultButton onClick={() => setOpenModal(true)} title="Add Contact">
-          <PersonAddIcon/>
-        </DefaultButton>
-      </Box>
-      <ContactCreationModal
-        reloadContacts={props.reloadContacts}
-        open={openModal}
-        handleClose={() => setOpenModal(false)}
-      />
-    </>
-  )
+  return loading || error ? <InformativeFeedback loading={loading} text={error ?? undefined} />
+    : <TableContent content={data as Contact[]}/>;
 }
 
-function PageableContactList(props: { contacts: Contact[], reloadContacts: Run }) {
-  const [page, setPage] = useState(1);
-
-  const handlePagination: (event: React.ChangeEvent<unknown>, value: number) => void = (_, value) => {
-    setPage(value);
-  }
-  
-  const countPerPage: number = 6;
-  const paginationCount: number = Math.floor(props.contacts.length / countPerPage);
-
+function TableContent(props: {content: Contact[]}) {
   return (
-    <>
-      <ContactList
-        reloadContacts={props.reloadContacts}
-        contacts={sliceContacts(countPerPage, page, props.contacts)}
-      />
-      {
-        props.contacts.length > countPerPage &&
-        <Box className="p-2">
-          <Pagination
-            sx={{
-              "& .MuiPaginationItem-root.Mui-selected": paint(bg("primary"), text("on-primary")),
-              "& .MuiPaginationItem-root.Mui-selected:hover": paint(bg("primary-container"), text("on-primary-container")),
-              "& .MuiPaginationItem-root:hover": paint(bg("secondary-container"), text("on-secondary-container")),
-              "& .MuiPaginationItem-root": paint(text("on-surface"))
-            }}
-            className="w-fit mx-auto"
-            count={props.contacts.length % countPerPage === 0 ? paginationCount : paginationCount + 1}
-            page={page}
-            onChange={handlePagination}
-            size="large" />
-        </Box>
-      }
-    </>
-  )
-}
-
-function ContactList(props: { contacts: Contact[], reloadContacts: Run}) {
-  const router = useRouter();
-  const [consentModal, setConsentModal] = useState({loading: false, open: false});
-  const [selectedContact, setSelectedContact] = useState({ name: "", id: ""});
-  const showAlert = useContext(AlertContext);
-
-  const unseenContactNames: string[] = getAllUnseenContactNames();
-
-  const removeContact = () => {
-    setConsentModal({...consentModal, loading: true})
-    deleteContact(selectedContact.id)
-      .then(() => {
-        clearLocalContacts();
-        props.reloadContacts();
-        showAlert("Contact deleted successfully!");
-      })
-      .catch(error => {
-        showAlert(convertNetworkErrorMessage(error.message), "error");
-      })
-      .finally(() => setConsentModal({open: false, loading: false}));
-  }
-
-  return (
-    <>
-      <Box className="w-full rounded-xl border" sx={paint(bg("surface"), text("on-surface"), border("outline-variant"))}>
-        {
-          props.contacts.map((contact, index, list) => {
-            return (
-              <>
-                <ListItem key={index} secondaryAction={
-                  <IconButton onClick={() => {
-                    setConsentModal({loading: false, open: true});
-                    setSelectedContact({ name: contact.name, id: contact.id });
-                  }}>
-                    <DeleteForeverIcon sx={text("on-surface")}/>
-                  </IconButton>
-                }>
-                  <ListItemButton onClick={() => {
-                    setSelectedLocalContact(contact.id);
-                    removeUnseenContactName(contact.name);
-                    router.push("/profile")
-                  }}>
-                    <ListItemAvatar>
-                      <BadgedAvatar
-                        avatarSeed={contact.name}
-                        badged={unseenContactNames.includes(contact.name)}
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      sx={text("on-surface")}
-                      primary={contact.name}
-                      secondary={unseenContactNames.includes(contact.name) ? "New" : null}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                {
-                  isNotTheLastItem(list, index) && <Divider variant="middle"/> 
-                }
-              </>
-            )
-          })
+    <div className="flex w-full flex-col items-start gap-6 overflow-hidden overflow-x-auto">
+      <Table
+        header={
+          <Table.HeaderRow>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Phone</Table.HeaderCell>
+            <Table.HeaderCell>Email</Table.HeaderCell>
+            <Table.HeaderCell>Birth</Table.HeaderCell>
+            <Table.HeaderCell>Address</Table.HeaderCell>
+            <Table.HeaderCell />
+          </Table.HeaderRow>
         }
-      </Box>
-      <Modal
-        mini
-        isLoading={consentModal.loading}
-        open={consentModal.open}
-        title={"Delete "+selectedContact.name+"?"}
-        handleClose={() => setConsentModal({loading: false, open: false})}
-        handleAccept={removeContact}
-      />
-    </>
+      >
+        {
+          props.content.map((contact, index) =>
+            <ContactRow
+              key={index}
+              id={contact.id}
+              name={contact.name}
+              phone={Object.values(contact.phoneNumbers)[0]}
+              email={Object.values(contact.emails)[0]}
+              birth="09/08/1991"
+              address={Object.values(contact.addresses)[0].city}
+            />
+          )
+        }
+      </Table>
+    </div>
   )
 }
 
-function ContactCreationModal(props: {
-  open: boolean,
-  handleClose: Run,
-  reloadContacts: Run
+function ContactRow(props: {
+  id: string,
+  name: string,
+  phone: string,
+  email: string,
+  birth: string,
+  address: string
 }) {
-  const [textFieldData, setTextFieldData] = useState<ShortContact>(
-    { name: "", phoneLabel: "", phoneValue: ""}
-  )
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | undefined>(undefined);
-  const showAlert = useContext(AlertContext);
-
-  const setTextField = (field: string) => ({ target: { value }}: ChangeEvent<HTMLInputElement>) =>
-      setTextFieldData({...textFieldData, [field]: field === "phoneValue" ? phoneValueTransformer(textFieldData.phoneValue, value) : value});
-
-  const addNewContact = () => {
-    setError(undefined);
-    setIsLoading(true);
-    createNewContact({
-      name: textFieldData.name,
-      phoneLabel: textFieldData.phoneLabel,
-      phoneValue: textFieldData.phoneValue
-    })
-    .then(() => {
-      closeAndReset();
-      clearLocalContacts()
-      showAlert("Successfully created!");
-      addUnseenContactName(textFieldData.name);
-      props.reloadContacts();
-    })
-    .catch(error => {
-      if (isViolationError(error)) {
-        setError(error);
-        return;
-      }
-      showAlert(convertNetworkErrorMessage(error.message), "error");
-      closeAndReset();
-    })
-    .finally(() => setIsLoading(false));
-  }
-
-  const closeAndReset = () => {
-    props.handleClose();
-    setError(undefined);
-    setIsLoading(false);
-    setTextFieldData({
-      name: "",
-      phoneLabel: "",
-      phoneValue: "",
-    });
-  };
+  const [editLoading, setEditLoading] = useState(false);
+  const nextRouter = useRouter();
 
   return (
-    <Modal title="Create new contact" open={props.open} isLoading={isLoading} handleAccept={addNewContact} handleClose={closeAndReset}>
-      <Box className="w-full flex gap-2 mb-2">
-        <TextField
-          disabled={isLoading}
-          value={textFieldData.name}
-          onChange={setTextField("name")}
-          error={isNotUndefined(error) && !!extractHelperTextFromError("name", error)}
-          helperText={extractHelperTextFromError("name", error)}
-          {...textFieldTheme}
-          className="w-full"
-          label="contact name"
-          placeholder="contact name"
-          size="small"
-          variant="outlined"
+    <Table.Row>
+      <Table.Cell>
+        <div className="flex items-center gap-2">
+          <Avatar
+            size="small"
+            image={`https://api.dicebear.com/9.x/shapes/svg?seed=${props.name}&backgroundType=gradientLinear`}
+            square={true}
+          >
+          </Avatar>
+          <span className="whitespace-nowrap text-body-bold font-body-bold text-default-font">
+            {props.name}
+          </span>
+        </div>
+      </Table.Cell>
+      {
+        Object.values(props).slice(2).map((value, index) =>
+          <Table.Cell key={index}>
+            <span className="whitespace-nowrap text-body font-body text-neutral-500">
+              {value}
+            </span>
+          </Table.Cell>
+        )
+      }
+      <Table.Cell>
+        <IconButton
+          loading={editLoading}
+          variant="brand-secondary"
+          icon="FeatherUser"
+          onClick={() => {
+            setEditLoading(true);
+            nextRouter.push("/subframe/profile/"+props.id);
+          }}
         />
-        <TextField
-          disabled={isLoading}
-          value={textFieldData.phoneLabel}
-          onChange={setTextField("phoneLabel")}
-          error={isNotUndefined(error) && !!extractHelperTextFromError("label", error)}
-          helperText={extractHelperTextFromError("label", error)}
-          {...textFieldTheme}
-          label="phone label"
-          placeholder="phone label"
-          size="small"
-          variant="outlined"
-        />
-      </Box>
-      <TextField
-        disabled={isLoading}
-        onChange={setTextField("phoneValue")}
-        value={textFieldData.phoneValue}
-        error={isNotUndefined(error) && !!extractHelperTextFromError("phone", error)}
-        helperText={extractHelperTextFromError("phone", error)}
-        {...textFieldTheme}
-        className="w-full"
-        label="phone"
-        placeholder="+xxxxxxxxxxx"
-        size="small"
-        variant="outlined"
-      />
-    </Modal>
+        <DeleteWithConfirmation onConfirm={()=>{}}/>
+      </Table.Cell>
+
+    </Table.Row>
   )
 }
+
+function InformativeFeedback({ loading = false, text = "Loading...", icon }: {
+  loading?: boolean, text?: string, icon?: ReactNode
+}) {
+  return (
+    <div className="flex w-full flex-col items-center px-1 py-1">
+      {
+        loading ? <Loader /> : icon ?? (
+          <SubframeCore.Icon
+            className="text-body font-body text-default-font"
+            name="FeatherAlertTriangle"
+          />
+        )
+      }
+      <span className="text-body font-body text-default-font">{text}</span>
+    </div>
+  )
+}
+
+function LocalAlert(props: {
+  onDispose: () => void,
+  variant?: Variant,
+  title: string,
+}) {
+  setTimeout(props.onDispose, 2000);
+
+  return (
+    <Alert
+      variant={props.variant}
+      title={props.title}
+      actions={
+        <IconButton
+          size="medium"
+          icon="FeatherX"
+          onClick={props.onDispose}
+        />
+      }
+    />
+  )
+}
+
+export default Page;
