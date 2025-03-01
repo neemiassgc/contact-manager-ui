@@ -8,6 +8,7 @@ import { Badge } from "@/subframe/components/Badge";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
 import { Address, Contact, Variant } from "../lib/types";
+import { isApplicationJson } from "../lib/misc";
 
 type Props = {
   value: string,
@@ -28,6 +29,7 @@ export default function Drawer(props: {
   const [phones, setPhones] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
   const [emails, setEmails] = useState<StringField[]>([]);
   const [addresses, setAddresses] = useState<AddressField[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const pushField = (array: StringField[]) => [
     ...array,
@@ -77,8 +79,14 @@ export default function Drawer(props: {
         </div>
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
-          <ContactNameForm value={contactName.value} error={contactName.error} onChange={setContactName}/>
+          <ContactNameForm
+            disabled={loading}
+            value={contactName.value}
+            error={contactName.error}
+            onChange={setContactName}
+          />
           <SimpleContactForm
+            disabled={loading}
             objects={phones}
             setObjects={setPhones}
             onAddButtonClick={() => setPhones(pushField(phones))}
@@ -94,6 +102,7 @@ export default function Drawer(props: {
               onClick={() => setEmails(pushField(emails))}
             /> :
             <SimpleContactForm
+              disabled={loading}
               objects={emails}
               setObjects={setEmails}
               onAddButtonClick={() => setEmails(pushField(emails))}
@@ -110,6 +119,7 @@ export default function Drawer(props: {
                onClick={() => setAddresses(pushAddressField(addresses))}
              /> :
             <ContactAddressForm
+              disabled={loading}
               addresses={addresses}
               setAddresses={setAddresses}
               onAddButtonClick={() => setAddresses(pushAddressField(addresses))}
@@ -117,9 +127,12 @@ export default function Drawer(props: {
             />
           }
           <Button
+            loading={loading}
             size="large"
             icon="FeatherUserPlus"
-            onClick={() => {
+            onClick={async () => {
+              setLoading(true);
+
               const validatedPhoneMarkers = validateMarkers(phones);
               const validatedEmailMarkers = validateMarkers(emails);
               const validatedAddressMarkers = validateMarkers(addresses);
@@ -130,9 +143,72 @@ export default function Drawer(props: {
                 setPhones(validatedPhoneMarkers as StringField[]);
                 setEmails(validatedEmailMarkers as StringField[]);
                 setAddresses(validatedAddressMarkers as AddressField[]);
+                setLoading(false);
+                return;
               }
 
-              console.log(buildContactJson(contactName.value, phones, emails, addresses));
+              try {
+                const request = await fetch("/api/contacts", {
+                  method: "post",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify(buildContactJson(contactName.value, phones, emails, addresses))
+                });
+
+                if (!request.ok) {
+                    if (
+                      request.headers.has("content-type") &&
+                      isApplicationJson(request.headers.get("content-type") as string)
+                    ) {
+                      const response:  {fieldViolations: {[prop: string]: string[]}} = await request.json();
+                      if ("fieldViolations" in response) {
+                        const phonesCopy = [...phones];
+                        const emailsCopy = [...emails];
+                        const addressesCopy = [...addresses];
+                        const contactNameCopy = {...contactName};
+
+                        
+                        for (const key of Object.keys(response.fieldViolations)) {
+                          if (key === "name") {
+                            contactNameCopy.error = response.fieldViolations[key][0];
+                            return;
+                          }
+
+                          const parts = key.split("[");
+                          const field = parts[0];
+                          const marker = parts[1].slice(0, -1);
+
+                          if (field === "phoneNumbers") {
+                            for (let i = 0; i < phones.length; i++) {
+                              if (phones[i].marker.value === marker)
+                                phonesCopy[i].marker.error = response.fieldViolations[key][0];
+                            }
+                          }
+                          if (field === "emails") {
+                            for (let i = 0; i < emails.length; i++) {
+                              if (emails[i].marker.value === marker)
+                                phonesCopy[i].marker.error = response.fieldViolations[key][0];
+                            }
+                          }
+                        }
+
+                        setPhones(phonesCopy);
+                        setEmails(emailsCopy);
+                        setContactName(contactNameCopy);
+                        // setAddresses(addressesCopy);
+                      }
+                      props.showAlert(await request.json(), "error");
+                    }
+                    props.showAlert(await request.text(), "error");
+                  }   
+              }
+              catch(error) {
+                props.showAlert(error+"", "error");
+              }
+              finally {
+                setLoading(false);
+              }
             }}
           >
             Create
