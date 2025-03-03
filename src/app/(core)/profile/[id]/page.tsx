@@ -1,10 +1,10 @@
 import PageLayout from "@/subframe/layouts/PageLayout";
 import { Avatar } from "@/subframe/components/Avatar";
 import * as SubframeCore from "@subframe/core";
-import { ContactContent } from "./components";
-import { Contact } from "@/app/lib/types";
 import { authorizedFetch } from "@/app/api/contacts/misc";
-import { BreadcrumbsNavigator } from "./components";
+import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
+import { Contact } from "../../components/drawer/types";
+import ContactContent from "./components/ContactContent";
 
 export default async function Page(props: {
   params: Promise<{ id: string }>
