@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { bg } from "./lib/colors";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Contact Manager",
-  description: "Web UI to interact with an API that manages contacts",
+  description: "Web UI for managing contacts through a REST API",
 };
 
 export default function RootLayout({
@@ -17,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className} style={bg("surface-container-low")}>
+      <body className={inter.className}>
         {children}
       </body>
     </html>
