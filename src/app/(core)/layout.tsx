@@ -1,3 +1,4 @@
+import DefaultPageLayout from "@/subframe/layouts/PageLayout";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 
 export default function Layout({
@@ -7,7 +8,9 @@ export default function Layout({
 }>) {
   return (
     <UserProvider>
-      {children}
+      <DefaultPageLayout>
+        {children}
+      </DefaultPageLayout>
     </UserProvider>
   )
 }
