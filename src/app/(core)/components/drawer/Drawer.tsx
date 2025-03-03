@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { DrawerLayout } from "@/subframe/layouts/DrawerLayout";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
-import { isApplicationJson } from "@/app/lib/misc";
 import { AddressField, StringField, Contact, Variant, Props } from "./types";
 import AddButton from "./AddButton";
 import ContactAddressForm from "./ContactAddressForm";
@@ -254,4 +253,8 @@ function validateMarkers(fields: StringField[] | AddressField[]) {
 
 function concat<T>(...arrays: T[][]): T[] {
   return arrays.reduce((prev, curr) => [...prev, ...curr], [])
+}
+
+function isApplicationJson(contentType: string): boolean {
+  return contentType.includes("application/json");
 }

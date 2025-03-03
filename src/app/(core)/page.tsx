@@ -15,7 +15,7 @@ import { Contact, Variant } from "./components/drawer/types";
 import { useRouter } from "next/navigation";
 import DeleteWithConfirmation from "./components/DeleteWithConfirmation"
 import { Alert } from "@/subframe/components/Alert";
-import Drawer from "./components/drawer/Comp"
+import Drawer from "./components/drawer/Drawer"
 
 function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
