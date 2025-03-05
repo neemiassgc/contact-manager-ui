@@ -42,12 +42,13 @@ export default function SimpleContactForm(props: {
               }
             />
             <TextInput
+              error={obj.field.error}
               disabled={props.disabled}
               placeholder={props.variant}
               value={obj.field.value}
               onChange={value =>
                 props.setObjects(editAt(props.objects, index, {
-                  field: {...obj.field, value},
+                  field: {value},
                   marker: {...obj.marker}
                 }))
             }
