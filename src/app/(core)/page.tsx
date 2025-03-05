@@ -144,14 +144,16 @@ function BreadcrumbsBox() {
   )
 }
 
+type ContactWithId = Contact & { id: string }
+
 function TableContainer() {
   const { data, loading, error } = useFetch("/api/contacts");
 
   return loading || error ? <InformativeFeedback loading={loading} text={error ?? undefined} />
-    : <TableContent content={data as Contact[]}/>;
+    : <TableContent content={data as ContactWithId[]}/>;
 }
 
-function TableContent(props: {content: Contact[]}) {
+function TableContent(props: {content: ContactWithId[]}) {
   return (
     <div className="flex w-full flex-col items-start gap-6 overflow-hidden overflow-x-auto">
       <Table
