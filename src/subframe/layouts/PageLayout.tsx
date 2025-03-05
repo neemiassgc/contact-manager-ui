@@ -12,6 +12,8 @@ interface DefaultPageLayoutRootProps
   extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   className?: string;
+  picture: string;
+  username: string;
 }
 
 const DefaultPageLayoutRoot = React.forwardRef<
@@ -71,9 +73,25 @@ const DefaultPageLayoutRoot = React.forwardRef<
                 </SubframeCore.Tooltip.Portal>
               </SubframeCore.Tooltip.Root>
             </SubframeCore.Tooltip.Provider>
-            <Avatar image="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/fychrij7dzl8wgq2zjq9.avif">
-              A
-            </Avatar>
+            <SubframeCore.Tooltip.Provider>
+            <SubframeCore.Tooltip.Root>
+                <SubframeCore.Tooltip.Trigger asChild={true}>
+                  <Avatar image={otherProps.picture}>
+                    A
+                  </Avatar>
+                </SubframeCore.Tooltip.Trigger>
+                <SubframeCore.Tooltip.Portal>
+                  <SubframeCore.Tooltip.Content
+                    side="right"
+                    align="start"
+                    sideOffset={4}
+                    asChild={true}
+                  >
+                    <Tooltip>{otherProps.username}</Tooltip>
+                  </SubframeCore.Tooltip.Content>
+                </SubframeCore.Tooltip.Portal>
+              </SubframeCore.Tooltip.Root>
+            </SubframeCore.Tooltip.Provider>
           </div>
         }
       >

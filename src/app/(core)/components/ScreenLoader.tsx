@@ -18,7 +18,7 @@ export default function ScreenLoader(props: {children: ReactNode}) {
      {
        error ? <Feedback message={error.message} error/> :
        !user || isLoading ? <Feedback message="Loading, Detecting user..."/> :
-       <DefaultPageLayout>{props.children}</DefaultPageLayout>
+       <DefaultPageLayout picture={user.picture as string} username={user.name as string}>{props.children}</DefaultPageLayout>
      }
     </>
   )
