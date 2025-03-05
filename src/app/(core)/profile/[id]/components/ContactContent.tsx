@@ -1,3 +1,5 @@
+"use client"
+
 import { Contact } from "@/app/(core)/components/drawer/types";
 import { Tabs } from "@/subframe/components/Tabs";
 import { useState } from "react";

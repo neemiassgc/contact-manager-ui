@@ -1,3 +1,5 @@
+"use client";
+
 import { Breadcrumbs } from "@/subframe/components/Breadcrumbs";
 import { IconButton } from "@/subframe/components/IconButton";
 import { useRouter } from "next/navigation";
@@ -5,7 +7,7 @@ import { useRouter } from "next/navigation";
 export default function BreadcrumbsNavigator() {
   const nextRouter = useRouter();
 
-  const redirectToHome = () => nextRouter.push("/subframe");
+  const redirectToHome = () => nextRouter.push("/");
 
   return (
     <div className="flex w-full items-center gap-4 px-4 py-4">
