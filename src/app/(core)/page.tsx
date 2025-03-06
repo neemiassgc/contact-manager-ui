@@ -175,9 +175,9 @@ function TableContent(props: {content: ContactWithId[]}) {
               id={contact.id}
               name={contact.name}
               phone={Object.values(contact.phoneNumbers)[0]}
-              email={Object.values(contact.emails)[0]}
+              email={isNotEmpty(contact.emails) ? Object.values(contact.emails)[0] : ""}
               birth="09/08/1991"
-              address={Object.values(contact.addresses)[0].city}
+              address={isNotEmpty(contact.addresses) ? Object.values(contact!.addresses)[0].city : ""}
             />
           )
         }
@@ -276,6 +276,10 @@ function LocalAlert(props: {
       }
     />
   )
+}
+
+function isNotEmpty(obj?: any): boolean {
+  return obj && Object.keys(obj).length > 0;
 }
 
 export default Page;
