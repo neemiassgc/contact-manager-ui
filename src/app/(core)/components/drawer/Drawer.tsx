@@ -53,6 +53,63 @@ export default function Comp(props: {
     ]
   }
 
+  function treatFieldErrors(fieldErrors: {fieldViolations: {[prop: string]: string[]}}): void {
+    const phonesCopy = fullStringFieldCopy(phones);
+    const emailsCopy = fullStringFieldCopy(emails);
+    const addressesCopy = fullAddressFieldCopy(addresses);
+    const contactNameCopy = {...contactName};
+
+    
+    for (const key of Object.keys(fieldErrors.fieldViolations)) {
+      if (key === "name") {
+        contactNameCopy.error = fieldErrors.fieldViolations[key][0];
+        continue;
+      }
+
+      const parts = key.split("[");
+      const field = parts[0];
+
+      if (field === "phoneNumbers") {
+        const marker = parts[1].slice(0, -1);
+        for (let i = 0; i < phones.length; i++) {
+          if (phones[i].marker.value === marker) {
+            phonesCopy[i].field.error = fieldErrors.fieldViolations[key][0];
+            continue;
+          }
+        }
+      }
+
+      if (field === "emails") {
+        const marker = parts[1].slice(0, -1);
+        for (let i = 0; i < emails.length; i++) {
+          if (emails[i].marker.value === marker) {
+            emailsCopy[i].field.error = fieldErrors.fieldViolations[key][0];
+            continue;
+          }
+        }
+      }
+
+      if (field === "addresses") {
+        const dividedLine = parts[1].split(".");
+        const addressField = dividedLine[1];
+        const marker = dividedLine[0].slice(0, -1);
+        for (let i = 0; i < addresses.length; i++) {
+          if (addresses[i].marker.value === marker) {
+            addressesCopy[i].field.error = {
+              ...addressesCopy[i].field.error,
+              [addressField]: fieldErrors.fieldViolations[key][0]
+            }
+          }
+        }
+      }
+    }
+
+    setPhones(phonesCopy);
+    setEmails(emailsCopy);
+    setContactName(contactNameCopy);
+    setAddresses(addressesCopy);
+  }
+
   return (
     <DrawerLayout open={true} onOpenChange={() => {}}>
       <div className="flex h-screen w-144 flex-col items-start gap-2 p-3 overflow-auto">
@@ -146,46 +203,11 @@ export default function Comp(props: {
                 });
 
                 if (!request.ok) {
-                    if (
-                      request.headers.has("content-type") &&
-                      isApplicationJson(request.headers.get("content-type") as string)
-                    ) {
-                      const response:  {fieldViolations: {[prop: string]: string[]}} = await request.json();
-                      if ("fieldViolations" in response) {
-                        const phonesCopy = [...phones];
-                        const emailsCopy = [...emails];
-                        const addressesCopy = [...addresses];
-                        const contactNameCopy = {...contactName};
-
-                        
-                        for (const key of Object.keys(response.fieldViolations)) {
-                          if (key === "name") {
-                            contactNameCopy.error = response.fieldViolations[key][0];
-                            return;
-                          }
-
-                          const parts = key.split("[");
-                          const field = parts[0];
-                          const marker = parts[1].slice(0, -1);
-
-                          if (field === "phoneNumbers") {
-                            for (let i = 0; i < phones.length; i++) {
-                              if (phones[i].marker.value === marker)
-                                phonesCopy[i].marker.error = response.fieldViolations[key][0];
-                            }
-                          }
-                          if (field === "emails") {
-                            for (let i = 0; i < emails.length; i++) {
-                              if (emails[i].marker.value === marker)
-                                phonesCopy[i].marker.error = response.fieldViolations[key][0];
-                            }
-                          }
-                        }
-
-                        setPhones(phonesCopy);
-                        setEmails(emailsCopy);
-                        setContactName(contactNameCopy);
-                        // setAddresses(addressesCopy);
+                    if (isJsonContent(request.headers)) {
+                      const response = await request.json();
+                      if (isFieldViolationError(response)) {
+                        const fieldErrors: {fieldViolations: {[prop: string]: string[]}} = response;
+                        treatFieldErrors(fieldErrors);
                       }
                       props.showAlert(await request.json(), "error");
                     }
