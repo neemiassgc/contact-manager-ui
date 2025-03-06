@@ -259,4 +259,8 @@ function isJsonContent(headers: Headers): boolean {
   return headers.has("content-type") &&
   (headers.get("content-type") as string).includes("application/json");
 }
+
+function isFieldViolationError(jsonObject: any): boolean {
+  return "fieldViolations" in jsonObject;
+}
 }
