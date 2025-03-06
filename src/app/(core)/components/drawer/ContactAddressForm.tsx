@@ -48,6 +48,8 @@ export default function ContactAddressForm(props: {
                   key={j}
                   className="h-auto w-full flex-none"
                   disabled={props.disabled}
+                  error={!!address.field.error}
+                  helpText={address.field.error ? address.field.error[key] : null}
                 >
                   <TextField.Input
                     placeholder={key}
@@ -56,7 +58,10 @@ export default function ContactAddressForm(props: {
                       props.setAddresses(editAt(props.addresses, index, {
                         marker: {...address.marker},
                         field: {
-                          ...address.field,
+                          error: {
+                            ...address.field.error,
+                            [key]: undefined
+                          },
                           value: {
                             ...address.field.value,
                             [key]: event.target.value
