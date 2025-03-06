@@ -255,6 +255,8 @@ function concat<T>(...arrays: T[][]): T[] {
   return arrays.reduce((prev, curr) => [...prev, ...curr], [])
 }
 
-function isApplicationJson(contentType: string): boolean {
-  return contentType.includes("application/json");
+function isJsonContent(headers: Headers): boolean {
+  return headers.has("content-type") &&
+  (headers.get("content-type") as string).includes("application/json");
+}
 }
