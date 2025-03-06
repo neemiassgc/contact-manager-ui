@@ -7,7 +7,7 @@ export type Marker = { marker: Props }
 
 export type StringField = Marker & { field: Props }
 
-export type AddressField = Marker & { field: { value: Address, error?: string | undefined } }
+export type AddressField = Marker & { field: { value: Address, error?: Partial<Address> | undefined } }
 
 export interface Address {
   [index: string]: string,
