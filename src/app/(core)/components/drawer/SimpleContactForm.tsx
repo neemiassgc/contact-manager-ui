@@ -59,7 +59,7 @@ export default function SimpleContactForm(props: {
           </div>
         ))
       }
-      <AddButton title={capitalize(props.variant)} onClick={props.onAddButtonClick}/>
+      <AddButton disabled={props.disabled} title={capitalize(props.variant)} onClick={props.onAddButtonClick}/>
     </div>
   );
 }

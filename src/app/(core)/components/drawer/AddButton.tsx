@@ -5,10 +5,12 @@ export default function AddButton(props: {
   title: string,
   onClick: () => void,
   iconRight?: string,
-  variant?: "neutral-primary" | "neutral-secondary"
+  variant?: "neutral-primary" | "neutral-secondary",
+  disabled?: boolean
 }) {
   return (
     <Button
+      disabled={props.disabled}
       className="h-8 w-full flex-none"
       variant={props.variant ?? "neutral-primary"}
       icon="FeatherPlus"

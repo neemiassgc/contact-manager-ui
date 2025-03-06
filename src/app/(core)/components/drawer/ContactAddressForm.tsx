@@ -76,7 +76,7 @@ export default function ContactAddressForm(props: {
           </div>
         ))
       }
-      <AddButton title="Add Address" onClick={props.onAddButtonClick} />
+      <AddButton disabled={props.disabled} title="Add Address" onClick={props.onAddButtonClick} />
     </div>
   )
 }

@@ -142,6 +142,7 @@ export default function Comp(props: {
           {
             emails.length === 0 ?
             <AddButton
+              disabled={loading}
               title={"Add Email"}
               iconRight="FeatherAtSign"
               variant="neutral-secondary"
@@ -159,6 +160,7 @@ export default function Comp(props: {
           {
              addresses.length === 0 ?
              <AddButton
+              disabled={loading}
                title={"Add Address"}
                iconRight="FeatherMapPin"
                variant="neutral-secondary"
