@@ -263,4 +263,15 @@ function isJsonContent(headers: Headers): boolean {
 function isFieldViolationError(jsonObject: any): boolean {
   return "fieldViolations" in jsonObject;
 }
+
+function fullStringFieldCopy(array: StringField[]): StringField[] {
+  return array.map(it => ({
+    marker: {
+      ...it.marker
+    },
+    field: {
+      ...it.field
+    }
+  }))
+}
 }
