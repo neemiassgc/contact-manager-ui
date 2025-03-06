@@ -274,4 +274,17 @@ function fullStringFieldCopy(array: StringField[]): StringField[] {
     }
   }))
 }
+
+function fullAddressFieldCopy(array: AddressField[]): AddressField[] {
+  return array.map(it => ({
+    marker: {
+      ...it.marker
+    },
+    field: {
+      ...it.field,
+      value: {
+        ...it.field.value
+      }
+    }
+  }))
 }
