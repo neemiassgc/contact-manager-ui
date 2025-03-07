@@ -1,13 +1,12 @@
 "use client";
 
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { DropdownMenu } from "@/subframe/components/DropdownMenu";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
 import { Table } from "@/subframe/components/Table";
 import { Avatar } from "@/subframe/components/Avatar";
 import { IconButton } from "@/subframe/components/IconButton";
-import { Loader } from "@/subframe/components/Loader";
 import * as SubframeCore from "@subframe/core";
 import { useFetch } from "./hooks";
 import { Contact, Variant } from "./components/drawer/types";
@@ -16,6 +15,8 @@ import DeleteWithConfirmation from "./components/DeleteWithConfirmation"
 import { Alert } from "@/subframe/components/Alert";
 import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
+import Feedback from "./components/Feedback";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
@@ -24,6 +25,8 @@ function Page() {
     title: "",
     variant: "success" as Variant
   });
+  const { data, loading, error, reload } = useFetch("/api/contacts");
+  const { user } = useUser();
 
   return (
     <>
@@ -39,7 +42,7 @@ function Page() {
         <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
           <div className="flex w-full flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <span className="w-full text-heading-3 font-heading-3 text-default-font">
-              Contacts
+              Contacts for {user!.name}
             </span>
             <div className="flex w-full items-center gap-2">
               <div className="flex grow shrink-0 basis-0 flex-wrap items-center gap-4">
@@ -94,7 +97,10 @@ function Page() {
                 </div>
               </div>
             </div>
-            <TableContainer/>
+            {
+              loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
+              <TableContent content={data as (Contact & { id: string })[] }/>
+            }
             <div className="flex w-full items-center justify-center gap-4">
               <span className="grow shrink-0 basis-0 text-body font-body text-subtext-color">
                 Showing 1 – 4 of 8
@@ -131,16 +137,7 @@ function Page() {
   );
 }
 
-type ContactWithId = Contact & { id: string }
-
-function TableContainer() {
-  const { data, loading, error } = useFetch("/api/contacts");
-
-  return loading || error ? <InformativeFeedback loading={loading} text={error ?? undefined} />
-    : <TableContent content={data as ContactWithId[]}/>;
-}
-
-function TableContent(props: {content: ContactWithId[]}) {
+function TableContent(props: {content: (Contact & { id: string })[] }) {
   return (
     <div className="flex w-full flex-col items-start gap-6 overflow-hidden overflow-x-auto">
       <Table
@@ -222,24 +219,6 @@ function ContactRow(props: {
       </Table.Cell>
 
     </Table.Row>
-  )
-}
-
-function InformativeFeedback({ loading = false, text = "Loading...", icon }: {
-  loading?: boolean, text?: string, icon?: ReactNode
-}) {
-  return (
-    <div className="flex w-full flex-col items-center px-1 py-1">
-      {
-        loading ? <Loader /> : icon ?? (
-          <SubframeCore.Icon
-            className="text-body font-body text-default-font"
-            name="FeatherAlertTriangle"
-          />
-        )
-      }
-      <span className="text-body font-body text-default-font">{text}</span>
-    </div>
   )
 }
 
