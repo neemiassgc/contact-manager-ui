@@ -42,14 +42,14 @@ function Page() {
         <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
           <div className="flex w-full flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <span className="w-full text-heading-3 font-heading-3 text-default-font">
-              Contacts for {user!.name}
+              Logged as {user!.name}
             </span>
             <div className="flex w-full items-center gap-2">
               <div className="flex grow shrink-0 basis-0 flex-wrap items-center gap-4">
                 <div className="flex grow shrink-0 basis-0 items-center gap-1">
                   <TextField
+                    disabled={loading}
                     variant="filled"
-                    label=""
                     helpText=""
                     icon="FeatherSearch"
                   >
@@ -64,6 +64,7 @@ function Page() {
                   <SubframeCore.DropdownMenu.Root>
                     <SubframeCore.DropdownMenu.Trigger asChild={true}>
                       <Button
+                        disabled={loading}
                         variant="neutral-secondary"
                         iconRight="FeatherChevronDown"
                         onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
@@ -89,6 +90,7 @@ function Page() {
                     </SubframeCore.DropdownMenu.Portal>
                   </SubframeCore.DropdownMenu.Root>
                   <Button
+                    disabled={loading}
                     icon="FeatherPlus"
                     onClick={() => setOpenContactDrawer(true)}
                   >
@@ -103,16 +105,18 @@ function Page() {
             }
             <div className="flex w-full items-center justify-center gap-4">
               <span className="grow shrink-0 basis-0 text-body font-body text-subtext-color">
-                Showing 1 – 4 of 8
+                {!loading && "Showing 1 – 4 of 8"}
               </span>
               <div className="flex items-center justify-center gap-2">
                 <Button
+                  disabled={loading}
                   variant="neutral-secondary"
                   onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
                 >
                   Prev
                 </Button>
                 <Button
+                  disabled={loading}
                   variant="neutral-secondary"
                   onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
                 >
