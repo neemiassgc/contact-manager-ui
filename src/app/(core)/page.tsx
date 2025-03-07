@@ -1,7 +1,6 @@
 "use client";
 
 import React, { ReactNode, useState } from "react";
-import { Breadcrumbs } from "@/subframe/components/Breadcrumbs";
 import { DropdownMenu } from "@/subframe/components/DropdownMenu";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
@@ -16,6 +15,7 @@ import { useRouter } from "next/navigation";
 import DeleteWithConfirmation from "./components/DeleteWithConfirmation"
 import { Alert } from "@/subframe/components/Alert";
 import Drawer from "./components/drawer/Drawer"
+import BreadcrumbsBox from "./components/BreadcrumbsBox";
 
 function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
@@ -129,19 +129,6 @@ function Page() {
       }
     </>
   );
-}
-
-function BreadcrumbsBox() {
-  return (
-    <div className="flex w-full items-center gap-4 px-4 py-4">
-      <Breadcrumbs>
-        <div className="flex items-center gap-2">
-          <Breadcrumbs.Divider />
-          <Breadcrumbs.Item>Home</Breadcrumbs.Item>
-        </div>
-      </Breadcrumbs>
-    </div>
-  )
 }
 
 type ContactWithId = Contact & { id: string }
