@@ -10,14 +10,14 @@ export default function ScreenLoader(props: {children: ReactNode}) {
 
   if ((!user && !isLoading)) {
     window.location.assign("/api/auth/login");
-    return <Feedback message="User not authenticated. Redirecting..."/>
+    return <Feedback message="User not authenticated. Redirecting..." fullScreen/>
   }
 
   return (
     <>
      {
-       error ? <Feedback message={error.message} error/> :
-       !user || isLoading ? <Feedback message="Loading, detecting user..."/> :
+       error ? <Feedback message={error.message} error fullScreen/> :
+       !user || isLoading ? <Feedback message="Loading, detecting user..." fullScreen/> :
        <DefaultPageLayout picture={user.picture as string} username={user.name as string}>{props.children}</DefaultPageLayout>
      }
     </>
