@@ -97,27 +97,6 @@ export default function Page() {
               loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
               <TableContent content={data as (Contact & { id: string })[] }/>
             }
-            <div className="flex w-full items-center justify-center gap-4">
-              <span className="grow shrink-0 basis-0 text-body font-body text-subtext-color">
-                {!loading && "Showing 1 – 4 of 8"}
-              </span>
-              <div className="flex items-center justify-center gap-2">
-                <Button
-                  disabled={loading}
-                  variant="neutral-secondary"
-                  onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-                >
-                  Prev
-                </Button>
-                <Button
-                  disabled={loading}
-                  variant="neutral-secondary"
-                  onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
           </div>
           <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
             © 2025 Created by <span className="underline">Neemias Santos</span>
