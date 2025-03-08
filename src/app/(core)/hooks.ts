@@ -6,6 +6,8 @@ export function useFetch(url: string) {
   const [error, setError] = useState<string | null>(null);
 
   function fetchData() {
+    setLoading(true);
+    setError(null);
     fetch(url)
       .then(response => {
         if (!response.ok) {
