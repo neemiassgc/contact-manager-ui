@@ -40,59 +40,57 @@ export default function Page() {
             <span className="w-full text-heading-3 font-heading-3 text-default-font">
               Logged as {user!.name}
             </span>
-            <div className="flex w-full items-center gap-2">
-              <div className="flex grow shrink-0 basis-0 flex-wrap items-center gap-4">
-                <div className="flex grow shrink-0 basis-0 items-center gap-1">
-                  <TextField
-                    disabled={loading}
-                    variant="filled"
-                    helpText=""
-                    icon="FeatherSearch"
-                  >
-                    <TextField.Input
-                      placeholder="Search..."
-                      value=""
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
-                    />
-                  </TextField>
-                </div>
-                <div className="flex items-center gap-2">
-                  <SubframeCore.DropdownMenu.Root>
-                    <SubframeCore.DropdownMenu.Trigger asChild={true}>
-                      <Button
-                        disabled={loading}
-                        variant="neutral-secondary"
-                        iconRight="FeatherChevronDown"
-                        onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-                      >
-                        Sort by
-                      </Button>
-                    </SubframeCore.DropdownMenu.Trigger>
-                    <SubframeCore.DropdownMenu.Portal>
-                      <SubframeCore.DropdownMenu.Content
-                        side="bottom"
-                        align="end"
-                        sideOffset={4}
-                        asChild={true}
-                      >
-                        <DropdownMenu>
-                          <DropdownMenu.DropdownItem icon={null}>Name</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Phone</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Email</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Birth</DropdownMenu.DropdownItem>
-                          <DropdownMenu.DropdownItem icon={null}>Address</DropdownMenu.DropdownItem>
-                        </DropdownMenu>
-                      </SubframeCore.DropdownMenu.Content>
-                    </SubframeCore.DropdownMenu.Portal>
-                  </SubframeCore.DropdownMenu.Root>
-                  <Button
-                    disabled={loading}
-                    icon="FeatherPlus"
-                    onClick={() => setOpenContactDrawer(true)}
-                  >
-                    Add
-                  </Button>
-                </div>
+            <div className="flex w-full items-center gap-2 sticky top-0 z-10 bg-[#ffffff]">
+              <div className="flex grow shrink-0 basis-0 items-center gap-1">
+                <TextField
+                  disabled={loading}
+                  variant="filled"
+                  helpText=""
+                  icon="FeatherSearch"
+                >
+                  <TextField.Input
+                    placeholder="Search..."
+                    value=""
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                  />
+                </TextField>
+              </div>
+              <div className="flex items-center gap-2">
+                <SubframeCore.DropdownMenu.Root>
+                  <SubframeCore.DropdownMenu.Trigger asChild={true}>
+                    <Button
+                      disabled={loading}
+                      variant="neutral-secondary"
+                      iconRight="FeatherChevronDown"
+                      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+                    >
+                      Sort by
+                    </Button>
+                  </SubframeCore.DropdownMenu.Trigger>
+                  <SubframeCore.DropdownMenu.Portal>
+                    <SubframeCore.DropdownMenu.Content
+                      side="bottom"
+                      align="end"
+                      sideOffset={4}
+                      asChild={true}
+                    >
+                      <DropdownMenu>
+                        <DropdownMenu.DropdownItem icon={null}>Name</DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownItem icon={null}>Phone</DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownItem icon={null}>Email</DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownItem icon={null}>Birth</DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownItem icon={null}>Address</DropdownMenu.DropdownItem>
+                      </DropdownMenu>
+                    </SubframeCore.DropdownMenu.Content>
+                  </SubframeCore.DropdownMenu.Portal>
+                </SubframeCore.DropdownMenu.Root>
+                <Button
+                  disabled={loading}
+                  icon="FeatherPlus"
+                  onClick={() => setOpenContactDrawer(true)}
+                >
+                  Add
+                </Button>
               </div>
             </div>
             {
