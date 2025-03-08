@@ -95,7 +95,7 @@ export default function Page() {
             </div>
             {
               loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
-              <TableContent content={data as (Contact & { id: string })[] }/>
+              <TableContent content={data as (Contact & { id: string })[]} reloadContacts={reload}/>
             }
           </div>
           <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">

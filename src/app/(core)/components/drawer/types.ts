@@ -34,3 +34,12 @@ export interface Contact {
   addresses: IndexedAddress,
   emails: IndexedString
 }
+
+export interface ContactTableRow {
+  id: string,
+  name: string,
+  phone: string,
+  email: string,
+  birth: string,
+  address: string,
+}
