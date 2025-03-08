@@ -129,6 +129,7 @@ export default function Page() {
       {
         openContactDrawer &&
         <Drawer
+          reloadContacts={reload}
           showAlert={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
           close={() => setOpenContactDrawer(false)}
         />

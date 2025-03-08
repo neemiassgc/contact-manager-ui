@@ -12,7 +12,8 @@ import ContactNameForm from "./ContactFormName";
 
 export default function Comp(props: {
   close: () => void,
-  showAlert: (title: string, variant: Variant) => void
+  showAlert: (title: string, variant: Variant) => void,
+  reloadContacts: () => void
 }) {
   const [contactName, setContactName] = useState<Props>({value: ""});
   const [phones, setPhones] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
@@ -210,11 +211,16 @@ export default function Comp(props: {
                       if (isFieldViolationError(response)) {
                         const fieldErrors: {fieldViolations: {[prop: string]: string[]}} = response;
                         treatFieldErrors(fieldErrors);
+                        return
                       }
-                      props.showAlert(await request.json(), "error");
                     }
                     props.showAlert(await request.text(), "error");
                   }   
+                if (request.ok) {
+                  props.close();
+                  props.showAlert("Contact created successfully", "success");
+                  props.reloadContacts();
+                }
               }
               catch(error) {
                 props.showAlert(error+"", "error");
