@@ -4,20 +4,19 @@ import React, { useState } from "react";
 import { DropdownMenu } from "@/subframe/components/DropdownMenu";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
-import { IconButton } from "@/subframe/components/IconButton";
 import * as SubframeCore from "@subframe/core";
 import { useFetch } from "./hooks";
 import { Contact, Variant } from "./components/drawer/types";
-import { Alert } from "@/subframe/components/Alert";
 import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";
 import TableContent from "./components/TableContent";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import Notification from "./components/Notification";
 
-function Page() {
+export default function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
-  const [alert, setAlert] = useState({
+  const [notification, setNotification] = useState({
     open: false,
     title: "",
     variant: "success" as Variant
@@ -27,11 +26,11 @@ function Page() {
 
   return (
     <>
-      { alert.open &&
-        <LocalAlert
-          title={alert.title}
-          variant={alert.variant}
-          onDispose={() => setAlert({...alert, open: false})}
+      { notification.open &&
+        <Notification
+          title={notification.title}
+          variant={notification.variant}
+          onDispose={() => setNotification({...notification, open: false})}
         />
       }
       <div className="container max-w-none flex h-full w-full flex-col items-start">
@@ -130,34 +129,10 @@ function Page() {
       {
         openContactDrawer &&
         <Drawer
-          showAlert={(title: string, variant: Variant) => setAlert({title, variant, open: true})}
+          showAlert={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
           close={() => setOpenContactDrawer(false)}
         />
       }
     </>
   );
 }
-
-function LocalAlert(props: {
-  onDispose: () => void,
-  variant?: Variant,
-  title: string,
-}) {
-  setTimeout(props.onDispose, 2000);
-
-  return (
-    <Alert
-      variant={props.variant}
-      title={props.title}
-      actions={
-        <IconButton
-          size="medium"
-          icon="FeatherX"
-          onClick={props.onDispose}
-        />
-      }
-    />
-  )
-}
-
-export default Page;
