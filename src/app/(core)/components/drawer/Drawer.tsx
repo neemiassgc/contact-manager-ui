@@ -112,7 +112,7 @@ export default function Comp(props: {
   }
 
   return (
-    <DrawerLayout open={true} onOpenChange={() => {}}>
+    <DrawerLayout className="z-10" open={true} onOpenChange={() => {}}>
       <div className="flex h-screen w-144 flex-col items-start gap-2 p-3 overflow-auto">
         <div className="flex w-full items-center justify-between px-4 pt-4 pb-1">
           <span className="text-heading-2 font-heading-2 text-default-font">

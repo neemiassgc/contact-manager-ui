@@ -28,7 +28,7 @@ export default function FieldMarker(props: {
           sideOffset={4}
           asChild={true}
         >
-          <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg">
+          <div className="flex w-36 flex-none items-start rounded-md border border-solid border-neutral-border bg-default-background shadow-lg z-20">
             <TextField icon="FeatherTag" error={checkedError} helpText={props.error} disabled={props.disabled}>
               <TextField.Input
                 placeholder={checkedError ? "type here" : props.error}
