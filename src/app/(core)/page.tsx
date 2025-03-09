@@ -11,7 +11,6 @@ import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";
 import TableContent from "./components/TableContent";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import Notification from "./components/Notification";
 
 export default function Page() {
@@ -22,7 +21,6 @@ export default function Page() {
     variant: "success" as Variant
   });
   const { data, loading, error, reload } = useFetch("/api/contacts");
-  const { user } = useUser();
 
   return (
     <>
@@ -38,7 +36,7 @@ export default function Page() {
         <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
           <div className="flex w-full flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <span className="w-full text-heading-3 font-heading-3 text-default-font">
-              Logged as {user!.name}
+              Manage your Contacts
             </span>
             <div className="flex w-full items-center gap-2 sticky top-0 z-10 bg-[#ffffff]">
               <div className="flex grow shrink-0 basis-0 items-center gap-1">
