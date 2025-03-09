@@ -93,7 +93,11 @@ export default function Page() {
             </div>
             {
               loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
-              <TableContent content={data as (Contact & { id: string })[]} reloadContacts={reload}/>
+              <TableContent
+                content={data as (Contact & { id: string })[]}
+                reloadContacts={reload}
+                showNotification={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
+              />
             }
           </div>
           <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">

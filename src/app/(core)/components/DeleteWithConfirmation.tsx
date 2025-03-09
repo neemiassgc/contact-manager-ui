@@ -4,15 +4,18 @@ import * as SubframeCore from "@subframe/core";
 import { IconButton } from "@/subframe/components/IconButton";
 import { DropdownMenu } from "@/subframe/components/DropdownMenu";
 
-export default function DeleteWithConfirmation(props: {onConfirm: () => void}) {
+export default function DeleteWithConfirmation(props: {
+  loading: boolean,
+  onConfirm: () => void
+}) {
   return (
     <SubframeCore.DropdownMenu.Root>
       <SubframeCore.DropdownMenu.Trigger asChild={true}>
         <IconButton
+          loading={props.loading}
           variant="destructive-secondary"
           size="large"
           icon="FeatherTrash"
-          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
         />
       </SubframeCore.DropdownMenu.Trigger>
       <SubframeCore.DropdownMenu.Portal>

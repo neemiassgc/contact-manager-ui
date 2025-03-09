@@ -1,9 +1,10 @@
 import { Table } from "@/subframe/components/Table";
 import ContactRow from "./ContactRow";
-import type { Contact } from "./drawer/types";
+import type { Contact, Variant } from "./drawer/types";
 
 export default function TableContent(props: {
-  reloadContacts: () => void,
+  reloadContacts: (loading: boolean) => void,
+  showNotification: (title: string, variant: Variant) => void,
   content: (Contact & { id: string })[]
 }) {
   return (
@@ -23,6 +24,7 @@ export default function TableContent(props: {
         {
           props.content.map((contact, index) =>
             <ContactRow
+              showNotification={props.showNotification}
               reloadContacts={props.reloadContacts}
               key={index}
               contact={{

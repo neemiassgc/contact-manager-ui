@@ -6,13 +6,14 @@ import { Table } from "@/subframe/components/Table";
 import DeleteWithConfirmation from "./DeleteWithConfirmation"
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ContactTableRow } from "./drawer/types";
+import { ContactTableRow, Variant } from "./drawer/types";
 
 export default function ContactRow(props: {
+  showNotification: (title: string, variant: Variant) => void,
   contact: ContactTableRow,
-  reloadContacts: () => void
+  reloadContacts: (loading: boolean) => void
 }) {
-  const [editLoading, setEditLoading] = useState(false);
+  const [loading, setLoading] = useState([false, false]);
   const nextRouter = useRouter();
 
   return (
@@ -41,15 +42,26 @@ export default function ContactRow(props: {
       }
       <Table.Cell>
         <IconButton
-          loading={editLoading}
+          loading={loading[0]}
           variant="brand-secondary"
           icon="FeatherUser"
           onClick={() => {
-            setEditLoading(true);
+            setLoading([true, false]);;
             nextRouter.push("/profile/"+props.contact.id);
           }}
         />
-        <DeleteWithConfirmation onConfirm={()=>{}}/>
+        <DeleteWithConfirmation loading={loading[1]} onConfirm={() => {
+          setLoading([false, true]);
+          fetch("/api/contacts/"+props.contact.id, {
+            method: "DELETE"
+          })
+            .then(() => {
+              props.showNotification("Contact deleted successfully", "success")
+              props.reloadContacts(false);
+            })
+            .catch(error => props.showNotification(error.message, "error"))
+            .finally(() => setLoading([false, false]))
+        }}/>
       </Table.Cell>
 
     </Table.Row>
