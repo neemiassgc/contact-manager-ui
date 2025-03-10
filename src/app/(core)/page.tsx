@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
 import { useFetch } from "./hooks";
-import { Contact, Variant } from "./components/drawer/types";
+import { ContactWithId, Variant } from "./components/drawer/types";
 import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";
@@ -74,7 +74,7 @@ export default function Page() {
               loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
               <TableContent
                 grouped={grouped}
-                content={data as (Contact & { id: string })[]}
+                content={data as ContactWithId[]}
                 reloadContacts={reload}
                 showNotification={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
               />

@@ -43,3 +43,5 @@ export interface ContactTableRow {
   birth: string,
   address: string,
 }
+
+export type ContactWithId = Contact & { id: string };

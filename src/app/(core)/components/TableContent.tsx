@@ -1,8 +1,6 @@
 import { Table } from "@/subframe/components/Table";
 import ContactRow from "./ContactRow";
-import type { Contact, Variant } from "./drawer/types";
-
-type ContactWithId = Contact & { id: string };
+import type { ContactWithId, Variant } from "./drawer/types";
 
 export default function TableContent(props: {
   reloadContacts: (loading: boolean) => void,
