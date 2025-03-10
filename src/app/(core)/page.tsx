@@ -21,6 +21,7 @@ export default function Page() {
   });
   const { data, loading, error, reload } = useFetch("/api/contacts");
   const [grouped, setGrouped] = useState(false);
+  const [searchExpression, setSearchExpression] = useState("");
 
   return (
     <>
@@ -43,13 +44,12 @@ export default function Page() {
                 <TextField
                   disabled={loading}
                   variant="filled"
-                  helpText=""
                   icon="FeatherSearch"
                 >
                   <TextField.Input
                     placeholder="Search..."
-                    value=""
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
+                    value={searchExpression}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchExpression(event.target.value)}
                   />
                 </TextField>
               </div>
@@ -74,7 +74,7 @@ export default function Page() {
               loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
               <TableContent
                 grouped={grouped}
-                content={data as ContactWithId[]}
+                content={filterByExpression(data, searchExpression)}
                 reloadContacts={reload}
                 showNotification={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
               />
@@ -95,4 +95,9 @@ export default function Page() {
       }
     </>
   );
+}
+
+function filterByExpression(contacts: ContactWithId[], expression: string): ContactWithId[] {
+  if (expression.length === 0) return contacts;
+  return contacts.filter((contact) => contact.name.toLowerCase().includes(expression.toLowerCase()));
 }
