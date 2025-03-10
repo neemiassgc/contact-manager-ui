@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { DropdownMenu } from "@/subframe/components/DropdownMenu";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
-import * as SubframeCore from "@subframe/core";
 import { useFetch } from "./hooks";
 import { Contact, Variant } from "./components/drawer/types";
 import Drawer from "./components/drawer/Drawer"
@@ -54,34 +52,6 @@ export default function Page() {
                 </TextField>
               </div>
               <div className="flex items-center gap-2">
-                <SubframeCore.DropdownMenu.Root>
-                  <SubframeCore.DropdownMenu.Trigger asChild={true}>
-                    <Button
-                      disabled={loading}
-                      variant="neutral-secondary"
-                      iconRight="FeatherChevronDown"
-                      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-                    >
-                      Sort by
-                    </Button>
-                  </SubframeCore.DropdownMenu.Trigger>
-                  <SubframeCore.DropdownMenu.Portal>
-                    <SubframeCore.DropdownMenu.Content
-                      side="bottom"
-                      align="end"
-                      sideOffset={4}
-                      asChild={true}
-                    >
-                      <DropdownMenu>
-                        <DropdownMenu.DropdownItem icon={null}>Name</DropdownMenu.DropdownItem>
-                        <DropdownMenu.DropdownItem icon={null}>Phone</DropdownMenu.DropdownItem>
-                        <DropdownMenu.DropdownItem icon={null}>Email</DropdownMenu.DropdownItem>
-                        <DropdownMenu.DropdownItem icon={null}>Birth</DropdownMenu.DropdownItem>
-                        <DropdownMenu.DropdownItem icon={null}>Address</DropdownMenu.DropdownItem>
-                      </DropdownMenu>
-                    </SubframeCore.DropdownMenu.Content>
-                  </SubframeCore.DropdownMenu.Portal>
-                </SubframeCore.DropdownMenu.Root>
                 <Button
                   disabled={loading}
                   icon="FeatherPlus"
