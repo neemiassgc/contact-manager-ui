@@ -100,7 +100,7 @@ export default function Page() {
               />
             }
           </div>
-          <span className="w-full font-['Montserrat'] text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
+          <span className="w-full text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
             © 2025 Created by <span className="underline">Neemias Santos</span>
           </span>
         </div>
