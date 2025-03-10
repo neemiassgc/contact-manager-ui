@@ -10,6 +10,7 @@ import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";
 import TableContent from "./components/TableContent";
 import Notification from "./components/Notification";
+import { IconButton } from "@/subframe/components/IconButton";
 
 export default function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
@@ -19,6 +20,7 @@ export default function Page() {
     variant: "success" as Variant
   });
   const { data, loading, error, reload } = useFetch("/api/contacts");
+  const [grouped, setGrouped] = useState(false);
 
   return (
     <>
@@ -51,7 +53,14 @@ export default function Page() {
                   />
                 </TextField>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-5">
+                <IconButton
+                  disabled={loading}
+                  variant={grouped ? "brand-secondary" : "neutral-secondary"}
+                  size="large"
+                  icon={grouped ? "FeatherGrid3X3" : "FeatherGrid2X2"}
+                  onClick={() => setGrouped(!grouped)}
+                />
                 <Button
                   disabled={loading}
                   icon="FeatherPlus"
@@ -64,6 +73,7 @@ export default function Page() {
             {
               loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
               <TableContent
+                grouped={grouped}
                 content={data as (Contact & { id: string })[]}
                 reloadContacts={reload}
                 showNotification={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
