@@ -20,7 +20,7 @@ export default async function Page(props: {
           <BreadcrumbsNavigator username={contact.name}/>
         </div>
       </div>
-      <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-12 bg-default-background px-12 py-12 overflow-auto">
+      <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-12 bg-default-background px-12 py-12 overflow-visible">
         <div className="flex w-full flex-col items-start gap-6">
           <TopRow contactName={contact.name}/>
           <div className="flex w-full flex-wrap items-start gap-2">
