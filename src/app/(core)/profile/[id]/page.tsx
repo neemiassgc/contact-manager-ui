@@ -26,7 +26,7 @@ export default async function Page(props: {
             <div className="flex items-center gap-4">
               <Avatar
                 size="x-large"
-                image="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                image={`https://api.dicebear.com/9.x/adventurer/svg?seed=${contact.name}&backgroundType=gradientLinear`}
               >
                 SW
               </Avatar>

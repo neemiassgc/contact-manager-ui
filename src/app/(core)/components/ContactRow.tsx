@@ -21,8 +21,8 @@ export default function ContactRow(props: {
       <Table.Cell>
         <div className="flex items-center gap-2">
           <Avatar
-            size="small"
-            image={`https://api.dicebear.com/9.x/shapes/svg?seed=${props.contact.name}&backgroundType=gradientLinear`}
+            size="medium"
+            image={`https://api.dicebear.com/9.x/adventurer/svg?seed=${props.contact.name}&backgroundType=gradientLinear`}
             square={true}
           >
           </Avatar>
