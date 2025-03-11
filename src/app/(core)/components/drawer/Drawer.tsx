@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { DrawerLayout } from "@/subframe/layouts/DrawerLayout";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
@@ -9,10 +9,10 @@ import AddButton from "./AddButton";
 import ContactAddressForm from "./ContactAddressForm";
 import SimpleContactForm from "./SimpleContactForm";
 import ContactNameForm from "./ContactFormName";
+import NotificationContext from "../NotificationContext";
 
-export default function Comp(props: {
+export default function Drawer(props: {
   close: () => void,
-  showAlert: (title: string, variant: Variant) => void,
   reloadContacts: () => void
 }) {
   const [contactName, setContactName] = useState<Props>({value: ""});
@@ -20,6 +20,8 @@ export default function Comp(props: {
   const [emails, setEmails] = useState<StringField[]>([]);
   const [addresses, setAddresses] = useState<AddressField[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const showNotification = useContext(NotificationContext);
 
   const pushField = (array: StringField[]) => [
     ...array,
@@ -214,16 +216,16 @@ export default function Comp(props: {
                         return
                       }
                     }
-                    props.showAlert(await request.text(), "error");
+                    showNotification(await request.text(), "error");
                   }   
                 if (request.ok) {
                   props.close();
-                  props.showAlert("Contact created successfully", "success");
+                  showNotification("Contact created successfully", "success");
                   props.reloadContacts();
                 }
               }
               catch(error) {
-                props.showAlert(error+"", "error");
+                showNotification(error+"", "error");
               }
               finally {
                 setLoading(false);

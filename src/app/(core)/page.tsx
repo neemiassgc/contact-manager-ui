@@ -9,29 +9,16 @@ import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";
 import TableContent from "./components/TableContent";
-import Notification from "./components/Notification";
 import { IconButton } from "@/subframe/components/IconButton";
 
 export default function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
-  const [notification, setNotification] = useState({
-    open: false,
-    title: "",
-    variant: "success" as Variant
-  });
   const { data, loading, error, reload } = useFetch("/api/contacts");
   const [grouped, setGrouped] = useState(false);
   const [searchExpression, setSearchExpression] = useState("");
 
   return (
     <>
-      { notification.open &&
-        <Notification
-          title={notification.title}
-          variant={notification.variant}
-          onDispose={() => setNotification({...notification, open: false})}
-        />
-      }
       <div className="container max-w-none flex h-full w-full flex-col items-start">
         <BreadcrumbsBox/>
         <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-8 overflow-auto">
@@ -76,7 +63,6 @@ export default function Page() {
                 grouped={grouped}
                 content={filterByExpression(data, searchExpression)}
                 reloadContacts={reload}
-                showNotification={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
               />
             }
           </div>
@@ -89,7 +75,6 @@ export default function Page() {
         openContactDrawer &&
         <Drawer
           reloadContacts={reload}
-          showAlert={(title: string, variant: Variant) => setNotification({title, variant, open: true})}
           close={() => setOpenContactDrawer(false)}
         />
       }

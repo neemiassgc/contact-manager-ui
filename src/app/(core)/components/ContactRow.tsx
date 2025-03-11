@@ -5,16 +5,17 @@ import { IconButton } from "@/subframe/components/IconButton";
 import { Table } from "@/subframe/components/Table";
 import DeleteWithConfirmation from "./DeleteWithConfirmation"
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ContactTableRow, Variant } from "./drawer/types";
+import { useContext, useState } from "react";
+import { ContactTableRow } from "./drawer/types";
+import NotificationContext from "./NotificationContext";
 
 export default function ContactRow(props: {
-  showNotification: (title: string, variant: Variant) => void,
   contact: ContactTableRow,
   reloadContacts: (loading: boolean) => void
 }) {
   const [loading, setLoading] = useState([false, false]);
   const nextRouter = useRouter();
+  const showNotification = useContext(NotificationContext);
 
   return (
     <Table.Row>
@@ -56,10 +57,10 @@ export default function ContactRow(props: {
             method: "DELETE"
           })
             .then(() => {
-              props.showNotification("Contact deleted successfully", "success")
+              showNotification("Contact deleted successfully", "success")
               props.reloadContacts(false);
             })
-            .catch(error => props.showNotification(error.message, "error"))
+            .catch(error => showNotification(error.message, "error"))
             .finally(() => setLoading([false, false]))
         }}/>
       </Table.Cell>

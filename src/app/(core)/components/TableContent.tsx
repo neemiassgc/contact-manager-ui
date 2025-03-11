@@ -4,12 +4,10 @@ import type { ContactWithId, Variant } from "./drawer/types";
 
 export default function TableContent(props: {
   reloadContacts: (loading: boolean) => void,
-  showNotification: (title: string, variant: Variant) => void,
   content: ContactWithId[],
   grouped: boolean
 }) {
 
-  console.log(groupByAlphabeticalOrder(props.content))
   return (
     <div className="flex w-full flex-col items-start gap-6 overflow-hidden overflow-x-auto">
       <Table
@@ -40,7 +38,6 @@ export default function TableContent(props: {
                 {
                   group.map((contact, index) =>
                     <ContactRow
-                      showNotification={props.showNotification}
                       reloadContacts={props.reloadContacts}
                       key={index}
                       contact={{
