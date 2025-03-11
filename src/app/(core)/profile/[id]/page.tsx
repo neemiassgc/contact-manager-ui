@@ -2,9 +2,9 @@ import { Avatar } from "@/subframe/components/Avatar";
 import { DataFieldHorizontal } from "@/subframe/components/DataFieldHorizontal";
 import { authorizedFetch } from "@/app/api/contacts/misc";
 import { Contact } from "../../components/drawer/types";
-import { Breadcrumbs } from "@/subframe/components/Breadcrumbs";
 import { Button } from "@/subframe/components/Button";
 import { IconWithBackground } from "@/subframe/components/IconWithBackground";
+import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
 
 export default async function Page(props: {
   params: Promise<{ id: string }>
@@ -17,11 +17,7 @@ export default async function Page(props: {
     <div className="flex h-full w-full flex-col items-start bg-default-background overflow-auto">
       <div className="flex w-full flex-wrap items-start justify-between border-b border-solid border-neutral-border px-6 py-6">
         <div className="flex items-center gap-2 self-stretch">
-          {/* <Breadcrumbs>
-            <Breadcrumbs.Item>Contacts</Breadcrumbs.Item>
-            <Breadcrumbs.Divider />
-            <Breadcrumbs.Item active={true}>Sarah Wilson</Breadcrumbs.Item>
-          </Breadcrumbs> */}
+          <BreadcrumbsNavigator username={contact.name}/>
         </div>
       </div>
       <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-12 bg-default-background px-12 py-12 overflow-auto">
