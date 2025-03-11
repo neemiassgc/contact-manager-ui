@@ -1,10 +1,10 @@
-import { Avatar } from "@/subframe/components/Avatar";
+
 import { DataFieldHorizontal } from "@/subframe/components/DataFieldHorizontal";
 import { authorizedFetch } from "@/app/api/contacts/misc";
 import { Contact } from "../../components/drawer/types";
-import { Button } from "@/subframe/components/Button";
 import { IconWithBackground } from "@/subframe/components/IconWithBackground";
 import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
+import TopRow from "./components/TopRow";
 
 export default async function Page(props: {
   params: Promise<{ id: string }>
@@ -22,25 +22,7 @@ export default async function Page(props: {
       </div>
       <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-12 bg-default-background px-12 py-12 overflow-auto">
         <div className="flex w-full flex-col items-start gap-6">
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar
-                size="x-large"
-                image={`https://api.dicebear.com/9.x/adventurer/svg?seed=${contact.name}&backgroundType=gradientLinear`}
-              >
-                SW
-              </Avatar>
-              <span className="text-heading-2 font-heading-2 text-default-font">
-                Sarah Wilson
-              </span>
-            </div>
-            <Button
-              icon="FeatherEdit2"
-              // onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
-            >
-              Edit Contact
-            </Button>
-          </div>
+          <TopRow contactName={contact.name}/>
           <div className="flex w-full flex-wrap items-start gap-2">
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
               <DataFieldHorizontal icon="FeatherCalendar" label="Added on">
