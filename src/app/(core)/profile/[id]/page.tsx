@@ -1,9 +1,10 @@
 import { Avatar } from "@/subframe/components/Avatar";
-import * as SubframeCore from "@subframe/core";
+import { DataFieldHorizontal } from "@/subframe/components/DataFieldHorizontal";
 import { authorizedFetch } from "@/app/api/contacts/misc";
-import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
 import { Contact } from "../../components/drawer/types";
-import ContactContent from "./components/ContactContent";
+import { Breadcrumbs } from "@/subframe/components/Breadcrumbs";
+import { Button } from "@/subframe/components/Button";
+import { IconWithBackground } from "@/subframe/components/IconWithBackground";
 
 export default async function Page(props: {
   params: Promise<{ id: string }>
@@ -13,33 +14,161 @@ export default async function Page(props: {
   const contact: Contact = await response.json();
 
   return (
-    <div className="container max-w-none flex h-full w-full flex-col items-start gap-6 bg-default-background py-12">
-      <BreadcrumbsNavigator/>
-      <div className="flex w-full flex-col items-center justify-center gap-6">
-        <div className="flex w-full flex-col items-center justify-center gap-2">
-          <Avatar
-            size="x-large"
-            image="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/fychrij7dzl8wgq2zjq9.avif"
-          >
-            A
-          </Avatar>
-          <div className="flex flex-col items-center justify-center">
-            <span className="w-full text-heading-2 font-heading-2 text-default-font">
-              {contact.name}
-            </span>
+    <div className="flex h-full w-full flex-col items-start bg-default-background overflow-auto">
+      <div className="flex w-full flex-wrap items-start justify-between border-b border-solid border-neutral-border px-6 py-6">
+        <div className="flex items-center gap-2 self-stretch">
+          {/* <Breadcrumbs>
+            <Breadcrumbs.Item>Contacts</Breadcrumbs.Item>
+            <Breadcrumbs.Divider />
+            <Breadcrumbs.Item active={true}>Sarah Wilson</Breadcrumbs.Item>
+          </Breadcrumbs> */}
+        </div>
+      </div>
+      <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-12 bg-default-background px-12 py-12 overflow-auto">
+        <div className="flex w-full flex-col items-start gap-6">
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Avatar
+                size="x-large"
+                image="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+              >
+                SW
+              </Avatar>
+              <span className="text-heading-2 font-heading-2 text-default-font">
+                Sarah Wilson
+              </span>
+            </div>
+            <Button
+              icon="FeatherEdit2"
+              // onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+            >
+              Edit Contact
+            </Button>
           </div>
-          <div className="flex items-center gap-2">
-            <SubframeCore.Icon
-              className="text-body font-body text-default-font"
-              name="FeatherCake"
-            />
-            <span className="text-body font-body text-default-font">
-              09/07/1991
+          <div className="flex w-full flex-wrap items-start gap-2">
+            <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
+              <DataFieldHorizontal icon="FeatherCalendar" label="Added on">
+                <span className="whitespace-nowrap text-body font-body text-default-font">
+                  March 22, 2024
+                </span>
+              </DataFieldHorizontal>
+              <DataFieldHorizontal icon="FeatherCake" label="Birthday">
+                <span className="whitespace-nowrap text-body font-body text-default-font">
+                  July 15, 1995
+                </span>
+              </DataFieldHorizontal>
+            </div>
+            <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
+              <DataFieldHorizontal icon="FeatherBuilding" label="Company">
+                <span className="whitespace-nowrap text-body font-body text-default-font">
+                  TechCorp Solutions
+                </span>
+              </DataFieldHorizontal>
+              <DataFieldHorizontal icon="FeatherBriefcase" label="Role">
+                <span className="whitespace-nowrap text-body font-body text-default-font">
+                  Product Manager
+                </span>
+              </DataFieldHorizontal>
+            </div>
+          </div>
+        </div>
+        <div className="flex h-px w-full flex-none flex-col items-center gap-2 bg-neutral-border" />
+        <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-6 pb-6">
+          <div className="flex w-full flex-col items-start gap-4">
+            <span className="text-heading-3 font-heading-3 text-default-font">
+              Phone Numbers
             </span>
+            <div className="flex w-full flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background">
+              <div className="flex w-full items-center gap-4 border-b border-solid border-neutral-border px-4 py-4">
+                <IconWithBackground icon="FeatherPhone" />
+                <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                  <span className="text-body font-body text-default-font">
+                    +1 (555) 123-4567
+                  </span>
+                  <span className="text-caption font-caption text-subtext-color">
+                    Mobile
+                  </span>
+                </div>
+              </div>
+              <div className="flex w-full items-center gap-4 px-4 py-4">
+                <IconWithBackground icon="FeatherPhone" />
+                <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                  <span className="text-body font-body text-default-font">
+                    +1 (555) 987-6543
+                  </span>
+                  <span className="text-caption font-caption text-subtext-color">
+                    Work
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex w-full flex-col items-start gap-4">
+            <span className="text-heading-3 font-heading-3 text-default-font">
+              Email Addresses
+            </span>
+            <div className="flex w-full flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background">
+              <div className="flex w-full items-center gap-4 border-b border-solid border-neutral-border px-4 py-4">
+                <IconWithBackground icon="FeatherMail" />
+                <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                  <span className="text-body font-body text-default-font">
+                    sarah.wilson@techcorp.com
+                  </span>
+                  <span className="text-caption font-caption text-subtext-color">
+                    Work
+                  </span>
+                </div>
+              </div>
+              <div className="flex w-full items-center gap-4 px-4 py-4">
+                <IconWithBackground icon="FeatherMail" />
+                <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                  <span className="text-body font-body text-default-font">
+                    sarah.w@gmail.com
+                  </span>
+                  <span className="text-caption font-caption text-subtext-color">
+                    Personal
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex w-full flex-col items-start gap-4">
+            <span className="text-heading-3 font-heading-3 text-default-font">
+              Addresses
+            </span>
+            <div className="flex w-full flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background">
+              <div className="flex w-full items-center gap-4 border-b border-solid border-neutral-border px-4 py-4">
+                <IconWithBackground icon="FeatherMapPin" />
+                <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                  <span className="text-body-bold font-body-bold text-default-font">
+                    Office
+                  </span>
+                  <span className="text-body font-body text-default-font">
+                    123 Tech Street, Suite 400
+                  </span>
+                  <span className="text-body font-body text-default-font">
+                    San Francisco, CA 94105
+                  </span>
+                </div>
+              </div>
+              <div className="flex w-full items-center gap-4 px-4 py-4">
+                <IconWithBackground icon="FeatherMapPin" />
+                <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                  <span className="text-body-bold font-body-bold text-default-font">
+                    Home
+                  </span>
+                  <span className="text-body font-body text-default-font">
+                    456 Park Avenue
+                  </span>
+                  <span className="text-body font-body text-default-font">
+                    San Francisco, CA 94110
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <ContactContent contact={contact}/>
     </div>
   );
 }
