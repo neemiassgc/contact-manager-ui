@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
 import { useFetch } from "./hooks";
-import { ContactWithId, Variant } from "./components/drawer/types";
+import { ContactWithId, Variant } from "./components/types";
 import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";

@@ -4,7 +4,7 @@ import React, { useContext, useState } from "react";
 import { DrawerLayout } from "@/subframe/layouts/DrawerLayout";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
-import { AddressField, StringField, Contact, Variant, Props } from "./types";
+import { AddressField, StringField, Contact, Variant, Props } from "../types";
 import AddButton from "./AddButton";
 import ContactAddressForm from "./ContactAddressForm";
 import SimpleContactForm from "./SimpleContactForm";

@@ -5,7 +5,7 @@ import Feedback from "./Feedback";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { ReactNode, useState } from "react";
 import NotificationContext from "./NotificationContext";
-import { Variant } from "./drawer/types";
+import { Variant } from "./types";
 import Notification from "./Notification";
 
 export default function ScreenLoader(props: {children: ReactNode}) {

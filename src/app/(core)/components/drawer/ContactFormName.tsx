@@ -1,6 +1,6 @@
 import { TextField } from "@/subframe/components/TextField"
 import SubframeCore from "@subframe/core"
-import { Props } from "./types"
+import { Props } from "../types"
 
 export default function ContactNameForm(props: {
   value: string,

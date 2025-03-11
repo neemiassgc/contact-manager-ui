@@ -1,4 +1,4 @@
-import { IndexedAddress } from "@/app/(core)/components/drawer/types";
+import { IndexedAddress } from "@/app/(core)/components/types";
 import { IconWithBackground } from "@/subframe/components/IconWithBackground";
 
 export default function AddressSection(props: { content: IndexedAddress }) {

@@ -1,6 +1,6 @@
 import { Alert } from "@/subframe/components/Alert";
 import { IconButton } from "@/subframe/components/IconButton";
-import { Variant } from "./drawer/types";
+import { Variant } from "./types";
 
 export default function Notification(props: {
   onDispose: () => void,

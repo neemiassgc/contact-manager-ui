@@ -3,7 +3,7 @@ import TextInput from "./TextInput";
 import RemoveButton from "./RemoveButton";
 import AddButton from "./AddButton";
 import FieldMarker from "./FieldMarker";
-import { StringField } from "./types";
+import { StringField } from "../types";
 import { editAt } from "./tools";
 
 export default function SimpleContactForm(props: {

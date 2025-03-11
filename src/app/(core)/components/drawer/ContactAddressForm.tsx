@@ -1,5 +1,5 @@
 import SubframeCore from "@subframe/core"
-import { AddressField } from "./types"
+import { AddressField } from "../types"
 import FieldMarker from "./FieldMarker"
 import { TextField } from "@/subframe/components/TextField"
 import AddButton from "./AddButton"

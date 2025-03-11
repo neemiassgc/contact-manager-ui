@@ -1,7 +1,7 @@
 
 import { DataFieldHorizontal } from "@/subframe/components/DataFieldHorizontal";
 import { authorizedFetch } from "@/app/api/contacts/misc";
-import { Contact } from "../../components/drawer/types";
+import { Contact } from "../../components/types";
 import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
 import TopRow from "./components/TopRow";
 import InformationSection from "./components/InformationSection";

@@ -1,4 +1,4 @@
-import { IndexedString } from "@/app/(core)/components/drawer/types";
+import { IndexedString } from "@/app/(core)/components/types";
 import { IconWithBackground } from "@/subframe/components/IconWithBackground";
 import { IconName } from "@subframe/core";
 

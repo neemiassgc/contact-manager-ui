@@ -6,7 +6,7 @@ import { Table } from "@/subframe/components/Table";
 import DeleteWithConfirmation from "./DeleteWithConfirmation"
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
-import { ContactTableRow } from "./drawer/types";
+import { ContactTableRow } from "./types";
 import NotificationContext from "./NotificationContext";
 
 export default function ContactRow(props: {
