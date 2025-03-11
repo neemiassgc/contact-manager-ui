@@ -5,6 +5,7 @@ import { Contact } from "../../components/drawer/types";
 import { IconWithBackground } from "@/subframe/components/IconWithBackground";
 import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
 import TopRow from "./components/TopRow";
+import InformationSection from "./components/InformationSection";
 
 export default async function Page(props: {
   params: Promise<{ id: string }>
@@ -52,64 +53,8 @@ export default async function Page(props: {
         </div>
         <div className="flex h-px w-full flex-none flex-col items-center gap-2 bg-neutral-border" />
         <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-6 pb-6">
-          <div className="flex w-full flex-col items-start gap-4">
-            <span className="text-heading-3 font-heading-3 text-default-font">
-              Phone Numbers
-            </span>
-            <div className="flex w-full flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background">
-              <div className="flex w-full items-center gap-4 border-b border-solid border-neutral-border px-4 py-4">
-                <IconWithBackground icon="FeatherPhone" />
-                <div className="flex grow shrink-0 basis-0 flex-col items-start">
-                  <span className="text-body font-body text-default-font">
-                    +1 (555) 123-4567
-                  </span>
-                  <span className="text-caption font-caption text-subtext-color">
-                    Mobile
-                  </span>
-                </div>
-              </div>
-              <div className="flex w-full items-center gap-4 px-4 py-4">
-                <IconWithBackground icon="FeatherPhone" />
-                <div className="flex grow shrink-0 basis-0 flex-col items-start">
-                  <span className="text-body font-body text-default-font">
-                    +1 (555) 987-6543
-                  </span>
-                  <span className="text-caption font-caption text-subtext-color">
-                    Work
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex w-full flex-col items-start gap-4">
-            <span className="text-heading-3 font-heading-3 text-default-font">
-              Email Addresses
-            </span>
-            <div className="flex w-full flex-col items-start rounded-md border border-solid border-neutral-border bg-default-background">
-              <div className="flex w-full items-center gap-4 border-b border-solid border-neutral-border px-4 py-4">
-                <IconWithBackground icon="FeatherMail" />
-                <div className="flex grow shrink-0 basis-0 flex-col items-start">
-                  <span className="text-body font-body text-default-font">
-                    sarah.wilson@techcorp.com
-                  </span>
-                  <span className="text-caption font-caption text-subtext-color">
-                    Work
-                  </span>
-                </div>
-              </div>
-              <div className="flex w-full items-center gap-4 px-4 py-4">
-                <IconWithBackground icon="FeatherMail" />
-                <div className="flex grow shrink-0 basis-0 flex-col items-start">
-                  <span className="text-body font-body text-default-font">
-                    sarah.w@gmail.com
-                  </span>
-                  <span className="text-caption font-caption text-subtext-color">
-                    Personal
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <InformationSection iconName="FeatherPhone" title="Phone Numbers" content={contact.phoneNumbers} />
+          <InformationSection iconName="FeatherMail" title="Email Addresses" content={contact.emails} />
           <div className="flex w-full flex-col items-start gap-4">
             <span className="text-heading-3 font-heading-3 text-default-font">
               Addresses
