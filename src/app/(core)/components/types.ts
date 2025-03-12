@@ -45,3 +45,9 @@ export interface ContactTableRow {
 }
 
 export type ContactWithId = Contact & { id: string };
+
+type MapContact<Type> = {
+  [Property in keyof Type]: Type[Property] extends string ? Props : Type[Property] extends IndexedString ? StringField[] : AddressField[];
+};
+
+export type MappedContact = MapContact<Contact>;
