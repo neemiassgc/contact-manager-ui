@@ -10,10 +10,16 @@ import ContactAddressForm from "./ContactAddressForm";
 import SimpleContactForm from "./SimpleContactForm";
 import ContactNameForm from "./ContactFormName";
 import NotificationContext from "../NotificationContext";
+import { IconName } from "@subframe/core";
 
 export default function Drawer(props: {
   close: () => void,
-  reloadContacts: () => void
+  mainActionButton: {
+    title: string,
+    iconName: IconName,
+    httpMethod: "post" | "put",
+    onSuccess: () => void
+  }
 }) {
   const [contactName, setContactName] = useState<Props>({value: ""});
   const [phones, setPhones] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
@@ -180,7 +186,7 @@ export default function Drawer(props: {
           <Button
             loading={loading}
             size="large"
-            icon="FeatherUserPlus"
+            icon={props.mainActionButton.iconName}
             onClick={async () => {
               setLoading(true);
 
@@ -200,7 +206,7 @@ export default function Drawer(props: {
 
               try {
                 const request = await fetch("/api/contacts", {
-                  method: "post",
+                  method: props.mainActionButton.httpMethod,
                   headers: {
                     "Content-Type": "application/json"
                   },
@@ -221,7 +227,7 @@ export default function Drawer(props: {
                 if (request.ok) {
                   props.close();
                   showNotification("Contact created successfully", "success");
-                  props.reloadContacts();
+                  props.mainActionButton.onSuccess();
                 }
               }
               catch(error) {
@@ -232,7 +238,7 @@ export default function Drawer(props: {
               }
             }}
           >
-            Create
+            {props.mainActionButton.title}
           </Button>
         </div>
       </div>

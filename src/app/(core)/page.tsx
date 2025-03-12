@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
 import { useFetch } from "./hooks";
-import { ContactWithId, Variant } from "./components/types";
+import { ContactWithId } from "./components/types";
 import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";
@@ -74,7 +74,12 @@ export default function Page() {
       {
         openContactDrawer &&
         <Drawer
-          reloadContacts={reload}
+          mainActionButton={{
+            title: "Create",
+            iconName: "FeatherUserPlus",
+            httpMethod: "post",
+            onSuccess: () => reload(true)
+          }}
           close={() => setOpenContactDrawer(false)}
         />
       }
