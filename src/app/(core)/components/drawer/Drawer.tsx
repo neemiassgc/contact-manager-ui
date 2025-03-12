@@ -12,7 +12,14 @@ import ContactNameForm from "./ContactFormName";
 import NotificationContext from "../NotificationContext";
 import { IconName } from "@subframe/core";
 
-export default function Drawer(props: {
+export default function Drawer({initialize = {
+  name: {value: ""},
+  phoneNumbers: [{ marker: { value: ""}, field: { value: "" }}],
+  emails: [],
+  addresses: []
+},
+...props
+}: {
   close: () => void,
   mainActionButton: {
     title: string,
@@ -22,10 +29,10 @@ export default function Drawer(props: {
   },
   initialize?: MappedContact 
 }) {
-  const [contactName, setContactName] = useState<Props>({value: ""});
-  const [phones, setPhones] = useState<StringField[]>([{ marker: { value: ""}, field: { value: "" }}]);
-  const [emails, setEmails] = useState<StringField[]>([]);
-  const [addresses, setAddresses] = useState<AddressField[]>([]);
+  const [contactName, setContactName] = useState<Props>(initialize.name);
+  const [phones, setPhones] = useState<StringField[]>(initialize.phoneNumbers);
+  const [emails, setEmails] = useState<StringField[]>(initialize.emails);
+  const [addresses, setAddresses] = useState<AddressField[]>(initialize.addresses);
   const [loading, setLoading] = useState(false);
 
   const showNotification = useContext(NotificationContext);
