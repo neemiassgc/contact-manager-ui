@@ -32,6 +32,7 @@ export default function ContactAddressForm(props: {
           <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <div className="flex w-full items-center justify-between">
               <FieldMarker
+                initialize={address.marker.value}
                 disabled={props.disabled}
                 error={address.marker.error}
                 value={address.marker.value}
@@ -53,7 +54,7 @@ export default function ContactAddressForm(props: {
                 >
                   <TextField.Input
                     placeholder={key}
-                    value={address.field.value[key]}
+                    value={address.field.value[key === "address" ? "street" : key]}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       props.setAddresses(editAt(props.addresses, index, {
                         marker: {...address.marker},

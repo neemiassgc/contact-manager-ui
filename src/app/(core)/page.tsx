@@ -75,6 +75,7 @@ export default function Page() {
         openContactDrawer &&
         <Drawer
           mainActionButton={{
+            url: "/api/contacts",
             title: "Create",
             iconName: "FeatherUserPlus",
             httpMethod: "post",

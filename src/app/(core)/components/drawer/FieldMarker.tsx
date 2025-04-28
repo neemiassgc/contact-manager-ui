@@ -3,13 +3,14 @@ import { TextField } from "@/subframe/components/TextField";
 import SubframeCore from "@subframe/core";
 import { useState } from "react";
 
-export default function FieldMarker(props: {
+export default function FieldMarker({initialize = "mark", ...props}: {
   value: string,
   onChange: (value: string) => void,
   error: string | undefined,
-  disabled: boolean
+  disabled: boolean,
+  initialize?: string
 }) {
-  const [marker, setMarker] = useState("mark");
+  const [marker, setMarker] = useState(initialize);
 
   const checkedError: boolean = props.error !== undefined && props.error.length > 0;
 

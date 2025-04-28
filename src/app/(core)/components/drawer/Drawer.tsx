@@ -25,6 +25,7 @@ export default function Drawer({initialize = {
     title: string,
     iconName: IconName,
     httpMethod: "post" | "put",
+    url: string,
     onSuccess: () => void
   },
   initialize?: MappedContact 
@@ -213,7 +214,7 @@ export default function Drawer({initialize = {
               }
 
               try {
-                const request = await fetch("/api/contacts", {
+                const request = await fetch(props.mainActionButton.url, {
                   method: props.mainActionButton.httpMethod,
                   headers: {
                     "Content-Type": "application/json"

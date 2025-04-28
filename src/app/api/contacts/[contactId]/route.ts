@@ -12,17 +12,17 @@ export async function GET(_: Request, { params }: { params: { contactId: string 
   })
 }
 
-export async function PATCH(request: Request, { params }: { params: { contactId: string }}) {
+export async function PUT(request: Request, { params }: { params: { contactId: string }}) {
   return safe(async () => {
     const settings: object = {
-      method: "PATCH",
+      method: "PUT",
       headers: {
         ["Content-Type"]: "application/json"
       },
       body: request.body,
       duplex: "half"
     }
-    const fetchRequest = await authorizedFetch(urlPath+params.contactId, settings);
+    const fetchRequest = await authorizedFetch(urlPath + params.contactId, settings);
     return new NextResponse(fetchRequest.body, { status: fetchRequest.status, headers: fetchRequest.headers });
   });
 }

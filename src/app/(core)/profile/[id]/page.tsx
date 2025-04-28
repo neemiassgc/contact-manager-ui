@@ -23,7 +23,7 @@ export default async function Page(props: {
       </div>
       <div className="flex w-full grow shrink-0 basis-0 flex-col items-start gap-12 bg-default-background px-12 py-12 overflow-visible">
         <div className="flex w-full flex-col items-start gap-6">
-          <TopRow contactName={contact.name}/>
+          <TopRow contact={contact}/>
           <div className="flex w-full flex-wrap items-start gap-2">
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
               <DataFieldHorizontal icon="FeatherCalendar" label="Added on">
