@@ -24,7 +24,6 @@ export default function TableContent(props: {
       >
         {
           groupByAlphabeticalOrder(props.content).map((group, index) => {
-            console.log(group)
             return (
               <>
                 {

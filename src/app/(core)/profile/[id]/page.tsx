@@ -1,7 +1,7 @@
 
 import { DataFieldHorizontal } from "@/subframe/components/DataFieldHorizontal";
 import { authorizedFetch } from "@/app/api/contacts/misc";
-import { Contact } from "../../components/types";
+import {  ContactWithId } from "../../components/types";
 import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
 import TopRow from "./components/TopRow";
 import InformationSection from "./components/InformationSection";
@@ -12,7 +12,7 @@ export default async function Page(props: {
 }) {
   const { id } = await props.params;
   const response = await authorizedFetch(process.env.RESOURCE_SERVER+"/api/contacts/"+id)
-  const contact: Contact = await response.json();
+  const contact: ContactWithId = await response.json();
 
   return (
     <div className="flex h-full w-full flex-col items-start bg-default-background overflow-auto">

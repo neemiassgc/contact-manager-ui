@@ -5,9 +5,12 @@ import { Contact, ContactWithId, MappedContact } from "@/app/(core)/components/t
 import { Avatar } from "@/subframe/components/Avatar";
 import { Button } from "@/subframe/components/Button";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function TopRow(props: { contact: ContactWithId }) {
   const [openDrawer, setOpenDrawer] = useState(false);
+
+  const router = useRouter();
 
   return (
     <div className="flex w-full items-center justify-between">
@@ -37,7 +40,7 @@ export default function TopRow(props: { contact: ContactWithId }) {
             title: "Edit",
             iconName: "FeatherEdit",
             httpMethod: "put",
-            onSuccess: () => window.location.reload()
+            onSuccess: () => router.refresh()
           }}
           initialize={transformContact(props.contact)}
         />
