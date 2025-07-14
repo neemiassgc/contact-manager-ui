@@ -11,6 +11,7 @@ import SimpleContactForm from "./SimpleContactForm";
 import ContactNameForm from "./ContactFormName";
 import NotificationContext from "../NotificationContext";
 import { IconName } from "@subframe/core";
+import { useAIFetch } from "../../hooks";
 
 export default function Drawer({initialize = {
   name: {value: ""},
@@ -35,6 +36,48 @@ export default function Drawer({initialize = {
   const [emails, setEmails] = useState<StringField[]>(initialize.emails);
   const [addresses, setAddresses] = useState<AddressField[]>(initialize.addresses);
   const [loading, setLoading] = useState(false);
+
+  const { loading: AILoading, error: AIError, fetch: AIFetch} = useAIFetch(
+    data => {
+      setContactName({value: data.name});
+      setPhones(data.phoneNumbers.map((it: any) => {
+        return {
+          marker: {
+            value: it.marker,
+          },
+          field: {
+            value: "+"+it.value
+          }
+        }
+      }))
+      setEmails(data.emails.map((it: any) => {
+        return {
+          marker: {
+            value: it.marker,
+          },
+          field: {
+            value: it.value
+          }
+        }
+      }))
+      setAddresses(data.addresses.map((it: any) => {
+        return {
+          marker: {
+            value: it.marker,
+          },
+          field: {
+            value: {
+              street: it.street,
+              zipcode: it.zipcode,
+              country: it.country,
+              state: it.state,
+              city: it.city,
+            }
+          }
+        }
+      }));
+    }
+  );
 
   const showNotification = useContext(NotificationContext);
 
@@ -138,7 +181,9 @@ export default function Drawer({initialize = {
           <Button
             variant="brand-secondary"
             icon="FeatherSparkles"
-            onClick={()=>{}}
+            loading={AILoading}
+            disabled={AILoading}
+            onClick={AIFetch}
           >
             Generate with AI
           </Button>
