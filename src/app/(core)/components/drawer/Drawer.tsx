@@ -135,6 +135,13 @@ export default function Drawer({initialize = {
           <span className="text-heading-2 font-heading-2 text-default-font">
             Create a new contact
           </span>
+          <Button
+            variant="brand-secondary"
+            icon="FeatherSparkles"
+            onClick={()=>{}}
+          >
+            Generate with AI
+          </Button>
           <IconButton
             variant="destructive-primary"
             icon="FeatherX"
