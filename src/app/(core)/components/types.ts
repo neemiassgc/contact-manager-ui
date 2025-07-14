@@ -51,3 +51,5 @@ type MapContact<Type> = {
 };
 
 export type MappedContact = MapContact<Contact>;
+
+export type DrawerType = "Create" | "Edit";

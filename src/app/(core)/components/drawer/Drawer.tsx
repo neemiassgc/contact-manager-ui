@@ -4,7 +4,7 @@ import React, { useContext, useState } from "react";
 import { DrawerLayout } from "@/subframe/layouts/DrawerLayout";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
-import { AddressField, StringField, Contact, Props, MappedContact } from "../types";
+import { AddressField, StringField, Contact, Props, MappedContact, DrawerType } from "../types";
 import AddButton from "./AddButton";
 import ContactAddressForm from "./ContactAddressForm";
 import SimpleContactForm from "./SimpleContactForm";
@@ -23,7 +23,7 @@ export default function Drawer({initialize = {
 }: {
   close: () => void,
   mainActionButton: {
-    title: string,
+    title: DrawerType,
     iconName: IconName,
     httpMethod: "post" | "put",
     url: string,
@@ -176,17 +176,20 @@ export default function Drawer({initialize = {
       <div className="flex h-screen w-144 flex-col items-start gap-2 p-3 overflow-auto">
         <div className="flex w-full items-center justify-between px-4 pt-4 pb-1">
           <span className="text-heading-2 font-heading-2 text-default-font">
-            Create a new contact
+            {props.mainActionButton.title === "Create" ? "New Contact" : "Edit Contact: "+contactName.value}
           </span>
-          <Button
-            variant="brand-secondary"
-            icon="FeatherSparkles"
-            loading={AILoading}
-            disabled={AILoading}
-            onClick={AIFetch}
-          >
-            Generate with AI
-          </Button>
+          {
+            props.mainActionButton.title === "Edit" ? null :
+            <Button
+              variant="brand-secondary"
+              icon="FeatherSparkles"
+              loading={AILoading}
+              disabled={AILoading}
+              onClick={AIFetch}
+            >
+              Generate with AI
+            </Button>
+          }
           <IconButton
             variant="destructive-primary"
             icon="FeatherX"
