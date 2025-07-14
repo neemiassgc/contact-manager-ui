@@ -339,7 +339,7 @@ function validateMarkers(fields: StringField[] | AddressField[]) {
     let error: string = "";
     if (it.marker.value.length === 0) error = "marker cannot be empty";
     if (it.marker.value.length <= 3) error = "marker is too short";
-    if (it.marker.value.length > 14) error = "marker is too long";
+    if (it.marker.value.length > 25) error = "marker is too long";
     return {
       field: { ...it.field },
       marker: {
