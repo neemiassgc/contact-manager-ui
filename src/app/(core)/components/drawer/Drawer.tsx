@@ -178,18 +178,7 @@ export default function Drawer({initialize = {
           <span className="text-heading-2 font-heading-2 text-default-font">
             {props.mainActionButton.title === "Create" ? "New Contact" : "Edit Contact: "+contactName.value}
           </span>
-          {
-            props.mainActionButton.title === "Edit" ? null :
-            <Button
-              variant="brand-secondary"
-              icon="FeatherSparkles"
-              loading={AILoading}
-              disabled={AILoading}
-              onClick={AIFetch}
-            >
-              Generate with AI
-            </Button>
-          }
+          <AIButton loading={AILoading} onClick={AIFetch} visible={props.mainActionButton.title === "Create"}/>
           <IconButton
             variant="destructive-primary"
             icon="FeatherX"
@@ -199,13 +188,13 @@ export default function Drawer({initialize = {
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <ContactNameForm
-            disabled={loading}
+            disabled={loading || AILoading}
             value={contactName.value}
             error={contactName.error}
             onChange={setContactName}
           />
           <SimpleContactForm
-            disabled={loading}
+            disabled={loading || AILoading}
             objects={phones}
             setObjects={setPhones}
             onAddButtonClick={() => setPhones(pushField(phones))}
@@ -215,14 +204,14 @@ export default function Drawer({initialize = {
           {
             emails.length === 0 ?
             <AddButton
-              disabled={loading}
+              disabled={loading || AILoading}
               title={"Add Email"}
               iconRight="FeatherAtSign"
               variant="neutral-secondary"
               onClick={() => setEmails(pushField(emails))}
             /> :
             <SimpleContactForm
-              disabled={loading}
+              disabled={loading || AILoading}
               objects={emails}
               setObjects={setEmails}
               onAddButtonClick={() => setEmails(pushField(emails))}
@@ -233,14 +222,14 @@ export default function Drawer({initialize = {
           {
              addresses.length === 0 ?
              <AddButton
-              disabled={loading}
+              disabled={loading || AILoading}
                title={"Add Address"}
                iconRight="FeatherMapPin"
                variant="neutral-secondary"
                onClick={() => setAddresses(pushAddressField(addresses))}
              /> :
             <ContactAddressForm
-              disabled={loading}
+              disabled={loading || AILoading}
               addresses={addresses}
               setAddresses={setAddresses}
               onAddButtonClick={() => setAddresses(pushAddressField(addresses))}
@@ -249,6 +238,7 @@ export default function Drawer({initialize = {
           }
           <Button
             loading={loading}
+            disabled={loading || AILoading}
             size="large"
             icon={props.mainActionButton.iconName}
             onClick={async () => {
@@ -389,4 +379,22 @@ function fullAddressFieldCopy(array: AddressField[]): AddressField[] {
       }
     }
   }))
+}
+
+function AIButton(props: { loading: boolean, onClick: () => void, visible: boolean }) {
+  const [disabled, setDisabled] = useState(false);
+
+  if (!props.visible) return null;
+  return <Button
+    variant="brand-secondary"
+    icon="FeatherSparkles"
+    loading={props.loading}
+    disabled={props.loading || disabled}
+    onClick={() => {
+      setDisabled(true);
+      props.onClick();
+    }}
+  >
+    Generate with AI
+  </Button>
 }
