@@ -28,7 +28,7 @@ export default async function Page(props: {
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
               <DataFieldHorizontal icon="FeatherCalendar" label="Added on">
                 <span className="whitespace-nowrap text-body font-body text-default-font">
-                  March 22, 2024
+                  {formatToLegibleDate(contact.addedOn)}                  
                 </span>
               </DataFieldHorizontal>
               <DataFieldHorizontal icon="FeatherCake" label="Birthday">
@@ -60,4 +60,12 @@ export default async function Page(props: {
       </div>
     </div>
   );
+}
+
+function formatToLegibleDate(ISO8601Date: string): string {
+  return new Date(ISO8601Date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  })
 }
