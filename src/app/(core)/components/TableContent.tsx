@@ -16,8 +16,8 @@ export default function TableContent(props: {
             <Table.HeaderCell>Name</Table.HeaderCell>
             <Table.HeaderCell>Phone</Table.HeaderCell>
             <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Birth</Table.HeaderCell>
-            <Table.HeaderCell>Address</Table.HeaderCell>
+            <Table.HeaderCell>Company</Table.HeaderCell>
+            <Table.HeaderCell>Role</Table.HeaderCell>
             <Table.HeaderCell />
           </Table.HeaderRow>
         }
@@ -44,8 +44,8 @@ export default function TableContent(props: {
                         name: contact.name,
                         phone: Object.values(contact.phoneNumbers)[0],
                         email: isNotEmpty(contact.emails) ? Object.values(contact.emails)[0] : "",
-                        birth: "09/08/1991",
-                        address: isNotEmpty(contact.addresses) ? Object.values(contact.addresses)[0].city : ""
+                        company: "TechCorp Solutions",
+                        role: "Product Manager"
                       }}
                     />
                   )

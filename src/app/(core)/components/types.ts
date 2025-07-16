@@ -42,8 +42,8 @@ export interface ContactTableRow {
   name: string,
   phone: string,
   email: string,
-  birth: string,
-  address: string,
+  company: string,
+  role: string,
 }
 
 export type ContactWithId = Contact & { id: string };
