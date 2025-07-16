@@ -31,6 +31,7 @@ export interface IndexedAddress {
 export interface Contact {
   name: string,
   addedOn: string,
+  birthday?: string,
   phoneNumbers: IndexedString,
   addresses: IndexedAddress,
   emails: IndexedString

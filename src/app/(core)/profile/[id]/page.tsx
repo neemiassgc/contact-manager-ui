@@ -31,11 +31,14 @@ export default async function Page(props: {
                   {formatToLegibleDate(contact.addedOn)}                  
                 </span>
               </DataFieldHorizontal>
-              <DataFieldHorizontal icon="FeatherCake" label="Birthday">
-                <span className="whitespace-nowrap text-body font-body text-default-font">
-                  July 15, 1995
-                </span>
-              </DataFieldHorizontal>
+              {
+                contact.birthday &&
+                <DataFieldHorizontal icon="FeatherCake" label="Birthday">
+                  <span className="whitespace-nowrap text-body font-body text-default-font">
+                    {formatToLegibleDate(contact.birthday)}
+                  </span>
+                </DataFieldHorizontal>
+              }
             </div>
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
               <DataFieldHorizontal icon="FeatherBuilding" label="Company">
