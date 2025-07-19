@@ -1,11 +1,14 @@
 import { TextField } from "@/subframe/components/TextField"
 import SubframeCore from "@subframe/core"
-import { Props } from "../types"
+import { Base } from "../types"
+import RemoveButton from "./RemoveButton"
 
-export default function ContactNameForm(props: {
+export default function ContactSimpleForm(props: {
   value: string,
   error?: string,
-  onChange: (obj: Props) => void,
+  onChange: (obj: Base) => void,
+  title: string,
+  onRemoval?: () => void,
   disabled: boolean
 }) {
   return (
@@ -17,7 +20,7 @@ export default function ContactNameForm(props: {
             name="FeatherContact"
           />
           <span className="text-caption-bold font-caption-bold text-default-font">
-            Contact Name
+            {props.title}
           </span>
         </div>
       </div>
@@ -28,11 +31,14 @@ export default function ContactNameForm(props: {
         disabled= {props.disabled}
       >
         <TextField.Input
-          placeholder="Contact Name"
+          placeholder={props.title}
           value={props.value}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange({value: event.target.value})}
         />
       </TextField>
+      {
+        props.onRemoval && <RemoveButton onClick={props.onRemoval}/>
+      }
     </div>
   )
 }

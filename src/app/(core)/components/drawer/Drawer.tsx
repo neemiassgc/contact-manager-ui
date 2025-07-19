@@ -188,6 +188,7 @@ export default function Drawer({initialize = {
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <ContactNameForm
+            title="Contact name"
             disabled={loading || AILoading}
             value={contactName.value}
             error={contactName.error}
