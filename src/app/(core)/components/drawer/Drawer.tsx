@@ -4,7 +4,7 @@ import React, { useContext, useState } from "react";
 import { DrawerLayout } from "@/subframe/layouts/DrawerLayout";
 import { IconButton } from "@/subframe/components/IconButton";
 import { Button } from "@/subframe/components/Button";
-import { AddressField, StringField, Contact, Props, MappedContact, DrawerType } from "../types";
+import { AddressField, StringField, Contact, Base, MappedContact, DrawerType } from "../types";
 import AddButton from "./AddButton";
 import ContactAddressForm from "./ContactAddressForm";
 import SimpleContactForm from "./SimpleContactForm";
@@ -31,7 +31,7 @@ export default function Drawer({initialize = {
   },
   initialize?: MappedContact 
 }) {
-  const [contactName, setContactName] = useState<Props>(initialize.name);
+  const [contactName, setContactName] = useState<Base>(initialize.name);
   const [phones, setPhones] = useState<StringField[]>(initialize.phoneNumbers);
   const [emails, setEmails] = useState<StringField[]>(initialize.emails);
   const [addresses, setAddresses] = useState<AddressField[]>(initialize.addresses);

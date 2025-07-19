@@ -1,11 +1,11 @@
-export type Props = {
+export type Base = {
   value: string,
   error?: string | undefined
 }
 
-export type Marker = { marker: Props }
+export type Marker = { marker: Base }
 
-export type StringField = Marker & { field: Props }
+export type StringField = Marker & { field: Base }
 
 export type AddressField = Marker & { field: { value: Address, error?: Partial<Address> | undefined } }
 
