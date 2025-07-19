@@ -4,7 +4,7 @@ import { IconName } from "@subframe/core";
 export default function AddButton(props: {
   title: string,
   onClick: () => void,
-  iconRight?: string,
+  iconRight?: IconName,
   variant?: "neutral-primary" | "neutral-secondary",
   disabled?: boolean
 }) {

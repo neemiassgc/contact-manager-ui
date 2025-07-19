@@ -11,8 +11,12 @@ export default function ContactAddressForm(props: {
   onRemoveButtonClick: () => void,
   setAddresses: (addresses: AddressField[]) => void,
   addresses: AddressField[],
-  disabled: boolean
+  disabled: boolean,
+  children: React.ReactNode,
+  buttonCollapse: boolean
 }) {
+  if (props.buttonCollapse)
+    return props.children;
 
   return (
     <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">

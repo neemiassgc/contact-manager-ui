@@ -7,11 +7,11 @@ import { Button } from "@/subframe/components/Button";
 import { AddressField, StringField, Contact, Base, MappedContact, DrawerType } from "../types";
 import AddButton from "./AddButton";
 import ContactAddressForm from "./ContactAddressForm";
-import SimpleContactForm from "./SimpleContactForm";
-import ContactNameForm from "./ContactFormName";
+import CompoundContactForm from "./CompoundContactForm";
 import NotificationContext from "../NotificationContext";
 import { IconName } from "@subframe/core";
 import { useAIFetch } from "../../hooks";
+import SimpleContactForm from "./SimpleContactForm";
 
 export default function Drawer({initialize = {
   name: {value: ""},
@@ -32,6 +32,7 @@ export default function Drawer({initialize = {
   initialize?: MappedContact 
 }) {
   const [contactName, setContactName] = useState<Base>(initialize.name);
+  const [birthday, setBirthday] = useState<Base>();
   const [phones, setPhones] = useState<StringField[]>(initialize.phoneNumbers);
   const [emails, setEmails] = useState<StringField[]>(initialize.emails);
   const [addresses, setAddresses] = useState<AddressField[]>(initialize.addresses);
@@ -187,7 +188,8 @@ export default function Drawer({initialize = {
         </div>
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
-          <ContactNameForm
+          <SimpleContactForm
+            iconName={"FeatherUser"}
             title="Contact name"
             disabled={loading || AILoading}
             value={contactName.value}
@@ -195,6 +197,16 @@ export default function Drawer({initialize = {
             onChange={setContactName}
           />
           <SimpleContactForm
+            iconName={"FeatherCake"}
+            title="Birthday"
+            disabled={loading || AILoading}
+            value={contactName.value}
+            error={contactName.error}
+            onChange={setContactName}
+            onButtonCollapse={birthday ? undefined : (() => setBirthday({value: ""}))}
+            onRemoval={() => setBirthday(undefined)}
+          />
+          <CompoundContactForm
             disabled={loading || AILoading}
             objects={phones}
             setObjects={setPhones}
@@ -202,41 +214,39 @@ export default function Drawer({initialize = {
             onRemoveButtonClick={() => setPhones(phones.slice(0, phones.length - 1))}
             variant="phone"
           />
-          {
-            emails.length === 0 ?
+          <CompoundContactForm
+            disabled={loading || AILoading}
+            objects={emails}
+            setObjects={setEmails}
+            onAddButtonClick={() => setEmails(pushField(emails))}
+            onRemoveButtonClick={() => setEmails(emails.slice(0, emails.length - 1))}
+            variant="email"
+            buttonCollapse={emails.length === 0}
+          >
             <AddButton
               disabled={loading || AILoading}
               title={"Add Email"}
               iconRight="FeatherAtSign"
               variant="neutral-secondary"
               onClick={() => setEmails(pushField(emails))}
-            /> :
-            <SimpleContactForm
-              disabled={loading || AILoading}
-              objects={emails}
-              setObjects={setEmails}
-              onAddButtonClick={() => setEmails(pushField(emails))}
-              onRemoveButtonClick={() => setEmails(emails.slice(0, emails.length - 1))}
-              variant="email"
             />
-          }
-          {
-             addresses.length === 0 ?
-             <AddButton
+          </CompoundContactForm>
+          <ContactAddressForm
+            disabled={loading || AILoading}
+            addresses={addresses}
+            setAddresses={setAddresses}
+            onAddButtonClick={() => setAddresses(pushAddressField(addresses))}
+            onRemoveButtonClick={() => setAddresses(addresses.slice(0, addresses.length - 1))}
+            buttonCollapse={addresses.length === 0}
+          >
+            <AddButton
               disabled={loading || AILoading}
-               title={"Add Address"}
-               iconRight="FeatherMapPin"
-               variant="neutral-secondary"
-               onClick={() => setAddresses(pushAddressField(addresses))}
-             /> :
-            <ContactAddressForm
-              disabled={loading || AILoading}
-              addresses={addresses}
-              setAddresses={setAddresses}
-              onAddButtonClick={() => setAddresses(pushAddressField(addresses))}
-              onRemoveButtonClick={() => setAddresses(addresses.slice(0, addresses.length - 1))}
+              title={"Add Address"}
+              iconRight="FeatherMapPin"
+              variant="neutral-secondary"
+              onClick={() => setAddresses(pushAddressField(addresses))}
             />
-          }
+          </ContactAddressForm>
           <Button
             loading={loading}
             disabled={loading || AILoading}

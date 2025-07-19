@@ -1,70 +1,58 @@
-import SubframeCore from "@subframe/core";
-import TextInput from "./TextInput";
-import RemoveButton from "./RemoveButton";
-import AddButton from "./AddButton";
-import FieldMarker from "./FieldMarker";
-import { StringField } from "../types";
-import { editAt } from "./tools";
+import { TextField } from "@/subframe/components/TextField"
+import SubframeCore, { IconName } from "@subframe/core"
+import { Base } from "../types"
+import RemoveButton from "./RemoveButton"
+import AddButton from "./AddButton"
 
 export default function SimpleContactForm(props: {
-  variant: "phone" | "email",
-  onAddButtonClick: () => void,
-  onRemoveButtonClick: () => void,
-  objects: StringField[],
-  setObjects: (object: StringField[]) => void,
-  disabled: boolean
+  value: string,
+  error?: string,
+  iconName: IconName,
+  onChange: (obj: Base) => void,
+  title: string,
+  onRemoval?: () => void,
+  disabled: boolean,
+  onButtonCollapse?: () => void,
 }) {
+  if (props.onButtonCollapse)
+    return (
+      <AddButton
+        disabled={props.disabled}
+        title={"Add "+props.title}
+        iconRight={props.iconName}
+        variant="neutral-secondary"
+        onClick={props.onButtonCollapse}
+      />
+  )
+
   return (
-    <div className="flex w-full flex-col items-end justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-      <div className="flex w-full items-end justify-between">
+    <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+      <div className="flex w-full flex-col items-start">
         <div className="flex items-center justify-center gap-2">
           <SubframeCore.Icon
-            className="text-caption-bold font-caption-bold text-default-font"
-            name={props.variant === "phone" ? "FeatherPhone" : "FeatherAtSign"}
+            className="text-body font-body text-default-font"
+            name={props.iconName}
           />
           <span className="text-caption-bold font-caption-bold text-default-font">
-            {capitalize(props.variant)}
+            {props.title}
           </span>
         </div>
       </div>
+      <TextField
+        className="h-auto w-full flex-none"
+        helpText={props.error}
+        error={!!props.error}
+        disabled= {props.disabled}
+      >
+        <TextField.Input
+          placeholder={props.title}
+          value={props.value}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onChange({value: event.target.value})}
+        />
+      </TextField>
       {
-        props.objects.map((obj, index) =>(
-          <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
-            <FieldMarker
-              initialize={obj.marker.value}
-              disabled={props.disabled}
-              error={obj.marker.error}
-              value={obj.marker.value}
-              onChange={value =>
-                props.setObjects(editAt(props.objects, index, {
-                  field: {...obj.field},
-                  marker: {value}
-                }))
-              }
-            />
-            <TextInput
-              error={obj.field.error}
-              disabled={props.disabled}
-              placeholder={props.variant}
-              value={obj.field.value}
-              onChange={value =>
-                props.setObjects(editAt(props.objects, index, {
-                  field: {value},
-                  marker: {...obj.marker}
-                }))
-            }
-            />
-            {
-              (props.variant === "phone" && index + 1 === 1) ? null : <RemoveButton onClick={props.onRemoveButtonClick}/>
-            }
-          </div>
-        ))
+        props.onRemoval && <RemoveButton onClick={props.onRemoval}/>
       }
-      <AddButton disabled={props.disabled} title={capitalize(props.variant)} onClick={props.onAddButtonClick}/>
     </div>
-  );
-}
-
-function capitalize(word: string): string {
-  return word[0].toUpperCase() + word.slice(1);
+  )
 }
