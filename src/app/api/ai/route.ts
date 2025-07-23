@@ -8,7 +8,7 @@ export async function GET() {
     Generate a completely random and unique set of contact information for a fictional person. Avoid clichés, obvious patterns, and recycled formats. The data should feel realistic and unpredictable, not generic.
     Make sure the data is diverse and globally representative, using believable formats, but avoid obvious patterns or clichés like “John Smith” or “123 Main St.” Names, and locations should feel authentic, original, and varied.
     Use creative combinations of names and locations, and ensure the contact does not resemble placeholder data or templates.
-    Phone numbers can be from anywhere in the world, but just numbers
+    Phone numbers can be from anywhere in the world, but just numbers.
   `
 
   const response = await ai.models.generateContent({
@@ -21,6 +21,10 @@ export async function GET() {
         properties: {
           name: {
             type: Type.STRING,
+          },
+          birthday: {
+            type: Type.STRING,
+            nullable: true
           },
           phoneNumbers: {
             type: Type.ARRAY,

@@ -32,15 +32,18 @@ export default function Drawer({initialize = {
   initialize?: MappedContact 
 }) {
   const [contactName, setContactName] = useState<Base>(initialize.name);
-  const [birthday, setBirthday] = useState<Base>();
+  const [birthday, setBirthday] = useState<Base | undefined>(initialize.birthday);
   const [phones, setPhones] = useState<StringField[]>(initialize.phoneNumbers);
   const [emails, setEmails] = useState<StringField[]>(initialize.emails);
   const [addresses, setAddresses] = useState<AddressField[]>(initialize.addresses);
   const [loading, setLoading] = useState(false);
 
+  console.log(birthday)
+
   const { loading: AILoading, error: AIError, fetch: AIFetch} = useAIFetch(
     data => {
       setContactName({value: data.name});
+      setBirthday({value: data.birthday})
       setPhones(data.phoneNumbers.map((it: any) => {
         return {
           marker: {
@@ -128,6 +131,10 @@ export default function Drawer({initialize = {
         continue;
       }
 
+      if (key.includes("phoneNumbers") && !key.includes("[")) {
+        showNotification("Create a phone number to start", "error");
+        return;
+      }
       const parts = key.split("[");
       const field = parts[0];
 
@@ -189,6 +196,7 @@ export default function Drawer({initialize = {
         <div className="flex h-px w-full flex-none flex-col items-center bg-neutral-border" />
         <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-4">
           <SimpleContactForm
+            type="text"
             iconName={"FeatherUser"}
             title="Contact name"
             disabled={loading || AILoading}
@@ -197,13 +205,14 @@ export default function Drawer({initialize = {
             onChange={setContactName}
           />
           <SimpleContactForm
+            type="date"
             iconName={"FeatherCake"}
             title="Birthday"
             disabled={loading || AILoading}
-            value={contactName.value}
-            error={contactName.error}
-            onChange={setContactName}
-            onButtonCollapse={birthday ? undefined : (() => setBirthday({value: ""}))}
+            value={birthday?.value ?? ""}
+            error={birthday?.error}
+            onChange={setBirthday}
+            onButtonCollapse={birthday ? undefined : () => setBirthday({value: ""})}
             onRemoval={() => setBirthday(undefined)}
           />
           <CompoundContactForm
@@ -275,7 +284,7 @@ export default function Drawer({initialize = {
                   headers: {
                     "Content-Type": "application/json"
                   },
-                  body: JSON.stringify(buildContactJson(contactName.value, phones, emails, addresses))
+                  body: JSON.stringify(buildContactJson(contactName.value, phones, emails, addresses, birthday))
                 });
 
                 if (!request.ok) {
@@ -315,9 +324,11 @@ function buildContactJson(
   contactName: string,
   phones: StringField[],
   emails: StringField[],
-  addresses: AddressField[]
-): Contact {
+  addresses: AddressField[],
+  birthday?: Base
+): Omit<Contact, "addedOn"> {
   return {
+    ...(birthday ? {birthday: birthday.value} : {}),
     name: contactName,
     phoneNumbers: phones.reduce((prev, curr) => ({
       ...prev,
