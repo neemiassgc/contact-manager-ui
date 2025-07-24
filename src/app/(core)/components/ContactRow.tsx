@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { ContactTableRow } from "./types";
 import NotificationContext from "./NotificationContext";
+import SubframeCore from "@subframe/core";
 
 export default function ContactRow(props: {
   contact: ContactTableRow,
@@ -35,9 +36,13 @@ export default function ContactRow(props: {
       {
         Object.values(props.contact).slice(2).map((value, index) =>
           <Table.Cell key={index}>
-            <span className="whitespace-nowrap text-body font-body text-neutral-500">
-              {value}
-            </span>
+            {
+              !value ?
+              <SubframeCore.Icon className="text-body font-body text-default-font text-xl" name="FeatherX"/> :
+              <span className="whitespace-nowrap text-body font-body text-neutral-500">
+                {value}
+              </span>
+            }
           </Table.Cell>
         )
       }
