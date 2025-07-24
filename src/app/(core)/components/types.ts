@@ -32,6 +32,7 @@ export interface Contact {
   name: string,
   addedOn: string,
   birthday?: string,
+  company?: string,
   phoneNumbers: IndexedString,
   addresses: IndexedAddress,
   emails: IndexedString

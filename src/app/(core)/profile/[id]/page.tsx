@@ -13,7 +13,7 @@ export default async function Page(props: {
   const { id } = await props.params;
   const response = await authorizedFetch(process.env.RESOURCE_SERVER+"/api/contacts/"+id)
   const contact: ContactWithId = await response.json();
-
+  
   return (
     <div className="flex h-full w-full flex-col items-start bg-default-background overflow-auto">
       <div className="flex w-full flex-wrap items-start justify-between border-b border-solid border-neutral-border px-6 py-6">
@@ -41,11 +41,14 @@ export default async function Page(props: {
               }
             </div>
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
-              <DataFieldHorizontal icon="FeatherBuilding" label="Company">
-                <span className="whitespace-nowrap text-body font-body text-default-font">
-                  TechCorp Solutions
-                </span>
-              </DataFieldHorizontal>
+              {
+                contact.company &&
+                <DataFieldHorizontal icon="FeatherBuilding" label="Company">
+                  <span className="whitespace-nowrap text-body font-body text-default-font">
+                    {contact.company}
+                  </span>
+                </DataFieldHorizontal>
+              }
               <DataFieldHorizontal icon="FeatherBriefcase" label="Role">
                 <span className="whitespace-nowrap text-body font-body text-default-font">
                   Product Manager

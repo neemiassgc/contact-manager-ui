@@ -33,17 +33,17 @@ export default function Drawer({initialize = {
 }) {
   const [contactName, setContactName] = useState<Base>(initialize.name);
   const [birthday, setBirthday] = useState<Base | undefined>(initialize.birthday);
+  const [company, setCompany] = useState<Base | undefined>(initialize.company);
   const [phones, setPhones] = useState<StringField[]>(initialize.phoneNumbers);
   const [emails, setEmails] = useState<StringField[]>(initialize.emails);
   const [addresses, setAddresses] = useState<AddressField[]>(initialize.addresses);
   const [loading, setLoading] = useState(false);
 
-  console.log(birthday)
-
   const { loading: AILoading, error: AIError, fetch: AIFetch} = useAIFetch(
     data => {
       setContactName({value: data.name});
-      setBirthday({value: data.birthday})
+      setBirthday({value: data.birthday});
+      setCompany({value: data.company});
       setPhones(data.phoneNumbers.map((it: any) => {
         return {
           marker: {
@@ -123,11 +123,16 @@ export default function Drawer({initialize = {
     const emailsCopy = fullStringFieldCopy(emails);
     const addressesCopy = fullAddressFieldCopy(addresses);
     const contactNameCopy = {...contactName};
+    const companyCopy = {...company};
 
-    
     for (const key of Object.keys(fieldErrors.fieldViolations)) {
       if (key === "name") {
         contactNameCopy.error = fieldErrors.fieldViolations[key][0];
+        continue;
+      }
+
+      if (key === "company") {
+        companyCopy.error = fieldErrors.fieldViolations[key][0];
         continue;
       }
 
@@ -177,6 +182,7 @@ export default function Drawer({initialize = {
     setEmails(emailsCopy);
     setContactName(contactNameCopy);
     setAddresses(addressesCopy);
+    setCompany(companyCopy as Base);
   }
 
   return (
@@ -214,6 +220,17 @@ export default function Drawer({initialize = {
             onChange={setBirthday}
             onButtonCollapse={birthday ? undefined : () => setBirthday({value: ""})}
             onRemoval={() => setBirthday(undefined)}
+          />
+          <SimpleContactForm
+            type="text"
+            iconName={"FeatherBuilding"}
+            title="Company"
+            disabled={loading || AILoading}
+            value={company?.value ?? ""}
+            error={company?.error}
+            onChange={setCompany}
+            onButtonCollapse={company ? undefined : () => setCompany({value: ""})}
+            onRemoval={() => setCompany(undefined)}
           />
           <CompoundContactForm
             disabled={loading || AILoading}
@@ -284,7 +301,7 @@ export default function Drawer({initialize = {
                   headers: {
                     "Content-Type": "application/json"
                   },
-                  body: JSON.stringify(buildContactJson(contactName.value, phones, emails, addresses, birthday))
+                  body: JSON.stringify(buildContactJson(contactName.value, phones, emails, addresses, birthday, company))
                 });
 
                 if (!request.ok) {
@@ -325,10 +342,12 @@ function buildContactJson(
   phones: StringField[],
   emails: StringField[],
   addresses: AddressField[],
-  birthday?: Base
+  birthday?: Base,
+  company?: Base
 ): Omit<Contact, "addedOn"> {
   return {
     ...(birthday ? {birthday: birthday.value} : {}),
+    ...(company ? {company: company.value} : {}),
     name: contactName,
     phoneNumbers: phones.reduce((prev, curr) => ({
       ...prev,

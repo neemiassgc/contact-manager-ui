@@ -11,7 +11,7 @@ export default function Notification(props: {
 
   return (
     <Alert
-      className="absolute top-0 left-0 w-fit"
+      className="absolute top-0 left-0 w-full"
       variant={props.variant}
       title={props.title}
       actions={

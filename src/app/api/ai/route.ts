@@ -26,6 +26,10 @@ export async function GET() {
             type: Type.STRING,
             nullable: true
           },
+          company: {
+            type: Type.STRING,
+            nullable: true
+          },
           phoneNumbers: {
             type: Type.ARRAY,
             items: {

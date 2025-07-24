@@ -52,6 +52,7 @@ export default function TopRow(props: { contact: ContactWithId }) {
 function transformContact(contact: Contact): MappedContact {
   return {
     ...(contact.birthday ? { birthday: { value: contact.birthday } } : {}),
+    ...(contact.company ? { company: { value: contact.company } } : {}),
     name: { value: contact.name },
     phoneNumbers: Object.keys(contact.phoneNumbers).map(key => ({
       marker: { value: key },
