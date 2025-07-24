@@ -1,6 +1,7 @@
 import { Table } from "@/subframe/components/Table";
 import ContactRow from "./ContactRow";
-import type { ContactWithId, Variant } from "./types";
+import type { ContactWithId } from "./types";
+import SubframeCore, { IconName } from "@subframe/core";
 
 export default function TableContent(props: {
   reloadContacts: (loading: boolean) => void,
@@ -13,11 +14,11 @@ export default function TableContent(props: {
       <Table
         header={
           <Table.HeaderRow>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Phone</Table.HeaderCell>
-            <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Company</Table.HeaderCell>
-            <Table.HeaderCell>Role</Table.HeaderCell>
+            <Table.HeaderCell className="flex items-center"><SimpleIcon name="FeatherUser"/> Name</Table.HeaderCell>
+            <Table.HeaderCell className="flex items-center"><SimpleIcon name="FeatherPhone"/> Phone</Table.HeaderCell>
+            <Table.HeaderCell className="flex items-center"><SimpleIcon name="FeatherMail"/> Email</Table.HeaderCell>
+            <Table.HeaderCell className="flex items-center"><SimpleIcon name="FeatherBuilding"/> Company</Table.HeaderCell>
+            <Table.HeaderCell className="flex items-center"><SimpleIcon name="FeatherBriefcase"/> Role</Table.HeaderCell>
             <Table.HeaderCell />
           </Table.HeaderRow>
         }
@@ -44,7 +45,7 @@ export default function TableContent(props: {
                         name: contact.name,
                         phone: Object.values(contact.phoneNumbers)[0],
                         email: isNotEmpty(contact.emails) ? Object.values(contact.emails)[0] : "",
-                        company: "TechCorp Solutions",
+                        company: contact.company ?? "",
                         role: "Product Manager"
                       }}
                     />
@@ -83,4 +84,8 @@ function groupByAlphabeticalOrder(contacts: ContactWithId[]): ContactWithId[][] 
   }
 
   return output;
+}
+
+function SimpleIcon({ name }: { name: IconName }) {
+  return <SubframeCore.Icon className="text-body font-body text-default-font mr-2" name={name}/> 
 }
