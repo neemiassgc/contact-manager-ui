@@ -7,11 +7,11 @@ export default function Notification(props: {
   variant?: Variant,
   title: string,
 }) {
-  setTimeout(props.onDispose, 3000);
+  setTimeout(props.onDispose, 5000);
 
   return (
     <Alert
-      className="absolute top-0 left-0 w-full"
+      className="absolute bottom-0 left-0 w-fit mb-5 ml-5 z-10"
       variant={props.variant}
       title={props.title}
       actions={
