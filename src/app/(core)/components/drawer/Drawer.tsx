@@ -34,6 +34,7 @@ export default function Drawer({initialize = {
   const [contactName, setContactName] = useState<Base>(initialize.name);
   const [birthday, setBirthday] = useState<Base | undefined>(initialize.birthday);
   const [company, setCompany] = useState<Base | undefined>(initialize.company);
+  const [role, setRole] = useState<Base | undefined>(initialize.role);
   const [phones, setPhones] = useState<StringField[]>(initialize.phoneNumbers);
   const [emails, setEmails] = useState<StringField[]>(initialize.emails);
   const [addresses, setAddresses] = useState<AddressField[]>(initialize.addresses);
@@ -44,6 +45,7 @@ export default function Drawer({initialize = {
       setContactName({value: data.name});
       setBirthday({value: data.birthday});
       setCompany({value: data.company});
+      setRole({value: data.role});
       setPhones(data.phoneNumbers.map((it: any) => {
         return {
           marker: {
@@ -124,6 +126,7 @@ export default function Drawer({initialize = {
     const addressesCopy = fullAddressFieldCopy(addresses);
     const contactNameCopy = {...contactName};
     const companyCopy = {...company};
+    const roleCopy = {...role};
 
     for (const key of Object.keys(fieldErrors.fieldViolations)) {
       if (key === "name") {
@@ -133,6 +136,11 @@ export default function Drawer({initialize = {
 
       if (key === "company") {
         companyCopy.error = fieldErrors.fieldViolations[key][0];
+        continue;
+      }
+
+       if (key === "role") {
+        roleCopy.error = fieldErrors.fieldViolations[key][0];
         continue;
       }
 
@@ -183,6 +191,7 @@ export default function Drawer({initialize = {
     setContactName(contactNameCopy);
     setAddresses(addressesCopy);
     setCompany(companyCopy as Base);
+    setRole(roleCopy as Base);
   }
 
   return (
@@ -231,6 +240,17 @@ export default function Drawer({initialize = {
             onChange={setCompany}
             onButtonCollapse={company ? undefined : () => setCompany({value: ""})}
             onRemoval={() => setCompany(undefined)}
+          />
+          <SimpleContactForm
+            type="text"
+            iconName={"FeatherBriefcase"}
+            title="Role"
+            disabled={loading || AILoading}
+            value={role?.value ?? ""}
+            error={role?.error}
+            onChange={setRole}
+            onButtonCollapse={role ? undefined : () => setRole({value: ""})}
+            onRemoval={() => setRole(undefined)}
           />
           <CompoundContactForm
             disabled={loading || AILoading}
@@ -301,7 +321,7 @@ export default function Drawer({initialize = {
                   headers: {
                     "Content-Type": "application/json"
                   },
-                  body: JSON.stringify(buildContactJson(contactName.value, phones, emails, addresses, birthday, company))
+                  body: JSON.stringify(buildContactJson(contactName.value, phones, emails, addresses, birthday, company, role))
                 });
 
                 if (!request.ok) {
@@ -343,11 +363,13 @@ function buildContactJson(
   emails: StringField[],
   addresses: AddressField[],
   birthday?: Base,
-  company?: Base
+  company?: Base,
+  role?: Base
 ): Omit<Contact, "addedOn"> {
   return {
     ...(birthday ? {birthday: birthday.value} : {}),
     ...(company ? {company: company.value} : {}),
+    ...(role ? {role: role.value} : {}),
     name: contactName,
     phoneNumbers: phones.reduce((prev, curr) => ({
       ...prev,

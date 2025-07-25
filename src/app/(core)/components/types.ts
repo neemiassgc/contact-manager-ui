@@ -33,6 +33,7 @@ export interface Contact {
   addedOn: string,
   birthday?: string,
   company?: string,
+  role?: string,
   phoneNumbers: IndexedString,
   addresses: IndexedAddress,
   emails: IndexedString

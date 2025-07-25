@@ -6,6 +6,7 @@ import BreadcrumbsNavigator from "./components/BreadcrumbsNavigator";
 import TopRow from "./components/TopRow";
 import InformationSection from "./components/InformationSection";
 import AddressSection from "./components/AddressSection";
+import SubframeCore from "@subframe/core";
 
 export default async function Page(props: {
   params: Promise<{ id: string }>
@@ -31,27 +32,21 @@ export default async function Page(props: {
                   {formatToLegibleDate(contact.addedOn)}                  
                 </span>
               </DataFieldHorizontal>
-              {
-                contact.birthday &&
-                <DataFieldHorizontal icon="FeatherCake" label="Birthday">
-                  <span className="whitespace-nowrap text-body font-body text-default-font">
-                    {formatToLegibleDate(contact.birthday)}
-                  </span>
-                </DataFieldHorizontal>
-              }
+              <DataFieldHorizontal icon="FeatherCake" label="Birthday">
+                <span className="whitespace-nowrap text-body font-body text-default-font">
+                  {contact.birthday ? formatToLegibleDate(contact.birthday) : <IconX/>}
+                </span>
+              </DataFieldHorizontal>
             </div>
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">
-              {
-                contact.company &&
-                <DataFieldHorizontal icon="FeatherBuilding" label="Company">
-                  <span className="whitespace-nowrap text-body font-body text-default-font">
-                    {contact.company}
-                  </span>
-                </DataFieldHorizontal>
-              }
+              <DataFieldHorizontal icon="FeatherBuilding" label="Company">
+                <span className="whitespace-nowrap text-body font-body text-default-font">
+                  {contact.company ?? <IconX/>}
+                </span>
+              </DataFieldHorizontal>
               <DataFieldHorizontal icon="FeatherBriefcase" label="Role">
                 <span className="whitespace-nowrap text-body font-body text-default-font">
-                  Product Manager
+                  {contact.role ?? <IconX/>}
                 </span>
               </DataFieldHorizontal>
             </div>
@@ -74,4 +69,8 @@ function formatToLegibleDate(ISO8601Date: string): string {
     month: "long",
     day: "numeric"
   })
+}
+
+function IconX() {
+  return <SubframeCore.Icon className="text-body font-body text-default-font text-xl" name="FeatherX"/>;
 }

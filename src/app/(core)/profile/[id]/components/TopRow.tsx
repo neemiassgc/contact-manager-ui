@@ -53,6 +53,7 @@ function transformContact(contact: Contact): MappedContact {
   return {
     ...(contact.birthday ? { birthday: { value: contact.birthday } } : {}),
     ...(contact.company ? { company: { value: contact.company } } : {}),
+    ...(contact.role ? { role: { value: contact.role } } : {}),
     name: { value: contact.name },
     phoneNumbers: Object.keys(contact.phoneNumbers).map(key => ({
       marker: { value: key },

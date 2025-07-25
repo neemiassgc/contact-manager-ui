@@ -46,7 +46,7 @@ export default function TableContent(props: {
                         phone: Object.values(contact.phoneNumbers)[0],
                         email: isNotEmpty(contact.emails) ? Object.values(contact.emails)[0] : "",
                         company: contact.company ?? "",
-                        role: "Product Manager"
+                        role: contact.role ?? ""
                       }}
                     />
                   )
