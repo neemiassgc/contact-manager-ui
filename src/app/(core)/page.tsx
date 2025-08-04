@@ -58,7 +58,7 @@ export default function Page() {
               </div>
             </div>
             {
-              loading || error ? <Feedback message={error ? error : "loading..."} error={!!error}/> :
+              loading || error ? <WakeUpLoader error={error}/> :
               <TableContent
                 grouped={grouped}
                 content={filterByExpression(data, searchExpression)}
@@ -91,4 +91,21 @@ export default function Page() {
 function filterByExpression(contacts: ContactWithId[], expression: string): ContactWithId[] {
   if (expression.length === 0) return contacts;
   return contacts.filter((contact) => contact.name.toLowerCase().includes(expression.toLowerCase()));
+}
+
+function WakeUpLoader({error, initNumber = 23}: { error: string | null, initNumber?: number }) {
+  const [countdown, setCountdown] = useState(initNumber);
+
+  const loadingFeedback = <Feedback message={error ? error : "Loading data..."} error={!!error}/>
+
+  if (countdown > 0) {
+    setTimeout(() => {
+      setCountdown(countdown - 1);
+    }, 1000);
+
+    if (countdown <= initNumber - 3)
+      return <Feedback message={`Waking up the server... ${countdown}s`} error={false}/>
+  }
+
+  return loadingFeedback;
 }
