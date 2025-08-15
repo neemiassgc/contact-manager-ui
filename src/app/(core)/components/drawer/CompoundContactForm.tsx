@@ -36,7 +36,6 @@ export default function CompoundContactForm(props: {
         props.objects.map((obj, index) =>(
           <div key={index} className="flex w-full items-center justify-end gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <FieldMarker
-              initialize={obj.marker.value}
               disabled={props.disabled}
               error={obj.marker.error}
               value={obj.marker.value}

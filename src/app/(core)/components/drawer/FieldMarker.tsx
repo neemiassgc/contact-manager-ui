@@ -1,29 +1,24 @@
 import { Badge } from "@/subframe/components/Badge";
 import { TextField } from "@/subframe/components/TextField";
 import SubframeCore from "@subframe/core";
-import { useState } from "react";
 
-export default function FieldMarker({initialize = "mark", ...props}: {
+export default function FieldMarker(props: {
   value: string,
   onChange: (value: string) => void,
   error: string | undefined,
-  disabled: boolean,
-  initialize?: string
+  disabled: boolean
 }) {
-  const [marker, setMarker] = useState(initialize);
-
   const checkedError: boolean = props.error !== undefined && props.error.length > 0;
 
   return (
     <SubframeCore.Popover.Root>
       <SubframeCore.Popover.Trigger asChild={true}>
         <Badge variant={checkedError ? "error" : "neutral"} iconRight="FeatherChevronDown">
-          {marker}
+          {props.value}
         </Badge>
       </SubframeCore.Popover.Trigger>
       <SubframeCore.Popover.Portal>
         <SubframeCore.Popover.Content
-          onInteractOutside={() => setMarker(props.value)}
           side="bottom"
           align="center"
           sideOffset={4}

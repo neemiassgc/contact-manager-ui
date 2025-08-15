@@ -36,7 +36,6 @@ export default function ContactAddressForm(props: {
           <div key={index} className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
             <div className="flex w-full items-center justify-between">
               <FieldMarker
-                initialize={address.marker.value}
                 disabled={props.disabled}
                 error={address.marker.error}
                 value={address.marker.value}
