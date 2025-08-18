@@ -8,6 +8,8 @@ import { IconButton } from "@/subframe/components/IconButton";
 import { Avatar } from "@/subframe/components/Avatar";
 import Image from "next/image";
 import { TopbarWithLeftNav } from "../components/TopbarWithLeftNav";
+import { useMediaQuery } from "@uidotdev/usehooks";
+import { useRouter } from "next/navigation";
 
 interface DefaultPageLayoutRootProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -24,9 +26,7 @@ const DefaultPageLayoutRoot = React.forwardRef<
   { children, className, ...otherProps }: DefaultPageLayoutRootProps,
   ref
 ) {
-  const [mobile, setMobile] = useState(true);
-
-  setTimeout(() => setMobile(!mobile), 3000)
+  const isSmallDevice = useMediaQuery("(max-width: 768px)")
 
   const logoImage = (
     <Image
@@ -40,13 +40,13 @@ const DefaultPageLayoutRoot = React.forwardRef<
   return (
     <div
       className={SubframeCore.twClassNames(
-        `flex h-screen w-full ${mobile ? "flex-col items-center" : "items-start"}`,
+        `flex h-screen w-full ${isSmallDevice ? "flex-col items-center" : "items-start"}`,
         className
       )}
       ref={ref as any}
       {...otherProps}
     >
-      { mobile ?
+      { isSmallDevice ?
         <TopbarWithLeftNav
           leftSlot={
             <div className="flex gap-6">
@@ -74,7 +74,7 @@ const DefaultPageLayoutRoot = React.forwardRef<
       }
       {children ? (
         <div
-        className={`flex w-full grow shrink-0 basis-0 flex-col items-start overflow-y-auto bg-default-background ${mobile ? "w-full gap-4" : "gap-2 self-stretch"}`}>
+        className={`flex w-full grow shrink-0 basis-0 flex-col items-start overflow-y-auto bg-default-background ${isSmallDevice ? "w-full gap-4" : "gap-2 self-stretch"}`}>
           {children}
         </div>
       ) : null}
@@ -137,6 +137,8 @@ function ProfileButtons(props: { username: string, picture: string, flexCol?: bo
 }
 
 function HomeButton() {
+  const nextRouter = useRouter();
+
   return (
     <SubframeCore.Tooltip.Provider>
       <SubframeCore.Tooltip.Root>
@@ -145,7 +147,7 @@ function HomeButton() {
             <IconButton
               variant="brand-secondary"
               icon="FeatherHome"
-              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
+              onClick={() => nextRouter.push("/")}
             />
           </div>
         </SubframeCore.Tooltip.Trigger>
