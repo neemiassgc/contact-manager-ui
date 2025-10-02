@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 
-export function useFetchWithEffect(url: string) {
+export function useGetContacts() {
   const [data, setData] = useState<null | any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const url = "/api/contacts";
 
   const dataRetrieval = (withLoading: boolean = true) =>
     fetchData(url, withLoading, setLoading, setError, setData);
@@ -11,7 +13,7 @@ export function useFetchWithEffect(url: string) {
   useEffect(dataRetrieval, [url]);
 
   return { data, loading, error, reload: dataRetrieval };
-};
+}
 
 export function useAIFetch(onComplete: (data: any) => void) {
   const [loading, setLoading] = useState(false);

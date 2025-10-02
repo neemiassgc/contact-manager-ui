@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
-import { useFetchWithEffect } from "./hooks";
+import { useGetContacts } from "./hooks";
 import { ContactWithId } from "./components/types";
 import Drawer from "./components/drawer/Drawer"
 import BreadcrumbsBox from "./components/BreadcrumbsBox";
@@ -13,7 +13,7 @@ import { IconButton } from "@/subframe/components/IconButton";
 
 export default function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
-  const { data, loading, error, reload } = useFetchWithEffect("/api/contacts");
+  const { data, loading, error, reload } = useGetContacts();
   const [grouped, setGrouped] = useState(false);
   const [searchExpression, setSearchExpression] = useState("");
 
