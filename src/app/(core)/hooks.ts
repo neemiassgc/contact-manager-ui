@@ -36,10 +36,9 @@ function fetchData(
   setLoading(withLoading);
   setError(null);
   fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+    .then(async response => {
+      if (!response.ok)
+        throw new Error(await response.text());
       return response.json();
     })
     .then(result => {

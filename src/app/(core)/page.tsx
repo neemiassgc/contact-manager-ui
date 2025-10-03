@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField } from "@/subframe/components/TextField";
 import { Button } from "@/subframe/components/Button";
 import { useGetContacts } from "./hooks";
@@ -10,12 +10,22 @@ import BreadcrumbsBox from "./components/BreadcrumbsBox";
 import Feedback from "./components/Feedback";
 import TableContent from "./components/TableContent";
 import { IconButton } from "@/subframe/components/IconButton";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 export default function Page() {
   const [openContactDrawer, setOpenContactDrawer] = useState(false);
   const { data, loading, error, reload } = useGetContacts();
   const [grouped, setGrouped] = useState(false);
   const [searchExpression, setSearchExpression] = useState("");
+  const user = useUser();
+
+  useEffect(() => {
+    if (!loading && !data && error) {
+      if (error === "User not found") {
+        saveNewUser(user!.user!.nickname as string, () => reload(true));
+      }
+    }
+  }, [loading, data, error, user, reload])
 
   return (
     <>
@@ -58,7 +68,9 @@ export default function Page() {
               </div>
             </div>
             {
-              loading || error ? <ContentLoader error={error}/> :
+              loading ? <ContentLoader message={"Loading data..."}/> :
+              error && error === "User not found" ? <ContentLoader message={`Creating user...`}/> :
+              error ? <ContentLoader error message={error}/> :
               <TableContent
                 grouped={grouped}
                 content={filterByExpression(data, searchExpression)}
@@ -93,10 +105,21 @@ function filterByExpression(contacts: ContactWithId[], expression: string): Cont
   return contacts.filter((contact) => contact.name.toLowerCase().includes(expression.toLowerCase()));
 }
 
-function ContentLoader({error, initNumber = 23}: { error: string | null, initNumber?: number }) {
+function saveNewUser(username: string, onComplete: () => void) {
+  fetch("/api/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username }),
+  })
+    .finally(onComplete);
+}
+
+function ContentLoader({ message, error = false, initNumber = 23}: { message: string,error?: boolean, initNumber?: number }) {
   const [countdown, setCountdown] = useState(initNumber);
 
-  const loadingFeedback = <Feedback message={error ? error : "Loading data..."} error={!!error}/>
+  const loadingFeedback = <Feedback message={message} error={error}/>
 
   if (countdown > 0) {
     setTimeout(() => {
