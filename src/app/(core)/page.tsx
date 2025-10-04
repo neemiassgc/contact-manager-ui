@@ -19,13 +19,13 @@ export default function Page() {
   const [searchExpression, setSearchExpression] = useState("");
   const user = useUser();
 
+  const userAbsence = error === "User not found";
+
   useEffect(() => {
-    if (!loading && !data && error) {
-      if (error === "User not found") {
+    if (!loading && !data && error)
+      if (userAbsence)
         saveNewUser(user!.user!.nickname as string, () => reload(true));
-      }
-    }
-  }, [loading, data, error, user, reload])
+  }, [loading, data, error, reload, userAbsence, user])
 
   return (
     <>
@@ -39,7 +39,7 @@ export default function Page() {
             <div className="flex w-full items-center gap-2 sticky top-0 z-10 bg-[#ffffff]">
               <div className="flex grow shrink-0 basis-0 items-center gap-1">
                 <TextField
-                  disabled={loading}
+                  disabled={loading || userAbsence}
                   variant="filled"
                   icon="FeatherSearch"
                 >
@@ -52,14 +52,14 @@ export default function Page() {
               </div>
               <div className="flex items-center gap-5">
                 <IconButton
-                  disabled={loading}
+                  disabled={loading || userAbsence}
                   variant={grouped ? "brand-secondary" : "neutral-secondary"}
                   size="large"
                   icon={grouped ? "FeatherGrid3X3" : "FeatherGrid2X2"}
                   onClick={() => setGrouped(!grouped)}
                 />
                 <Button
-                  disabled={loading}
+                  disabled={loading || userAbsence}
                   icon="FeatherPlus"
                   onClick={() => setOpenContactDrawer(true)}
                 >
@@ -68,14 +68,16 @@ export default function Page() {
               </div>
             </div>
             {
-              loading ? <ContentLoader message={"Loading data..."}/> :
-              error && error === "User not found" ? <ContentLoader message={`Creating user...`}/> :
-              error ? <ContentLoader error message={error}/> :
+              !loading && !error ?
               <TableContent
                 grouped={grouped}
                 content={filterByExpression(data, searchExpression)}
                 reloadContacts={reload}
-              />
+              /> :
+              <ContentLoader message={
+                loading ? "Loading data..." :
+                error && userAbsence ? "Creating user..." : error as string
+              } />
             }
           </div>
           <span className="w-full text-[14px] font-[500] leading-[20px] text-subtext-color text-center">
