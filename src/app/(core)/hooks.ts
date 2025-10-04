@@ -37,7 +37,9 @@ function fetchData(
   setError(null);
   fetch(url)
     .then(async response => {
-      if (!response.ok)
+      if (response.status >= 500)
+        throw new Error("User not found");
+      else if (!response.ok)
         throw new Error(await response.text());
       return response.json();
     })
